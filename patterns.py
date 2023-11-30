@@ -1,7 +1,7 @@
 import array
 from app_config import item_destruction_patterns_paths, slots_pattern_path, slots_pattern_mask_path, \
     pickaxe_pattern_path, pickaxe_pattern_mask_path, eq_inventory_patterns_paths, chest_inventory_patterns_paths, \
-    items_quantity_pattern, axe_pattern_path, axe_pattern_mask_path
+    items_quantity_pattern, axe_pattern_path, axe_pattern_mask_path, items_patterns_paths
 from image_operations import convert_cv_image_to_gray, load_cv_image
 from logger import app_logger
 from typing import Dict, Any
@@ -130,7 +130,6 @@ def load_items_patterns() -> None:
 
     Processes the items' patterns, masks, and color versions for each item defined in `items_patterns_paths`, loads the quantity mask for items.
     """
-    global items_patterns_paths
     global items_quantity_mask
     try:
         items_quantity_mask =convert_cv_image_to_gray(load_cv_image(items_quantity_pattern))

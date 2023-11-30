@@ -4,6 +4,7 @@
 node_modules/
 /outputs/
 activities/__pycache__/
+/activities/__pycache__/
 
 *.log
 *.xcf

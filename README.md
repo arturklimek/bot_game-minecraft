@@ -50,6 +50,8 @@ The script's configuration is done through the config.yaml file.
 You can customize key settings such as time intervals, game commands, and specific function settings.
 By running the check_button_id.py script and pressing keys during its operation, you can check the button IDs, which is necessary to change the configuration.
 
+**NOTE**: Please note that the saved /home locations require the cursor to be perfectly aligned (at one of the positions 0, 90, 180, 270 degrees) so that when moving, the character moves perfectly along the initial coordinates.
+
 
 ### Known Issues:
 - Problem capturing screenshots of the game window when using full-screen mode - it is recommended to use in window mode.

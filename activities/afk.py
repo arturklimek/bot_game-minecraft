@@ -30,7 +30,6 @@ def get_afk_counter() -> int:
     """
     return afk_counter
 
-
 def afk() -> bool:
     """
     Simulates an AFK (Away From Keyboard) behavior based on a cofigurable flag and intervals.
@@ -43,23 +42,24 @@ def afk() -> bool:
     global afk_counter
     if get_afk_breaks_flag():
         app_logger.debug(f"afk_counter: {afk_counter}")
-        afk_counter = afk_counter - 1
-        if afk_counter <= 0:
-            time.sleep(5)
-            tp_to_spawn()
-            time.sleep(5)
-            afk_time = draw_afk_time()
-            app_logger.info(f"Drawed afk_time: {afk_time}")
-            time.sleep(afk_time)
-            afk_counter = draw_afk_interval()
-            app_logger.info(f"Drawed afk_counter: {afk_counter}")
-            return True
-        elif afk_counter is None:
+        if afk_counter is None:
             afk_counter = draw_afk_interval()
             app_logger.info(f"afk_counter is None, draw new value: {afk_counter}")
             return False
         else:
-            return False
+            afk_counter = afk_counter - 1
+            if afk_counter <= 0:
+                time.sleep(5)
+                tp_to_spawn()
+                time.sleep(5)
+                afk_time = draw_afk_time()
+                app_logger.info(f"Drawed afk_time: {afk_time}")
+                time.sleep(afk_time)
+                afk_counter = draw_afk_interval()
+                app_logger.info(f"Drawed afk_counter: {afk_counter}")
+                return True
+            else:
+                return False
     else:
         return False
 

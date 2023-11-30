@@ -4,7 +4,7 @@ import keyboard
 from app_config import get_command_sethome, get_command_home_tmp, get_command_spawn, \
     get_command_home_repair, get_command_home_mining, get_command_home_chest, get_command_home_farm, \
     get_command_sell_inventory, get_hotkey_enter, get_hotkey_chat, get_chat_messages_flag, \
-    get_chat_messages_frequency_min
+    get_chat_messages_frequency_min, get_chat_messages
 from delay import return_random_wait_interval_time
 from logger import app_logger
 
@@ -22,12 +22,12 @@ def send_chat_notification() -> None:
     app_logger.debug("send_chat_notification was used")
     try:
         current_time = datetime.now()
-        chat_messages_len = len(get_chat_messages_frequency_min()())
+        chat_messages_len = len(get_chat_messages())
         if get_chat_messages_flag() and current_time - last_message_time >= timedelta(minutes=get_chat_messages_frequency_min()) and chat_messages_len > 0:
             time.sleep(return_random_wait_interval_time(0.25, 1))
-            send_on_chat(get_chat_messages_flag()[chat_message_id])
+            send_on_chat(get_chat_messages()[chat_message_id])
             chat_message_id = chat_message_id + 1
-            if chat_messages_len <= chat_message_id:
+            if chat_message_id >= chat_messages_len:
                 chat_message_id = 0
             time.sleep(return_random_wait_interval_time(0.25, 1))
             last_message_time = current_time

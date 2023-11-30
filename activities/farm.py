@@ -6,6 +6,8 @@ import copy
 import time
 import keyboard
 import pyautogui
+
+from activities.afk import afk, get_afk_counter
 from activities.chat import tp_to_farm_home, sellall_inventory, tp_to_spawn, set_tmp_home, tp_to_tmp_home
 from activities.eq_bar import get_item_slot_number, get_axe_image, check_axe_damage_to_repair, check_and_update_eq_coordinates
 from activities.repair import repair_item
@@ -39,7 +41,7 @@ def farm_procedure() -> None:
     try:
         if is_running_farm_procedure:
             app_logger.debug(f"farm_number is {get_farm_number()}")
-            for farm in range(get_farm_number()):
+            for farm in range(int(get_farm_number())):
                 repeat_farm = True
                 while repeat_farm:
                     repeat_farm = False
@@ -70,7 +72,7 @@ def farm_procedure() -> None:
                     keyboard.release("shift")
                     app_logger.debug(f"Release 'shift'")
                     app_logger.debug(f"farm_floors_number is {get_farm_floors_number()}")
-                    for floor in range(get_farm_floors_number()):
+                    for floor in range(int(get_farm_floors_number())):
                         keyboard.press_and_release(get_hotkeys_slots()[axe_slot])
                         app_logger.debug(f"Press and release {get_hotkeys_slots()[axe_slot]}")
                         time.sleep(0.2)
@@ -140,6 +142,26 @@ def farm_procedure() -> None:
                                 app_logger.debug("Taked check_axe_damage_to_repair is None")
                         else:
                             app_logger.debug(f"Taked axe_image_result is None")
+                        if get_tmp_home_flag():
+                            app_logger.debug(f"tmp_home_flag {get_tmp_home_flag()}")
+                            afk_counter = get_afk_counter()
+                            if afk_counter is not None:
+                                if get_afk_counter()-1 <= 0:
+                                    set_tmp_home()
+                                    time.sleep(return_random_wait_interval_time(0.2, 0.5))
+                                    afk()
+                                    time.sleep(return_random_wait_interval_time(0.5, 1))
+                                    tp_to_tmp_home()
+                                else:
+                                    afk()
+                            else:
+                                afk()
+                        else:
+                            if afk():
+                                if floor + 1 < get_farm_floors_number():
+                                    repeat_farm = True
+                                    app_logger.debug(f"repeat_farm was set to {repeat_farm}")
+                                    break
     except Exception as ex:
         app_logger.error(ex)
 

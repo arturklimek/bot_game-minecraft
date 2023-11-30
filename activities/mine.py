@@ -346,10 +346,6 @@ def mine_procedure() -> None:
     eq_check_counter = 3
     app_logger.debug(f"eq_check_counter was set to {eq_check_counter}")
     while is_running_mine_procedure:
-        current_time = datetime.now() # TODO: usunąć
-        if current_time.hour >= 4 and current_time.minute >= 50:
-            print("Stopping the program at 5:00")
-            os._exit(0)
         send_chat_notification()
         if moving_flag:
             if repair_flag:

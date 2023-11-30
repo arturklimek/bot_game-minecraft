@@ -208,7 +208,7 @@ def move_direction_and_mine() -> None:
     global moving_flag
     global current_moving_direction
     app_logger.debug("Starting move_direction")
-    tmp_moving_time = random.randint((get_moving_time()*0.8),(get_moving_time()*1.2))
+    tmp_moving_time = random.randint(int(get_moving_time()*0.8),int(get_moving_time()*1.2))
     app_logger.debug(f"tmp_moving_time was draw to value: {tmp_moving_time}")
     if is_running_mine_procedure and current_moving_direction:
         app_logger.debug(f"Pressing {current_moving_direction} for {get_moving_time()} seconds")

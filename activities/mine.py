@@ -5,7 +5,6 @@ import threading
 import time
 from datetime import datetime
 from typing import Optional
-
 import keyboard
 import pyautogui
 import activities.eq_bar

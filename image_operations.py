@@ -1,7 +1,6 @@
 from datetime import datetime
 import os
 from typing import Optional
-
 import cv2
 import numpy as np
 from PIL import Image, ImageGrab

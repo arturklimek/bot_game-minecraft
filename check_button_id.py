@@ -1,7 +1,6 @@
 import keyboard
 from keyboard import KeyboardEvent
 
-
 def print_pressed_keys(e: KeyboardEvent) -> None:
     """
     Prints the name and scan code of the pressed key.

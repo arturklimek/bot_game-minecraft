@@ -5,7 +5,6 @@ from clicker import click_right_mouse_button
 from delay import return_random_wait_interval_time
 from logger import app_logger
 
-
 def repair_item() -> None:
     """
     Initiates the item repair procedure.

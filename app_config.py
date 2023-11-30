@@ -1,6 +1,5 @@
 import os
 from typing import Dict, Set, List
-
 import yaml
 import urllib.parse
 from logger import app_logger

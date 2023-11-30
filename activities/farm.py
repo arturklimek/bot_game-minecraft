@@ -1,6 +1,5 @@
 import threading
 from typing import Optional, Tuple
-
 import activities.eq_bar
 import copy
 import time

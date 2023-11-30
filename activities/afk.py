@@ -19,6 +19,18 @@ def weighted_random_choice(values: list, weights: list) -> any:
     """
     return random.choices(values, weights=weights, k=1)[0]
 
+def get_afk_counter() -> int:
+    """
+    Retrieves the current value of the AFK (Away From Keyboard) counter.
+
+    This function returns the value of the global variable 'afk_counter', which tracks the number of times the AFK status has been detected or triggered.
+
+    Returns:
+        int: The current value of the AFK counter.
+    """
+    return afk_counter
+
+
 def afk() -> bool:
     """
     Simulates an AFK (Away From Keyboard) behavior based on a cofigurable flag and intervals.

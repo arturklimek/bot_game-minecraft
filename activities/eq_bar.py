@@ -40,7 +40,7 @@ def find_pickaxe_pattern(image: np.ndarray, threshold: float = 0.935) -> Optiona
             app_logger.debug(f'pickaxe was found in - top_left: {top_left} bottom_right: {bottom_right}')
             return top_left, bottom_right
         else:
-            app_logger.info('pickaxe pattern was not found.')
+            app_logger.debug('pickaxe pattern was not found.')
             return None
     except Exception as ex:
         app_logger.error(ex)
@@ -63,7 +63,7 @@ def find_eq_slots_pattern(image: np.ndarray, threshold: float = 0.9) -> Optional
         image_gray = convert_cv_image_to_gray(image)
         result = cv2.matchTemplate(image_gray, slots_patterns["slots_pattern"], cv2.TM_CCORR_NORMED, mask=slots_patterns["slots_pattern_mask"])
         _, max_val, _, max_loc = cv2.minMaxLoc(result)
-        app_logger.debug(f"pickaxe max_val: {max_val} max_loc: {max_loc}")
+        app_logger.debug(f"eq-slots max_val: {max_val} max_loc: {max_loc}")
         if max_val > threshold:
             top_left = max_loc
             w, h = slots_patterns["slots_pattern"].shape[1], slots_patterns["slots_pattern"].shape[0]
@@ -71,7 +71,7 @@ def find_eq_slots_pattern(image: np.ndarray, threshold: float = 0.9) -> Optional
             app_logger.debug(f'eq-slots was found in - top_left: {top_left} bottom_right: {bottom_right}')
             return top_left, bottom_right
         else:
-            app_logger.info('eq-slots pattern was not found.')
+            app_logger.debug('eq-slots pattern was not found.')
             return None
     except Exception as ex:
         app_logger.error(ex)
@@ -191,12 +191,12 @@ def check_pickaxe_damage_to_repair(image_pickaxe: Optional[np.ndarray] = None) -
             app_logger.debug("Taked image_pickaxe again is None - return")
             return None
     item_damage_id = analyze_damage_level(image_pickaxe)
-    app_logger.info(f"check_pickaxe_damage_to_repair - item_damage_id: {item_damage_id}")
+    app_logger.debug(f"check_pickaxe_damage_to_repair - item_damage_id: {item_damage_id}")
     if item_damage_id <= get_repair_threshold():
         app_logger.info(f"check_pickaxe_damage_to_repair: True")
         return True
     else:
-        app_logger.info(f"check_pickaxe_damage_to_repair: False")
+        app_logger.debug(f"check_pickaxe_damage_to_repair: False")
         return False
 
 def find_axe_pattern(image: np.ndarray, threshold: float = 0.95) -> Optional[Tuple[Tuple[int, int], Tuple[int, int]]]:
@@ -224,7 +224,7 @@ def find_axe_pattern(image: np.ndarray, threshold: float = 0.95) -> Optional[Tup
             app_logger.debug(f'axe was found in - top_left: {top_left} bottom_right: {bottom_right}')
             return top_left, bottom_right
         else:
-            app_logger.info('axe pattern was not found.')
+            app_logger.debug('axe pattern was not found.')
             return None
     except Exception as ex:
         app_logger.error(ex)
@@ -284,7 +284,7 @@ def check_axe_damage_to_repair(image_axe: Optional[np.ndarray] = None) -> Option
         app_logger.info(f"check_axe_damage_to_repair: True")
         return True
     else:
-        app_logger.info(f"check_axe_damage_to_repair: False")
+        app_logger.debug(f"check_axe_damage_to_repair: False")
         return False
 
 def check_and_update_eq_coordinates() -> None:

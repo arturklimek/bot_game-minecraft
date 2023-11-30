@@ -212,7 +212,7 @@ def set_items_stored_list(new_items_stored_list: List[str]) -> None:
     global items_stored_list
     items_stored_list = new_items_stored_list
 
-chat_messages_flag = False
+chat_messages_flag = True
 chat_messages = ['&6&lUWAGA! &f&lKupię &9&lMroczna Materia &7- &e&l2000&6&l$ &f&lza sztukę! &7- &b&l/msg MineArturVIP &7- &f&lNie ma mnie? Nie odpisuję? Napisz na DSC: &b&lMineArturVIP#6699 &f&llub do innego członka &7[&b&lS&f&lB&7&l-&f&lM&b&laf&9&lia&7]']
 chat_messages_frequency_min = 15
 
@@ -427,6 +427,7 @@ def get_config_dict():
     tmp_dict["sell_inventory_command"] = command_sell_inventory
     tmp_dict["autoclicker_delay_ms"] = autoclicker_delay_ms
     tmp_dict["afk_breaks"] = afk_breaks_flag
+    tmp_dict["farm_number"] = farm_number
     tmp_dict["farm_floors_number"] = farm_floors_number
     tmp_dict["farm_floor_time_moving"] = farm_floor_time_moving
     tmp_dict["game_hotkeys"] = {
@@ -478,6 +479,7 @@ def set_config_from_dict(config_dict):
     global command_sell_inventory
     global autoclicker_delay_ms
     global afk_breaks_flag
+    global farm_number
     global farm_floors_number
     global farm_floor_time_moving
     global hotkey_esc
@@ -516,6 +518,8 @@ def set_config_from_dict(config_dict):
             autoclicker_delay_ms = config_dict["autoclicker_delay_ms"]
         if "afk_breaks" in config_dict:
             afk_breaks_flag = config_dict["afk_breaks"]
+        if "farm_number" in config_dict:
+            farm_number = config_dict["farm_number"]
         if "farm_floors_number" in config_dict:
             farm_floors_number = config_dict["farm_floors_number"]
         if "farm_floor_time_moving" in config_dict:
@@ -562,6 +566,7 @@ comments = {
     'sell_inventory_command': f"# sell_inventory_command - Command to sell items, default value '{command_sell_inventory}' \n",
     'autoclicker_delay_ms': f"# autoclicker_delay_ms - Frequency used in autoclicker, default value '{autoclicker_delay_ms}' \n",
     'afk_breaks': f"# afk_breaks - True or False flag specifying whether random interrupts are to be used, default value '{afk_breaks_flag}' \n",
+    'farm_number': f"# farm_number - Number of farms used by the farm bot, default value '{farm_number}' \n",
     'farm_floors_number': f"# farm_floors_number - Number of floors handled by the farm bot, default value '{farm_floors_number}' \n",
     'farm_floor_time_moving': f"# farm_floor_time_moving - Time for the farm bot to move in a certain direction, default value '{farm_floor_time_moving}' \n",
     'game_hotkeys': f"# game_hotkeys - Setting ID hotkeys game settings \n#     'esc' - hotkey to close the window default value '{hotkey_esc}' \n#     'enter' - hotkey to send a message default value '{hotkey_enter}' \n#     'chat' - hotkey to open chat default value '{hotkey_chat}' \n#     'inventory' - hotkey to open and close the inventory default value '{hotkey_inventory}' \n#     'moving_up' - hotkey of moving forward default value '{hotkey_moving_up}' \n#     'moving_down' - hotkey moving backwards default value '{hotkey_moving_down}' \n#     'moving_left' - hotkey moving left default value '{hotkey_moving_left}' \n#     'moving_right' - hotkey moving to the right default value '{hotkey_moving_right}' \n",

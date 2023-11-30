@@ -1,0 +1,80 @@
+# APP CONFIG: 
+# afk_breaks - True or False flag specifying whether random interrupts are to be used, default value 'False' 
+afk_breaks: false
+# app_buttons - Application management button settings 
+#     'autoclicker_lpm' - setting the ID of the button that turns the left mouse button autoclicker on and off, default value '79' 
+#     'autoclicker_ppm' - setting the ID of the right mouse button autoclicker on and off button, default value '80 
+#     'mine' - setting the ID of the button to enable and disable the autoclicker procedure, default value '78 
+#     'farm' - setting the ID of the button that turns the autofarm procedure on and off, default value '69 
+app_buttons:
+  autoclicker_lpm: 79
+  autoclicker_ppm: 80
+  farm: 69
+  mine: 78
+# autoclicker_delay_ms - Frequency used in autoclicker, default value '10' 
+autoclicker_delay_ms: 10
+# chat_messages_flag - True or False flag to specify sending messages to the chat, default value 'False 
+chat_messages_flag: false
+# chat_messages_frequency_min - Frequency of sending chat messages, default value '15' 
+chat_messages_frequency_min: 15
+# chat_messages_list - List of messages sent to the chat 
+chat_messages_list:
+- '&6&lUWAGA! &f&lKupię &9&lMroczna Materia &7- &e&l2000&6&l$ &f&lza sztukę! &7- &b&l/msg
+  MineArturVIP &7- &f&lNie ma mnie? Nie odpisuję? Napisz na DSC: &b&lMineArturVIP#6699
+  &f&llub do innego członka &7[&b&lS&f&lB&7&l-&f&lM&b&laf&9&lia&7]'
+# eq_limit_to_stored - Determines the number of slots that start the procedure of putting items in the chest, default value '33' 
+eq_limit_to_stored: 33
+# farm_floor_time_moving - Time for the farm bot to move in a certain direction, default value '34' 
+farm_floor_time_moving: 34
+# farm_floors_number - Number of floors handled by the farm bot, default value '15' 
+farm_floors_number: 15
+# game_hotkeys - Setting ID hotkeys game settings 
+#     'esc' - hotkey to close the window default value '1' 
+#     'enter' - hotkey to send a message default value '28' 
+#     'chat' - hotkey to open chat default value '20' 
+#     'inventory' - hotkey to open and close the inventory default value '18' 
+#     'moving_up' - hotkey of moving forward default value '17' 
+#     'moving_down' - hotkey moving backwards default value '31' 
+#     'moving_left' - hotkey moving left default value '30' 
+#     'moving_right' - hotkey moving to the right default value '32' 
+game_hotkeys:
+  chat: 20
+  enter: 28
+  esc: 1
+  inventory: 18
+  moving_down: 31
+  moving_left: 30
+  moving_right: 32
+  moving_up: 17
+# homes - Teleport command settings to key locations used in the scrip. 
+#      'repair' - location used for repairing tools, default value '/home repair'. 
+#      'mining' - location of mining, default value '/home mine' 
+#      'chest' - location of the chest for depositing items, default value '/home chest'. 
+#      'farm' - farm location prefix, default value '/home farm' 
+#      'tmp' - tmp location prefix, default value '/home farm' 
+homes:
+  chest: /home chest
+  farm: /home farm
+  mining: /home mine
+  repair: /home repair
+  tmp: /home tmp
+# items_stored_list - list of items stored in the chest before sale, default value '['diamond', 'emerald', 'gold-ore', 'iron-ingot', 'iron-ore']' 
+items_stored_list:
+- diamond
+- emerald
+- gold-ore
+- iron-ingot
+- iron-ore
+# mine_moving_hold_shift - True or False flag specifying pressing the 'shift' button during the digging procedure, default value 'False' 
+mine_moving_hold_shift: false
+# mine_moving_time - Time for the mine bot to move in a certain direction, default value '10' 
+mine_moving_time: 10
+# protected_slots - A collection of slots protected from being put away in a box, default value '{8, 9, 7}' 
+protected_slots:
+- 8
+- 9
+- 7
+# sell_inventory_command - Command to sell items, default value '/sellall inventory' 
+sell_inventory_command: /sellall inventory
+# tmp_home_flag - A value of True or False, determines whether the program should use set and go home temporary, default value 'True' 
+tmp_home_flag: true

@@ -6,7 +6,7 @@ from logger import app_logger
 
 afk_counter = None
 
-def weighted_random_choice(values, weights):
+def weighted_random_choice(values: list, weights: list) -> any:
     """
     Selects a random choice from a list of values, weighted by a corresponding list of weights.
 
@@ -19,7 +19,7 @@ def weighted_random_choice(values, weights):
     """
     return random.choices(values, weights=weights, k=1)[0]
 
-def afk():
+def afk() -> bool:
     """
     Simulates an AFK (Away From Keyboard) behavior based on a cofigurable flag and intervals.
 
@@ -51,7 +51,7 @@ def afk():
     else:
         return False
 
-def draw_afk_interval():
+def draw_afk_interval() -> int:
     """
     Determines a random interval for the next AFK action.
 
@@ -68,7 +68,7 @@ def draw_afk_interval():
     app_logger.debug(f"new_draw_value: {new_drwa_value}")
     return new_drwa_value
 
-def draw_afk_time():
+def draw_afk_time() -> int:
     """
     Determines a random duration for the AFK action.
 

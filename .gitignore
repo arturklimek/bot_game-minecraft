@@ -3,9 +3,11 @@
 
 node_modules/
 /outputs/
+activities/__pycache__/
 
 *.log
 *.xcf
+*.pyc
 
 /dist
 /build

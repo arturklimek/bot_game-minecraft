@@ -12,10 +12,11 @@ from clicker import setup_autoclicer_hotkeys
 from logger import app_logger
 from patterns import load_patterns_all
 from screenshooter import start_screenshot_thread
+from typing import NoReturn
 
 lock = threading.Lock()
 
-def prepare_folders():
+def prepare_folders() -> None:
     """
     Creates necessary directories for the application if they do not exist.
     Specifically, it checks and creates the OUTPUTS_DIR_PATH and PATTERNS_DIR_PATH.
@@ -30,7 +31,7 @@ def prepare_folders():
     except Exception as ex:
         app_logger.error(ex)
 
-def sellall_inventory_thread():
+def sellall_inventory_thread() -> None:
     """
     Starts a new thread for selling inventory.
     This function sets the 'is_running_mine_procedure' flag to False and initiates the 'sellall_inventory' procedure in a separate thread.
@@ -56,7 +57,7 @@ def setup_buttons():
     app_logger.debug(f"Setup buttons are done")
 
 
-def main():
+def main() -> NoReturn:
     """
     Main function to initiate the application.
     Performs initial setup including loading configuration, preparing folders, loading patterns, updating sizes, setting up buttons, and starting the screenshot thread.

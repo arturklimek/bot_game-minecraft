@@ -1,14 +1,16 @@
 import threading
 import time
 import mss
+import numpy as np
 import pygetwindow
 from app_config import get_game_window_name, get_screenshots_frequency
 from image_operations import convert_screenshot_for_opencv
 from logger import app_logger
+from typing import Optional, Union
 
-last_screenshoot = None
+last_screenshot: Optional[np.ndarray] = None
 
-def get_last_screenshot():
+def get_last_screenshot() -> Optional[np.ndarray]:
     """
     Retrieves the last captured screenshot.
 
@@ -18,7 +20,7 @@ def get_last_screenshot():
     app_logger.debug("get_last_screenshot return last_screenshoot")
     return last_screenshoot
 
-def get_screenshot(window_title=get_game_window_name()):
+def get_screenshot(window_title: str = get_game_window_name()) -> Optional[np.ndarray]:
     """
     Captures a screenshot of a specified window.
 
@@ -43,7 +45,7 @@ def get_screenshot(window_title=get_game_window_name()):
             app_logger.error(f"Window '{window_title}' not found.")
             return None
 
-def screenshot_loop():
+def screenshot_loop() -> None:
     """
     Continuously captures screenshots of the specified window at set intervals.
 
@@ -62,7 +64,7 @@ def screenshot_loop():
         except Exception as ex:
             app_logger.error(ex)
 
-def start_screenshot_thread():
+def start_screenshot_thread() -> None:
     """
     Starts a new thread for the screenshot loop.
 

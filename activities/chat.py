@@ -11,7 +11,7 @@ from logger import app_logger
 last_message_time = datetime.now()
 chat_message_id = 0
 
-def send_chat_notification():
+def send_chat_notification() -> None:
     """
     Sends a chat notification based on the configured messages and frequency.
 
@@ -37,7 +37,7 @@ def send_chat_notification():
         app_logger.error(ex)
 
 
-def send_on_chat(text):
+def send_on_chat(text: str) -> None:
     """
     Sends a specified text message in the game chat.
 
@@ -60,7 +60,7 @@ def send_on_chat(text):
     keyboard.press_and_release(get_hotkey_enter())
     app_logger.debug(f"Press and release {get_hotkey_enter()}")
 
-def tp_to_repair_home():
+def tp_to_repair_home() -> None:
     """
     Teleports the player to a predefined 'repair' home location in the game.
 
@@ -70,7 +70,7 @@ def tp_to_repair_home():
     time.sleep(return_random_wait_interval_time())
     send_on_chat(get_command_home_repair())
 
-def tp_to_mining_home():
+def tp_to_mining_home() -> None:
     """
     Teleports the player to a predefined 'mining' home location in the game.
 
@@ -80,7 +80,7 @@ def tp_to_mining_home():
     time.sleep(return_random_wait_interval_time())
     send_on_chat(get_command_home_mining())
 
-def tp_to_chest_home():
+def tp_to_chest_home() -> None:
     """
     Teleports the player to a predefined 'chest' home location in the game.
 
@@ -90,7 +90,7 @@ def tp_to_chest_home():
     time.sleep(return_random_wait_interval_time())
     send_on_chat(get_command_home_chest())
 
-def tp_to_farm_home(index):
+def tp_to_farm_home(index: int) -> None:
     """
     Teleports the player to a predefined 'farm' home location in the game, specified by an index.
 
@@ -103,7 +103,7 @@ def tp_to_farm_home(index):
     time.sleep(return_random_wait_interval_time())
     send_on_chat(f"{get_command_home_farm()}{index}")
 
-def tp_to_tmp_home():
+def tp_to_tmp_home() -> None:
     """
     Teleports the player to a temporary home location in the game.
 
@@ -113,7 +113,7 @@ def tp_to_tmp_home():
     time.sleep(return_random_wait_interval_time())
     send_on_chat(get_command_home_tmp())
 
-def tp_to_spawn():
+def tp_to_spawn() -> None:
     """
     Teleports the player to the spawn location in the game.
 
@@ -123,7 +123,7 @@ def tp_to_spawn():
     time.sleep(return_random_wait_interval_time())
     send_on_chat(get_command_spawn())
 
-def set_tmp_home():
+def set_tmp_home() -> None:
     """
     Sets the current location as the temporary home in the game.
 
@@ -133,7 +133,7 @@ def set_tmp_home():
     time.sleep(return_random_wait_interval_time())
     send_on_chat(get_command_sethome() + " " + get_command_home_tmp()[6:])
 
-def sellall_inventory():
+def sellall_inventory() -> None:
     """
     Executes the command to sell all items in the player's inventory in the game.
 

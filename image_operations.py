@@ -1,12 +1,14 @@
 from datetime import datetime
 import os
+from typing import Optional
+
 import cv2
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageGrab
 from app_config import OUTPUTS_DIR_PATH
 from logger import app_logger
 
-def convert_screenshot_for_opencv(screenshot):
+def convert_screenshot_for_opencv(screenshot: ImageGrab) -> np.ndarray:
     """
     Converts a screenshot into a format compatible with OpenCV.
 
@@ -25,7 +27,7 @@ def convert_screenshot_for_opencv(screenshot):
     except Exception as ex:
         app_logger.error(ex)
 
-def convert_cv_image_to_gray(image):
+def convert_cv_image_to_gray(image: np.ndarray) -> np.ndarray:
     """
     Converts a color OpenCV image to grayscale.
 
@@ -46,7 +48,7 @@ def convert_cv_image_to_gray(image):
     except Exception as ex:
         app_logger.error(ex)
 
-def crop_image_by_mask(image, mask):
+def crop_image_by_mask(image: np.ndarray, mask: np.ndarray) -> np.ndarray:
     """
     Crops an image using a binary mask.
 
@@ -67,7 +69,7 @@ def crop_image_by_mask(image, mask):
     except Exception as ex:
         app_logger.error(ex)
 
-def save_cv_image(image, output_folder=OUTPUTS_DIR_PATH, filename=None):
+def save_cv_image(image: np.ndarray, output_folder: str = OUTPUTS_DIR_PATH, filename: Optional[str] = None) -> None:
     """
     Saves an OpenCV image to a file.
 
@@ -86,7 +88,7 @@ def save_cv_image(image, output_folder=OUTPUTS_DIR_PATH, filename=None):
     except Exception as ex:
         app_logger.error(ex)
 
-def show_cv_image(image):
+def show_cv_image(image: np.ndarray) -> None:
     """
     Displays an OpenCV image in a window.
 
@@ -103,7 +105,7 @@ def show_cv_image(image):
     except Exception as ex:
         app_logger.error(ex)
 
-def load_cv_image(file_path):
+def load_cv_image(file_path: str) -> Optional[np.ndarray]:
     """
     Loads an image from a file into OpenCV format.
 

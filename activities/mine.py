@@ -4,6 +4,8 @@ import random
 import threading
 import time
 from datetime import datetime
+from typing import Optional
+
 import keyboard
 import pyautogui
 import activities.eq_bar
@@ -41,7 +43,7 @@ pickaxe_slot = 9
 
 # last_farm_time = None
 
-def items_stored_procedure():
+def items_stored_procedure() -> None:
     """
     Handles the procedure for storing items in the chest and selling them.
 
@@ -143,7 +145,7 @@ def items_stored_procedure():
     except Exception as ex:
         app_logger.error(ex)
 
-def change_pickaxe_slot_number(pickaxe_top_left=None, pickaxe_bottom_right=None):
+def change_pickaxe_slot_number(pickaxe_top_left: Optional[tuple] = None, pickaxe_bottom_right: Optional[tuple] = None) -> None:
     """
     Updates the slot number of the pickaxe in the inventory.
 
@@ -182,7 +184,7 @@ def change_pickaxe_slot_number(pickaxe_top_left=None, pickaxe_bottom_right=None)
     except Exception as ex:
         app_logger.error(ex)
 
-def off_drop(drop_name):
+def off_drop(drop_name: str) -> None:
     """
     Sends a command to the game chat to turn off the drop of a specified item.
 
@@ -193,7 +195,8 @@ def off_drop(drop_name):
     """
     send_on_chat(f"/wylaczdrop {drop_name}")
     app_logger.debug(f"off_drop() was used (command: /wylaczdrop {drop_name})")
-def move_direction_and_mine():
+
+def move_direction_and_mine() -> None:
     """
     Automates the mining process in a specified direction.
 
@@ -242,7 +245,7 @@ def move_direction_and_mine():
         else:
             app_logger.debug(f"is_running_mine_procedure is: {is_running_mine_procedure}")
 
-def pickaxe_damage_checker():
+def pickaxe_damage_checker() -> None:
     """
     Continuously checks the damage level of the pickaxe during mining.
 
@@ -309,7 +312,7 @@ def pickaxe_damage_checker():
         except Exception as ex:
             app_logger.warning(ex)
 
-def mine_procedure():
+def mine_procedure() -> None:
     """
     Main function to start and manage the automated mining procedure.
 
@@ -395,7 +398,7 @@ def mine_procedure():
                 time.sleep(1)
         time.sleep(return_random_wait_interval_time())
 
-def toggle_mine_procedure():
+def toggle_mine_procedure() -> None:
     """
     Toggles the state of the mining procedure, starting or stopping it.
 

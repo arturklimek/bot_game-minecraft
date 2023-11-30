@@ -6,7 +6,7 @@ from delay import return_random_wait_interval_time
 from logger import app_logger
 
 
-def repair_item():
+def repair_item() -> None:
     """
     Initiates the item repair procedure.
 
@@ -24,7 +24,7 @@ def repair_item():
         click_right_mouse_button()
     time.sleep(return_random_wait_interval_time(1, 2))
 
-def repair_item_thread():
+def repair_item_thread() -> None:
     """
     Starts a new thread to execute the item repair procedure.
 

@@ -1,7 +1,9 @@
 import copy
 import time
+from typing import Tuple, Optional
 import cv2
 import keyboard
+import numpy as np
 from activities.item import analyze_damage_level
 from app_config import get_repair_threshold, get_hotkeys_slots
 from delay import return_random_wait_interval_time
@@ -13,7 +15,7 @@ from screenshooter import get_last_screenshot, get_screenshot
 eq_slot_top_left = None
 eq_slot_bottom_right = None
 
-def find_pickaxe_pattern(image, threshold=0.935): #TODO: przenieść część wspólną do jednej osobnej funkcji razem z find_eq_slots_pattern
+def find_pickaxe_pattern(image: np.ndarray, threshold: float = 0.935) -> Optional[Tuple[Tuple[int, int], Tuple[int, int]]]: #TODO: przenieść część wspólną do jednej osobnej funkcji razem z find_eq_slots_pattern
     """
     Finds the pickaxe pattern in a given image using template matching.
 
@@ -44,7 +46,7 @@ def find_pickaxe_pattern(image, threshold=0.935): #TODO: przenieść część ws
         app_logger.error(ex)
 
 
-def find_eq_slots_pattern(image, threshold=0.9): # requires a slot set to 9
+def find_eq_slots_pattern(image: np.ndarray, threshold: float = 0.9) -> Optional[Tuple[Tuple[int, int], Tuple[int, int]]]: # requires a slot set to 9
     """
     Finds the equipment slots pattern in a given image using template matching.
 
@@ -74,7 +76,7 @@ def find_eq_slots_pattern(image, threshold=0.9): # requires a slot set to 9
     except Exception as ex:
         app_logger.error(ex)
 
-def get_slots_image(image_screenshoot=None):
+def get_slots_image(image_screenshoot: Optional[np.ndarray] = None) -> Optional[Tuple[np.ndarray, Tuple[int, int], Tuple[int, int]]]:
     """
     Retrieves the image of the equipment slots.
 
@@ -104,7 +106,7 @@ def get_slots_image(image_screenshoot=None):
         app_logger.error(ex)
         return None
 
-def get_item_slot_number(item_top_left=None, item_bottom_right=None):
+def get_item_slot_number(item_top_left: Optional[Tuple[int, int]] = None, item_bottom_right: Optional[Tuple[int, int]] = None) -> Optional[int]:
     """
     Calculates the slot number of an item based on its position in the equipment inventory.
 
@@ -138,7 +140,7 @@ def get_item_slot_number(item_top_left=None, item_bottom_right=None):
         app_logger.error(ex)
         return None
 
-def get_pickaxe_image(image_slots=None):  #TODO: przenieść część wspólną do jednej osobnej funkcji razem z get_axe_image
+def get_pickaxe_image(image_slots: Optional[np.ndarray] = None) -> Optional[Tuple[np.ndarray, Tuple[int, int], Tuple[int, int]]]:  #TODO: przenieść część wspólną do jednej osobnej funkcji razem z get_axe_image
     """
     Retrieves the image of the pickaxe from the equipment slots.
 
@@ -171,7 +173,7 @@ def get_pickaxe_image(image_slots=None):  #TODO: przenieść część wspólną 
         app_logger.error(ex)
         return None
 
-def check_pickaxe_damage_to_repair(image_pickaxe=None):
+def check_pickaxe_damage_to_repair(image_pickaxe: Optional[np.ndarray] = None) -> Optional[bool]:
     """
     Checks if the pickaxe needs repair based on its damage level.
 
@@ -197,7 +199,7 @@ def check_pickaxe_damage_to_repair(image_pickaxe=None):
         app_logger.info(f"check_pickaxe_damage_to_repair: False")
         return False
 
-def find_axe_pattern(image, threshold=0.95):
+def find_axe_pattern(image: np.ndarray, threshold: float = 0.95) -> Optional[Tuple[Tuple[int, int], Tuple[int, int]]]:
     """
     Finds the axe pattern in a given image using template matching.
 
@@ -227,7 +229,7 @@ def find_axe_pattern(image, threshold=0.95):
     except Exception as ex:
         app_logger.error(ex)
 
-def get_axe_image(image_slots=None):
+def get_axe_image(image_slots: Optional[np.ndarray] = None) -> Optional[Tuple[np.ndarray, Tuple[int, int], Tuple[int, int]]]:
     """
     Retrieves the image of the axe from the equipment slots.
 
@@ -260,7 +262,7 @@ def get_axe_image(image_slots=None):
         app_logger.error(ex)
         return None
 
-def check_axe_damage_to_repair(image_axe=None):
+def check_axe_damage_to_repair(image_axe: Optional[np.ndarray] = None) -> Optional[bool]:
     """
     Checks if the axe needs repair based on its damage level.
 
@@ -285,7 +287,7 @@ def check_axe_damage_to_repair(image_axe=None):
         app_logger.info(f"check_axe_damage_to_repair: False")
         return False
 
-def check_and_update_eq_coordinates():
+def check_and_update_eq_coordinates() -> None:
     """
     Checks and updates the global coordinates of the equipment slots.
 

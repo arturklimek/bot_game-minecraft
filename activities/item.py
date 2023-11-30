@@ -5,7 +5,7 @@ from logger import app_logger
 from patterns import item_destruction_patterns
 
 
-def analyze_damage_level(item_image):
+def analyze_damage_level(item_image: np.ndarray) -> int:
     """
     Analyzes the damage level of a tool or item based on its image.
 

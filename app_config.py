@@ -1,4 +1,6 @@
 import os
+from typing import Dict, Set, List
+
 import yaml
 import urllib.parse
 from logger import app_logger
@@ -9,12 +11,12 @@ PATTERNS_DIR_PATH = os.path.join(APP_PATH, 'patterns')
 
 game_window_name = 'Minecraft'
 
-def get_game_window_name():
+def get_game_window_name() -> str:
     return game_window_name
 
 config_file_path = os.path.join(APP_PATH, 'config.yaml')
 
-def get_config_file_path():
+def get_config_file_path() -> str:
     return config_file_path
 
 command_spawn = '/spawn'
@@ -27,38 +29,38 @@ command_sell_inventory = '/sellall inventory'
 
 command_sethome = "/sethome"
 
-def get_command_spawn():
+def get_command_spawn() -> str:
     return command_spawn
 
-def get_command_home_repair():
+def get_command_home_repair() -> str:
     return command_home_repair
 
-def get_command_home_mining():
+def get_command_home_mining() -> str:
     return command_home_mining
 
-def get_command_home_chest():
+def get_command_home_chest() -> str:
     return command_home_chest
 
-def get_command_home_farm():
+def get_command_home_farm() -> str:
     return command_home_farm
 
-def get_command_home_tmp():
+def get_command_home_tmp() -> str:
     return command_home_tmp
 
-def get_command_sell_inventory():
+def get_command_sell_inventory() -> str:
     return command_sell_inventory
 
-def get_command_sethome():
+def get_command_sethome() -> str:
     return command_sethome
 
 autoclicker_delay_ms = 10
 
-def get_autoclicker_delay_ms():
+def get_autoclicker_delay_ms() -> int:
     return autoclicker_delay_ms
 
 afk_breaks_flag = False
 
-def get_afk_breaks_flag():
+def get_afk_breaks_flag() -> bool:
     return afk_breaks_flag
 
 pattern_settings = {
@@ -68,7 +70,7 @@ pattern_settings = {
     'eq_size': 3
 }
 
-def get_pattern_settings():
+def get_pattern_settings() -> Dict[str, any]:
     return pattern_settings
 
 slots_pattern_path = os.path.join(PATTERNS_DIR_PATH, f'eq-slots_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}.png')
@@ -83,10 +85,10 @@ axe_pattern_mask_path = os.path.join(PATTERNS_DIR_PATH, f'axe_{pattern_settings[
 repair_threshold = 2
 repair_mining_pickaxe_frequency = 15
 
-def get_repair_threshold():
+def get_repair_threshold() -> int:
     return repair_threshold
 
-def get_repair_mining_pickaxe_frequency():
+def get_repair_mining_pickaxe_frequency() -> int:
     return repair_mining_pickaxe_frequency
 
 # farm_toggle = False
@@ -97,21 +99,21 @@ farm_floor_time_moving = 34
 
 tmp_home_flag = True
 
-def get_farm_number():
+def get_farm_number() -> int:
     return farm_number
 
-def get_farm_floors_number():
+def get_farm_floors_number() -> int:
     return farm_floors_number
 
-def get_farm_floor_time_moving():
+def get_farm_floor_time_moving() -> int:
     return farm_floor_time_moving
 
-def get_tmp_home_flag():
+def get_tmp_home_flag() -> bool:
     return tmp_home_flag
 
 screenshots_frequency = 0.5
 
-def get_screenshots_frequency():
+def get_screenshots_frequency() -> float:
     return screenshots_frequency
 
 hotkey_esc = 1
@@ -134,31 +136,31 @@ hotkeys_slots = {
     9: 10
 }
 
-def get_hotkey_esc():
+def get_hotkey_esc() -> int:
     return hotkey_esc
 
-def get_hotkey_enter():
+def get_hotkey_enter() -> int:
     return hotkey_enter
 
-def get_hotkey_chat():
+def get_hotkey_chat() -> int:
     return hotkey_chat
 
-def get_hotkey_inventory():
+def get_hotkey_inventory() -> int:
     return hotkey_inventory
 
-def get_hotkey_moving_up():
+def get_hotkey_moving_up() -> int:
     return hotkey_moving_up
 
-def get_hotkey_moving_down():
+def get_hotkey_moving_down() -> int:
     return hotkey_moving_down
 
-def get_hotkey_moving_left():
+def get_hotkey_moving_left() -> int:
     return hotkey_moving_left
 
-def get_hotkey_moving_right():
+def get_hotkey_moving_right() -> int:
     return hotkey_moving_right
 
-def get_hotkeys_slots():
+def get_hotkeys_slots() -> Dict[int, int]:
     return hotkeys_slots
 
 button_autoclicker_lpm = 79
@@ -166,16 +168,16 @@ button_autoclicker_ppm = 80
 button_mine_procedure = 78
 button_farm_procedure = 69
 
-def get_button_autoclicker_lpm():
+def get_button_autoclicker_lpm() -> int:
     return button_autoclicker_lpm
 
-def get_button_autoclicker_ppm():
+def get_button_autoclicker_ppm() -> int:
     return button_autoclicker_ppm
 
-def get_button_mine_procedure():
+def get_button_mine_procedure() -> int:
     return button_mine_procedure
 
-def get_button_farm_procedure():
+def get_button_farm_procedure() -> int:
     return button_farm_procedure
 
 protected_slots = set([7,8,9])
@@ -183,22 +185,22 @@ protected_slots = set([7,8,9])
 def get_protected_slots():
     return protected_slots
 
-def set_protected_slots(new_protected_slots):
+def set_protected_slots(new_protected_slots: Set[int]) -> None:
     global protected_slots
     protected_slots = new_protected_slots
 
 moving_time = 10
 moving_hold_shift = False
 
-def get_moving_time():
+def get_moving_time() -> int:
     return moving_time
 
-def get_moving_hold_shift():
+def get_moving_hold_shift() -> bool:
     return moving_hold_shift
 
 eq_limit_to_stored = 33
 
-def get_eq_limit_to_stored():
+def get_eq_limit_to_stored() -> int:
     return eq_limit_to_stored
 
 items_stored_list = ["diamond", "emerald", "gold-ore", "iron-ingot", "iron-ore"]
@@ -206,7 +208,7 @@ items_stored_list = ["diamond", "emerald", "gold-ore", "iron-ingot", "iron-ore"]
 def get_items_stored_list():
     return items_stored_list
 
-def set_items_stored_list(new_items_stored_list):
+def set_items_stored_list(new_items_stored_list: List[str]) -> None:
     global items_stored_list
     items_stored_list = new_items_stored_list
 
@@ -214,13 +216,13 @@ chat_messages_flag = False
 chat_messages = ['&6&lUWAGA! &f&lKupię &9&lMroczna Materia &7- &e&l2000&6&l$ &f&lza sztukę! &7- &b&l/msg MineArturVIP &7- &f&lNie ma mnie? Nie odpisuję? Napisz na DSC: &b&lMineArturVIP#6699 &f&llub do innego członka &7[&b&lS&f&lB&7&l-&f&lM&b&laf&9&lia&7]']
 chat_messages_frequency_min = 15
 
-def get_chat_messages_flag():
+def get_chat_messages_flag() -> bool:
     return chat_messages_flag
 
-def get_chat_messages():
+def get_chat_messages() -> List[str]:
     return chat_messages
 
-def get_chat_messages_frequency_min():
+def get_chat_messages_frequency_min() -> int:
     return chat_messages_frequency_min
 
 eq_inventory_patterns_paths = {
@@ -575,7 +577,7 @@ comments = {
     'tmp_home_flag': f"# tmp_home_flag - A value of True or False, determines whether the program should use set and go home temporary, default value '{tmp_home_flag}' \n",
 }
 
-def encode_special_characters(string):
+def encode_special_characters(string: str) -> str:
     """
     Encodes special characters in a string using URL encoding.
 
@@ -589,7 +591,7 @@ def encode_special_characters(string):
     """
     return urllib.parse.quote(string, safe='')
 
-def decode_special_characters(string):
+def decode_special_characters(string: str) -> str:
     """
     Decodes special characters from a URL-encoded string.
 
@@ -604,7 +606,7 @@ def decode_special_characters(string):
     return urllib.parse.unquote(string)
 
 
-def save_config_dict(config_dict):
+def save_config_dict(config_dict: Dict[str, any]) -> None:
     """
     Saves the configuration dictionary to a YAML file with added comments.
 
@@ -632,7 +634,7 @@ def save_config_dict(config_dict):
     except Exception as ex:
         app_logger.error(ex)
 
-def read_config_file():
+def read_config_file() -> Dict[str, any]:
     """
     Reads the configuration from a YAML file and returns it as a dictionary.
 
@@ -655,7 +657,7 @@ def read_config_file():
     except Exception as ex:
         app_logger.error(ex)
 
-def setup_config_file():
+def setup_config_file() -> None:
     """
     Sets up the configuration file for the application.
 

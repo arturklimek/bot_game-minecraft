@@ -7,19 +7,19 @@ from logger import app_logger
 
 autoclicker_active = {'left': False, 'right': False}
 
-def click_right_mouse_button():
+def click_right_mouse_button() -> None:
     """
     Simulates a right mouse button click using the pyautogui library.
     """
     pyautogui.click(button='right')
 
-def click_left_mouse_button():
+def click_left_mouse_button() -> None:
     """
     Simulates a left mouse button click using the pyautogui library.
     """
     pyautogui.click(button='left')
 
-def autoclicker(button: str):
+def autoclicker(button: str) -> None:
     """
     Runs an autoclicker loop for the specified mouse button.
 
@@ -37,7 +37,7 @@ def autoclicker(button: str):
             app_logger.debug(f"autoclicker flag was change - stopped on button: {button}")
             break
 
-def toggle_autoclicker(button: str):
+def toggle_autoclicker(button: str) -> None:
     """
     Toggles the state of the autoclicker for the specified button.
 
@@ -52,7 +52,7 @@ def toggle_autoclicker(button: str):
         thread = threading.Thread(target=autoclicker, args=(button,), daemon=True)
         thread.start()
 
-def setup_autoclicer_hotkeys():
+def setup_autoclicer_hotkeys() -> None:
     """
     Sets up keyboard hotkeys to toggle the left and right mouse button autoclickers.
 

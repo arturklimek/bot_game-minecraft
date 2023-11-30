@@ -1,7 +1,7 @@
 import random
 from logger import app_logger
 
-def return_random_wait_interval_time(down:float=0.15, up:float=0.3) -> float:
+def return_random_wait_interval_time(down: float = 0.15, up: float = 0.3) -> float:
     """
     Generates a random waiting time within a specified interval.
 

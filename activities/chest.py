@@ -1,5 +1,7 @@
 import copy
 import time
+from typing import Optional, Tuple, List
+
 import cv2
 import numpy as np
 import pyautogui
@@ -27,7 +29,7 @@ eq_inventory_amount = 27
 chest_big_inventory_amount = 54
 chest_small_inventory_amount = 27
 
-def set_dimensions(element, pattern):
+def set_dimensions(element: dict, pattern: np.ndarray) -> None:
     """
     Sets the dimensions (width and height) of an element based on the given pattern.
 
@@ -38,7 +40,7 @@ def set_dimensions(element, pattern):
     if pattern is not None:
         element["width"], element["height"] = pattern.shape[1], pattern.shape[0]
 
-def update_chest_patterns_sizes():
+def update_chest_patterns_sizes() -> None:
     """
     Updates the sizes of chest inventory elements based on the defined chest inventory patterns.
     """
@@ -46,7 +48,7 @@ def update_chest_patterns_sizes():
         if element_key in chest_inventory_patterns:
             set_dimensions(chest_inventory_elements[element_key], chest_inventory_patterns[element_key])
 
-def find_chest_big_pattern(image, threshold=0.75):
+def find_chest_big_pattern(image: np.ndarray, threshold: float = 0.75) -> Optional[Tuple[Tuple[int, int], Tuple[int, int]]]:
     """
     Finds the 'big chest' pattern in a given image using template matching.
 
@@ -76,7 +78,7 @@ def find_chest_big_pattern(image, threshold=0.75):
     except Exception as ex:
         app_logger.error(ex)
 
-def get_chest_big_image(image_screenshoot=None):
+def get_chest_big_image(image_screenshoot: Optional[np.ndarray] = None) -> Optional[Tuple[np.ndarray, Tuple[int, int], Tuple[int, int]]]:
     """
     Retrieves the image of a 'big chest' from a screenshot or a given image.
 
@@ -108,7 +110,7 @@ def get_chest_big_image(image_screenshoot=None):
         app_logger.error(ex)
         return None
 
-def find_chest_small_pattern(image, threshold=0.75): #TODO: zrefactorować tak aby nie powielać kodu między funkcjami
+def find_chest_small_pattern(image: np.ndarray, threshold: float = 0.75) -> Optional[Tuple[Tuple[int, int], Tuple[int, int]]]: #TODO: zrefactorować tak aby nie powielać kodu między funkcjami
     """
     Finds the 'small chest' pattern in a given image using template matching.
 
@@ -138,7 +140,7 @@ def find_chest_small_pattern(image, threshold=0.75): #TODO: zrefactorować tak a
     except Exception as ex:
         app_logger.error(ex)
 
-def get_chest_small_image(image_screenshoot=None):
+def get_chest_small_image(image_screenshoot: Optional[np.ndarray] = None) -> Optional[Tuple[np.ndarray, Tuple[int, int], Tuple[int, int]]]:
     """
     Retrieves the image of a 'small chest' from a screenshot or a given image.
 
@@ -170,7 +172,7 @@ def get_chest_small_image(image_screenshoot=None):
         app_logger.error(ex)
         return None
 
-def check_and_get_chest_image(image_screenshoot=None):
+def check_and_get_chest_image(image_screenshoot: Optional[np.ndarray] = None) -> Optional[Tuple[np.ndarray, Tuple[int, int], Tuple[int, int], int]]:
     """
     Checks for and retrieves the image of either a 'big chest' or 'small chest' from a screenshot or a given image.
 
@@ -205,7 +207,7 @@ def check_and_get_chest_image(image_screenshoot=None):
         app_logger.error(ex)
         return None
 
-def get_slots_chest_coordinates(chest_image=None, chest_size=chest_big_inventory_amount):
+def get_slots_chest_coordinates(chest_image: Optional[np.ndarray] = None, chest_size: int = chest_big_inventory_amount) -> Optional[List[Tuple[Tuple[int, int], Tuple[int, int]]]]:
     """
     Calculates the coordinates of each slot in a chest inventory image.
 
@@ -264,7 +266,7 @@ def get_slots_chest_coordinates(chest_image=None, chest_size=chest_big_inventory
         app_logger.error(ex)
         return None
 
-def get_chest_slots_images(chest_image=None, slots_coordinates=None):
+def get_chest_slots_images(chest_image: Optional[np.ndarray] = None, slots_coordinates: Optional[List[Tuple[Tuple[int, int], Tuple[int, int]]]] = None) -> Optional[List[np.ndarray]]:
     """
     Retrieves images of individual slots in a chest inventory based on their coordinates.
 
@@ -303,7 +305,7 @@ def get_chest_slots_images(chest_image=None, slots_coordinates=None):
         app_logger.error(ex)
         return None
 
-def find_item_pattern_in_item_image(item_image, items_quantity_mask, patterns=items_patterns, threshold_pixels=0.95, threshold_pattern=0.26):
+def find_item_pattern_in_item_image(item_image: np.ndarray, items_quantity_mask: np.ndarray, patterns: dict = items_patterns, threshold_pixels: float = 0.95, threshold_pattern: float = 0.26) -> Optional[str]:
     """
     Identifies an item pattern within an item image.
 
@@ -348,7 +350,7 @@ def find_item_pattern_in_item_image(item_image, items_quantity_mask, patterns=it
     except Exception as ex:
         app_logger.error(ex)
 
-def get_game_window_coordinates(window_title):
+def get_game_window_coordinates(window_title: str) -> Optional[Tuple[int, int]]:
     """
     Retrieves the screen coordinates (top left corner) of a game window based on its title.
 
@@ -367,7 +369,7 @@ def get_game_window_coordinates(window_title):
         app_logger.debug(f"The window '{window_title}' was not found.")
         return None
 
-def shift_click_at_coordinates_in_game_window(slots_coordinates):
+def shift_click_at_coordinates_in_game_window(slots_coordinates: Tuple[Tuple[int, int], Tuple[int, int]]) -> None:
     """
     Performs a shift-click action at specified coordinates within a game window.
 
@@ -390,7 +392,7 @@ def shift_click_at_coordinates_in_game_window(slots_coordinates):
     app_logger.debug(f"click_x: {click_x} click_y: {click_y}")
     shift_click_at_coordinates(click_x, click_y)
 
-def shift_click_at_coordinates(click_x, click_y):
+def shift_click_at_coordinates(click_x: int, click_y: int) -> None:
     """
     Performs a shift-click action at specified screen coordinates.
 
@@ -413,7 +415,7 @@ def shift_click_at_coordinates(click_x, click_y):
     pyautogui.keyUp('shift')
     app_logger.debug(f"Release 'shift'")
 
-def calc_and_get_screenshoot_sloot_coordinates(slot_coordinates, chest_top_left, chest_bottom_right):
+def calc_and_get_screenshoot_sloot_coordinates(slot_coordinates: Tuple[Tuple[int, int], Tuple[int, int]], chest_top_left: Tuple[int, int], chest_bottom_right: Tuple[int, int]) -> Tuple[Tuple[int, int], Tuple[int, int]]:
     """
     Calculates the absolute screen coordinates for a slot based on its position within a chest inventory.
 

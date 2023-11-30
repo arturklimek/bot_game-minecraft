@@ -4,17 +4,18 @@ from app_config import item_destruction_patterns_paths, slots_pattern_path, slot
     items_quantity_pattern, axe_pattern_path, axe_pattern_mask_path
 from image_operations import convert_cv_image_to_gray, load_cv_image
 from logger import app_logger
+from typing import Dict, Any
 
-item_destruction_patterns = {}
-slots_patterns = {}
-pickaxe_patterns = {}
-axe_patterns = {}
-eq_inventory_patterns = {}
-chest_inventory_patterns = {}
-items_patterns = {}
-items_quantity_mask = array.array
+item_destruction_patterns: Dict[str, Dict[str, Any]] = {}
+slots_patterns: Dict[str, Any] = {}
+pickaxe_patterns: Dict[str, Any] = {}
+axe_patterns: Dict[str, Any] = {}
+eq_inventory_patterns: Dict[str, Any] = {}
+chest_inventory_patterns: Dict[str, Any] = {}
+items_patterns: Dict[str, Dict[str, Any]] = {}
+items_quantity_mask: array.array = array.array
 
-def load_slots_patterns():
+def load_slots_patterns() -> None:
     """
     Loads and stores slot patterns in grayscale for the application.
 
@@ -28,7 +29,7 @@ def load_slots_patterns():
     except Exception as ex:
         app_logger.error(ex)
 
-def load_pickaxe_patterns():
+def load_pickaxe_patterns() -> None:
     """
     Loads and stores pickaxe patterns and their masks for the application.
 
@@ -48,7 +49,7 @@ def load_pickaxe_patterns():
     except Exception as ex:
         app_logger.error(ex)
 
-def load_axe_patterns():
+def load_axe_patterns() -> None:
     """
     Loads and stores axe patterns and their masks for the application.
 
@@ -68,7 +69,7 @@ def load_axe_patterns():
     except Exception as ex:
         app_logger.error(ex)
 
-def load_item_destruction_patterns():
+def load_item_destruction_patterns() -> None:
     """
     Loads and stores item destruction bar patterns and their masks.
 
@@ -95,7 +96,7 @@ def load_item_destruction_patterns():
             app_logger.error(ex)
     app_logger.info("pickaxe_destruction_patterns was loaded")
 
-def load_chest_inventory_patterns():
+def load_chest_inventory_patterns() -> None:
     """
     Loads and stores chest inventory patterns.
 
@@ -109,7 +110,7 @@ def load_chest_inventory_patterns():
     except Exception as ex:
         app_logger.error(ex)
 
-def load_eq_inventory_patterns(): #TODO: Wykestrachować wspólną część z funkcją load_chest_inventory_patterns() do osobnej funkcji
+def load_eq_inventory_patterns() -> None: #TODO: Wykestrachować wspólną część z funkcją load_chest_inventory_patterns() do osobnej funkcji
     """
     Loads and stores equipment inventory patterns.
 
@@ -123,7 +124,7 @@ def load_eq_inventory_patterns(): #TODO: Wykestrachować wspólną część z fu
     except Exception as ex:
         app_logger.error(ex)
 
-def load_items_patterns():
+def load_items_patterns() -> None:
     """
     Loads and stores various item patterns along with their masks and colored versions.
 
@@ -145,7 +146,7 @@ def load_items_patterns():
     except Exception as ex:
         app_logger.error(ex)
 
-def load_patterns_all():
+def load_patterns_all() -> None:
     """
     Executes the loading of all patterns used in the application.
 

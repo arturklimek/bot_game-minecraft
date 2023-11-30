@@ -1,5 +1,7 @@
 import copy
 import time
+from typing import Optional, Tuple, List
+
 import cv2
 import keyboard
 import numpy as np
@@ -48,7 +50,7 @@ separation_frame = {
 eq_slots_amount = 9
 eq_inventory_amount = 27
 
-def update_eq_patterns_sizes():
+def update_eq_patterns_sizes() -> None:
     """
     Updates the sizes of various equipment inventory patterns based on their image shapes.
 
@@ -69,7 +71,7 @@ def update_eq_patterns_sizes():
     if eq_inventory_patterns["separation-frame"] is not None:
         separation_frame["width"], separation_frame["height"] = eq_inventory_patterns["separation-frame"].shape[1], eq_inventory_patterns["separation-frame"].shape[0]
 
-def find_eq_inventory_pattern(image):
+def find_eq_inventory_pattern(image: np.ndarray) -> Optional[Tuple[Tuple[int, int], Tuple[int, int]]]:
     """
     Finds the equipment inventory pattern in a given image.
 
@@ -100,7 +102,7 @@ def find_eq_inventory_pattern(image):
     except Exception as ex:
         app_logger.error(ex)
 
-def get_inventory_image(image_screenshoot=None):
+def get_inventory_image(image_screenshoot: Optional[np.ndarray] = None) -> Optional[Tuple[np.ndarray, Tuple[int, int], Tuple[int, int]]]:
     """
     Retrieves the cropped inventory image from a given screenshot.
 
@@ -134,7 +136,7 @@ def get_inventory_image(image_screenshoot=None):
         app_logger.error(ex)
         return None
 
-def get_inventory_slots_images(inventory_image=None, slots_coordinates=None):
+def get_inventory_slots_images(inventory_image: Optional[np.ndarray] = None, slots_coordinates: Optional[List[Tuple[Tuple[int, int], Tuple[int, int]]]] = None) -> Optional[List[np.ndarray]]:
     """
     Obtains images of individual inventory slots.
 
@@ -170,7 +172,7 @@ def get_inventory_slots_images(inventory_image=None, slots_coordinates=None):
         app_logger.error(ex)
         return None
 
-def get_slots_inventory_coordinates(inventory_image=None):
+def get_slots_inventory_coordinates(inventory_image: Optional[np.ndarray] = None) -> Optional[List[Tuple[Tuple[int, int], Tuple[int, int]]]]:
     """
     Calculates the coordinates of all inventory slots in the equipment inventory image.
 
@@ -221,7 +223,7 @@ def get_slots_inventory_coordinates(inventory_image=None):
         app_logger.error(ex)
         return None
 
-def check_slot_free(slot_image):
+def check_slot_free(slot_image: np.ndarray) -> Optional[bool]:
     """
     Checks if a given slot image represents an empty slot.
 
@@ -247,7 +249,7 @@ def check_slot_free(slot_image):
         app_logger.error(ex)
         return None
 
-def get_inventory_occupancy_value(slots_images_list):
+def get_inventory_occupancy_value(slots_images_list: List[np.ndarray]) -> Optional[int]:
     """
     Calculates the number of occupied slots in the inventory.
 
@@ -270,7 +272,7 @@ def get_inventory_occupancy_value(slots_images_list):
     except Exception as ex:
         app_logger.error(ex)
 
-def get_inventory_occupancy_list(slots_images_list):
+def get_inventory_occupancy_list(slots_images_list: List[np.ndarray]) -> Optional[List[bool]]:
     """
     Creates a list indicating the occupancy status of each slot in the inventory.
 
@@ -290,7 +292,7 @@ def get_inventory_occupancy_list(slots_images_list):
     except Exception as ex:
         app_logger.error(ex)
 
-def check_inventory_full():
+def check_inventory_full() -> Optional[bool]:
     """
     Checks if the inventory is full based on a set limit.
 

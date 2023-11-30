@@ -1,4 +1,6 @@
 import threading
+from typing import Optional, Tuple
+
 import activities.eq_bar
 import copy
 import time
@@ -18,7 +20,7 @@ axe_slot = 8
 farm_procedure_thread = None
 is_running_farm_procedure = False
 
-def farm_procedure():
+def farm_procedure() -> None:
     """
     Executes the farming procedure for a specified number of farms.
 
@@ -141,7 +143,7 @@ def farm_procedure():
     except Exception as ex:
         app_logger.error(ex)
 
-def change_axe_slot_number(axe_top_left=None, axe_bottom_right=None):
+def change_axe_slot_number(axe_top_left: Optional[Tuple[int, int]] = None, axe_bottom_right: Optional[Tuple[int, int]] = None) -> None:
     """
     Changes the currently active axe slot number based on its position in the inventory.
 
@@ -176,7 +178,7 @@ def change_axe_slot_number(axe_top_left=None, axe_bottom_right=None):
     else:
         app_logger.debug("axe_slot and new_axe_slot are that same")
 
-def farm_procedure_loop():
+def farm_procedure_loop() -> None:
     """
     Continuously runs the farm procedure while the farming process is active.
 
@@ -196,7 +198,7 @@ def farm_procedure_loop():
         time.sleep(return_random_wait_interval_time(1, 3))
         farm_procedure()
 
-def toggle_farm_procedure():
+def toggle_farm_procedure() -> None:
     """
     Toggles the farming procedure on or off based on the current state.
 

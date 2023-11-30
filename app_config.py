@@ -186,6 +186,7 @@ def get_protected_slots():
     return protected_slots
 
 def set_protected_slots(new_protected_slots: Set[int]) -> None:
+    app_logger.debug(f"set_protected_slots() - new_protected_slots: {new_protected_slots}")
     global protected_slots
     protected_slots = new_protected_slots
 
@@ -209,6 +210,7 @@ def get_items_stored_list():
     return items_stored_list
 
 def set_items_stored_list(new_items_stored_list: List[str]) -> None:
+    app_logger.debug(f"set_items_stored_list() - new_items_stored_list: {new_items_stored_list}")
     global items_stored_list
     items_stored_list = new_items_stored_list
 

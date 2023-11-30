@@ -172,12 +172,18 @@ def change_pickaxe_slot_number(pickaxe_top_left: Optional[tuple] = None, pickaxe
         new_pickaxe_slot = get_item_slot_number(pickaxe_top_left, pickaxe_bottom_right)
         app_logger.debug(f"new_pickaxe_slot: {new_pickaxe_slot}")
         if new_pickaxe_slot != pickaxe_slot:
-            if pickaxe_slot in get_protected_slots():
-                set_protected_slots(get_protected_slots().remove(pickaxe_slot))
+            protected_slots = set(get_protected_slots())
+            app_logger.debug(f"protected_slots: {protected_slots}")
+            if pickaxe_slot in protected_slots:
+                protected_slots.remove(pickaxe_slot)
                 app_logger.debug(f"pickaxe_slot: {pickaxe_slot} is in protected_slots - removing")
-            if new_pickaxe_slot not in get_protected_slots():
-                set_protected_slots(get_protected_slots().add(new_pickaxe_slot))
+                app_logger.debug(f"protected_slots: {protected_slots}")
+                set_protected_slots(protected_slots)
+            if new_pickaxe_slot not in protected_slots:
                 app_logger.debug(f"new_pickaxe_slot: {pickaxe_slot} is not in protected_slots - adding")
+                app_logger.debug(f"protected_slots: {protected_slots}")
+                protected_slots.add(new_pickaxe_slot)
+                set_protected_slots(protected_slots)
             pickaxe_slot = new_pickaxe_slot
         else:
             app_logger.debug("new_pickaxe_slot and pickaxe_slot have that same value")

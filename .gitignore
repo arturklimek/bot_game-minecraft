@@ -1,0 +1,14 @@
+.idea/
+*.iml
+
+node_modules/
+/outputs/
+
+*.log
+*.xcf
+
+/dist
+/build
+
+.env
+.venv

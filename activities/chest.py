@@ -305,7 +305,7 @@ def get_chest_slots_images(chest_image: Optional[np.ndarray] = None, slots_coord
         app_logger.error(ex)
         return None
 
-def find_item_pattern_in_item_image(item_image: np.ndarray, items_quantity_mask: np.ndarray, patterns: dict = items_patterns, threshold_pixels: float = 0.95, threshold_pattern: float = 0.26) -> Optional[str]:
+def find_item_pattern_in_item_image(item_image: np.ndarray, items_quantity_mask: np.ndarray, patterns: dict = items_patterns, threshold_pixels: float = 0.95, threshold_pattern: float = 0.23) -> Optional[str]:
     """
     Identifies an item pattern within an item image.
 

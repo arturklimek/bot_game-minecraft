@@ -1,7 +1,7 @@
 import array
 from app_config import item_destruction_patterns_paths, slots_pattern_path, slots_pattern_mask_path, \
     pickaxe_pattern_path, pickaxe_pattern_mask_path, eq_inventory_patterns_paths, chest_inventory_patterns_paths, \
-    items_quantity_pattern, axe_pattern_path, axe_pattern_mask_path, items_patterns_paths
+    items_quantity_pattern, axe_patterns_paths, axe_pattern_mask_path, items_patterns_paths
 from image_operations import convert_cv_image_to_gray, load_cv_image
 from logger import app_logger
 from typing import Dict, Any
@@ -57,12 +57,13 @@ def load_axe_patterns() -> None:
     """
     global axe_patterns
     try:
-        axe_pattern = convert_cv_image_to_gray(load_cv_image(axe_pattern_path))
-        axe_patterns["axe_pattern"] = axe_pattern
-        if axe_pattern is None:
-            app_logger.warning("Not loaded axe_pattern")
+        for key, path in axe_patterns_paths.items():
+            axe_pattern = convert_cv_image_to_gray(load_cv_image(path))
+            axe_patterns[key] = axe_pattern
+            if axe_pattern is None:
+                app_logger.warning(f"Not loaded axe pattern for key: {key}")
         axe_pattern_mask = convert_cv_image_to_gray(load_cv_image(axe_pattern_mask_path))
-        axe_patterns["axe_pattern_mask"] = axe_pattern_mask
+        axe_patterns["mask"] = axe_pattern_mask
         if axe_pattern_mask is None:
             app_logger.warning("Not loaded axe_pattern_mask")
         app_logger.info("axe_patterns was loaded")

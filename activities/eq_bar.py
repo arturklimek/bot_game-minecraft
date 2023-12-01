@@ -40,7 +40,7 @@ def find_pickaxe_pattern(image: np.ndarray, threshold: float = 0.935) -> Optiona
             app_logger.debug(f'pickaxe was found in - top_left: {top_left} bottom_right: {bottom_right}')
             return top_left, bottom_right
         else:
-            app_logger.debug('pickaxe pattern was not found.')
+            app_logger.info('pickaxe pattern was not found.')
             return None
     except Exception as ex:
         app_logger.error(ex)
@@ -63,7 +63,7 @@ def find_eq_slots_pattern(image: np.ndarray, threshold: float = 0.9) -> Optional
         image_gray = convert_cv_image_to_gray(image)
         result = cv2.matchTemplate(image_gray, slots_patterns["slots_pattern"], cv2.TM_CCORR_NORMED, mask=slots_patterns["slots_pattern_mask"])
         _, max_val, _, max_loc = cv2.minMaxLoc(result)
-        app_logger.debug(f"eq-slots max_val: {max_val} max_loc: {max_loc}")
+        app_logger.debug(f"pickaxe max_val: {max_val} max_loc: {max_loc}")
         if max_val > threshold:
             top_left = max_loc
             w, h = slots_patterns["slots_pattern"].shape[1], slots_patterns["slots_pattern"].shape[0]
@@ -71,7 +71,7 @@ def find_eq_slots_pattern(image: np.ndarray, threshold: float = 0.9) -> Optional
             app_logger.debug(f'eq-slots was found in - top_left: {top_left} bottom_right: {bottom_right}')
             return top_left, bottom_right
         else:
-            app_logger.debug('eq-slots pattern was not found.')
+            app_logger.info('eq-slots pattern was not found.')
             return None
     except Exception as ex:
         app_logger.error(ex)
@@ -133,7 +133,8 @@ def get_item_slot_number(item_top_left: Optional[Tuple[int, int]] = None, item_b
             0]
         slot_size = int(slots_width / 9)
         app_logger.debug(f"slot_size: {slot_size}")
-        item_slot_number = round(item_x1 / slot_size + 1)
+        # item_slot_number = round(item_x1 / slot_size + 1)
+        item_slot_number = (item_x1 // slot_size) + 1
         app_logger.debug(f"item_slot_number: {item_slot_number}")
         return item_slot_number
     except Exception as ex:
@@ -191,41 +192,48 @@ def check_pickaxe_damage_to_repair(image_pickaxe: Optional[np.ndarray] = None) -
             app_logger.debug("Taked image_pickaxe again is None - return")
             return None
     item_damage_id = analyze_damage_level(image_pickaxe)
-    app_logger.debug(f"check_pickaxe_damage_to_repair - item_damage_id: {item_damage_id}")
+    app_logger.info(f"check_pickaxe_damage_to_repair - item_damage_id: {item_damage_id}")
     if item_damage_id <= get_repair_threshold():
         app_logger.info(f"check_pickaxe_damage_to_repair: True")
         return True
     else:
-        app_logger.debug(f"check_pickaxe_damage_to_repair: False")
+        app_logger.info(f"check_pickaxe_damage_to_repair: False")
         return False
 
 def find_axe_pattern(image: np.ndarray, threshold: float = 0.95) -> Optional[Tuple[Tuple[int, int], Tuple[int, int]]]:
     """
-    Finds the axe pattern in a given image using template matching.
+    Finds the best matching axe pattern in a given image using template matching.
 
     Args:
-        image: The image to search for the axe pattern.
-        threshold: The threshold value for template matching, default is 0.95.
+        image (np.ndarray): The image to search for axe patterns.
+        threshold (float): The threshold value for template matching, default is 0.95.
 
     Returns:
-        A tuple containing the top-left and bottom-right coordinates of the found axe pattern, or None if not found.
+        Optional[Tuple[Tuple[int, int], Tuple[int, int]]]: A tuple containing the top-left and bottom-right
+        coordinates of the best matching axe pattern, or None if no pattern exceeds the threshold.
     """
     app_logger.debug("find_axe_pattern was used")
     app_logger.debug(f"used threshold: {threshold}")
     try:
         image_gray = convert_cv_image_to_gray(image)
-        result = cv2.matchTemplate(image_gray, axe_patterns["axe_pattern"], cv2.TM_CCORR_NORMED, mask=axe_patterns["axe_pattern_mask"])
-        _, max_val, _, max_loc = cv2.minMaxLoc(result)
-        app_logger.debug(f"axe max_val: {max_val} max_loc:{max_loc}")
-        if max_val > threshold:
-            top_left = max_loc
-            w, h = axe_patterns["axe_pattern"].shape[1], axe_patterns["axe_pattern"].shape[0]
+        best_match = (None, 0, None)
+        for key, pattern in axe_patterns.items():
+            if "mask" in key:
+                continue
+            result = cv2.matchTemplate(image_gray, pattern, cv2.TM_CCORR_NORMED, mask=axe_patterns["mask"])
+            _, max_val, _, max_loc = cv2.minMaxLoc(result)
+            app_logger.debug(f"{key} axe max_val: {max_val} max_loc:{max_loc}")
+            if max_val > best_match[1] and max_val > threshold:
+                w, h = pattern.shape[1], pattern.shape[0]
+                best_match = (max_loc, max_val, (w, h))
+        if best_match[1] > threshold:
+            top_left = best_match[0]
+            w, h = best_match[2]
             bottom_right = (top_left[0] + w, top_left[1] + h)
-            app_logger.debug(f'axe was found in - top_left: {top_left} bottom_right: {bottom_right}')
+            app_logger.debug(f'Best matching axe found - top_left: {top_left} bottom_right: {bottom_right}')
             return top_left, bottom_right
-        else:
-            app_logger.debug('axe pattern was not found.')
-            return None
+        app_logger.info('No axe pattern exceeded the threshold.')
+        return None
     except Exception as ex:
         app_logger.error(ex)
 
@@ -284,7 +292,7 @@ def check_axe_damage_to_repair(image_axe: Optional[np.ndarray] = None) -> Option
         app_logger.info(f"check_axe_damage_to_repair: True")
         return True
     else:
-        app_logger.debug(f"check_axe_damage_to_repair: False")
+        app_logger.info(f"check_axe_damage_to_repair: False")
         return False
 
 def check_and_update_eq_coordinates() -> None:

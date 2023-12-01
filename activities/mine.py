@@ -82,6 +82,8 @@ def items_stored_procedure() -> None:
                 if i + 1 in get_protected_slots():
                     continue
                 selected_item = find_item_pattern_in_item_image(slot, item_quantity_mask, items_patterns)
+                app_logger.debug(f"selected_item: {selected_item}")
+                app_logger.debug(f"get_items_stored_list(): {get_items_stored_list()}")
                 if selected_item is not None:
                     if selected_item in get_items_stored_list():
                         slots_coordinates_to_stored.insert(i, slots_coordinates_to_analize[i])

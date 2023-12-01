@@ -137,7 +137,7 @@ def farm_procedure() -> None:
                                         break
                                 keyboard.press_and_release(get_hotkeys_slots()[axe_slot])
                                 app_logger.debug(f"Press and release {get_hotkeys_slots()[axe_slot]}")
-                                time.sleep(return_random_wait_interval_time(0.1, 0.75))
+                                time.sleep(return_random_wait_interval_time(1, 1.5))
                             else:
                                 app_logger.debug("Taked check_axe_damage_to_repair is None")
                         else:

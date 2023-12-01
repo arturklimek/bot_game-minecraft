@@ -5,7 +5,7 @@ from typing import Optional
 import cv2
 import numpy as np
 from PIL import Image, ImageGrab
-from app_config import OUTPUTS_DIR_PATH
+from app_config import OUTPUTS_DIR_PATH, get_save_images_flags
 from logger import app_logger
 
 def convert_screenshot_for_opencv(screenshot: ImageGrab) -> np.ndarray:
@@ -125,3 +125,19 @@ def load_cv_image(file_path: str) -> Optional[np.ndarray]:
     except Exception as ex:
         app_logger.info(f"An exception occurred while loading an image: {ex}")
         return None
+
+def save_image_for_function(function_name: str, image_variable_name: str, image: np.ndarray) -> None:
+    """
+    Saves an image if flag for function_name is set True with a filename that includes the function name, image variable name, and a timestamp.
+
+    Args:
+        function_name (str): The name of the function calling this save operation.
+        image_variable_name (str): The name of the variable holding the image.
+        image (np.ndarray): The image to be saved.
+    """
+    save_images_flags = get_save_images_flags()
+    if save_images_flags[function_name]:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S%f")
+        filename = f"{function_name}_{image_variable_name}_{timestamp}.png"
+        save_cv_image(filename=filename, image=image)
+        app_logger.debug(f"Saved {image_variable_name} in default path with filename: {filename}")

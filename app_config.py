@@ -11,6 +11,20 @@ PATTERNS_DIR_PATH = os.path.join(APP_PATH, 'patterns')
 
 game_window_name = 'Minecraft'
 
+save_images_flags = {
+    "find_chest_big_pattern": True,
+    "get_chest_big_image": True,
+    "find_chest_small_pattern": True,
+    "get_chest_small_image": True,
+    "check_and_get_chest_image": True,
+    "get_slots_chest_coordinates": True,
+    "get_chest_slots_images": True,
+    "find_item_pattern_in_item_image": True,
+}
+
+def get_save_images_flags():
+    return save_images_flags
+
 def get_game_window_name() -> str:
     return game_window_name
 

@@ -1,13 +1,14 @@
 import copy
 import time
+from datetime import datetime
 from typing import Optional, Tuple, List
 
 import cv2
 import numpy as np
 import pyautogui
 import pygetwindow
-from app_config import get_game_window_name
-from image_operations import convert_cv_image_to_gray
+from app_config import get_game_window_name, get_save_images_flags
+from image_operations import convert_cv_image_to_gray, save_cv_image, save_image_for_function
 from logger import app_logger
 from patterns import chest_inventory_patterns, items_patterns
 from screenshooter import get_last_screenshot
@@ -63,6 +64,7 @@ def find_chest_big_pattern(image: np.ndarray, threshold: float = 0.75) -> Option
     app_logger.debug("find_chest_big_pattern was used")
     app_logger.debug(f"threshold: {threshold}")
     try:
+        save_image_for_function("find_chest_big_pattern", "image", image)
         image_gray = convert_cv_image_to_gray(copy.copy(image))
         result = cv2.matchTemplate(image_gray, chest_inventory_patterns["chest-big"], cv2.TM_CCOEFF_NORMED, mask=chest_inventory_patterns["chest-big_mask"])
         _, max_val, _, max_loc = cv2.minMaxLoc(result)
@@ -95,12 +97,14 @@ def get_chest_big_image(image_screenshoot: Optional[np.ndarray] = None) -> Optio
     else:
         image = copy.copy(image_screenshoot)
     try:
+        save_image_for_function("get_chest_big_image", "image_screenshoot", image_screenshoot)
         chest_pattern = find_chest_big_pattern(image)
         if chest_pattern:
             chest_top_left, chest_bottom_right = chest_pattern
             chest_x1, chest_y1 = chest_top_left
             chest_x2, chest_y2 = chest_bottom_right
             cropped_chest_image = image[chest_y1:chest_y2, chest_x1:chest_x2]
+            save_image_for_function("get_chest_big_image", "cropped_chest_image", cropped_chest_image)
             app_logger.debug(f"chest_top_left: {chest_top_left} chest_bottom_right: {chest_bottom_right}")
             return cropped_chest_image, chest_top_left, chest_bottom_right
         else:
@@ -125,6 +129,7 @@ def find_chest_small_pattern(image: np.ndarray, threshold: float = 0.75) -> Opti
     app_logger.debug("find_chest_small_pattern was used")
     app_logger.debug(f"threshold: {threshold}")
     try:
+        save_image_for_function("find_chest_small_pattern", "image", image)
         image_gray = convert_cv_image_to_gray(copy.copy(image))
         result = cv2.matchTemplate(image_gray, chest_inventory_patterns["chest-small"], cv2.TM_CCOEFF_NORMED, mask=chest_inventory_patterns["chest-small_mask"])
         _, max_val, _, max_loc = cv2.minMaxLoc(result)
@@ -157,6 +162,7 @@ def get_chest_small_image(image_screenshoot: Optional[np.ndarray] = None) -> Opt
     else:
         image = copy.copy(image_screenshoot)
     try:
+        save_image_for_function("get_chest_small_image", "image_screenshoot", image_screenshoot)
         chest_pattern = find_chest_small_pattern(image)
         if chest_pattern:
             chest_top_left, chest_bottom_right = chest_pattern
@@ -189,6 +195,7 @@ def check_and_get_chest_image(image_screenshoot: Optional[np.ndarray] = None) ->
     else:
         image = copy.copy(image_screenshoot)
     try:
+        save_image_for_function("check_and_get_chest_image", "image_screenshoot", image_screenshoot)
         chest_pattern = find_chest_big_pattern(image)
         chest_size = chest_big_inventory_amount
         if not chest_pattern:
@@ -199,6 +206,7 @@ def check_and_get_chest_image(image_screenshoot: Optional[np.ndarray] = None) ->
             chest_x1, chest_y1 = chest_top_left
             chest_x2, chest_y2 = chest_bottom_right
             cropped_chest_image = image[chest_y1:chest_y2, chest_x1:chest_x2]
+            save_image_for_function("check_and_get_chest_image", "cropped_chest_image", cropped_chest_image)
             app_logger.debug(f"chest_top_left: {chest_top_left} chest_bottom_right: {chest_bottom_right} chest_size: {chest_size}")
             return cropped_chest_image, chest_top_left, chest_bottom_right, chest_size
         app_logger.debug("chest_pattern is None")
@@ -225,6 +233,7 @@ def get_slots_chest_coordinates(chest_image: Optional[np.ndarray] = None, chest_
             chest_image, chest_top_left, chest_bottom_right, chest_size = check_and_get_chest_image()
         else:
             chest_image = copy.copy(chest_image)
+        save_image_for_function("get_slots_chest_coordinates", "chest_image", chest_image)
         chest_width, chest_height = chest_image.shape[1], chest_image.shape[0]
         slots_coordinates = []
         start_slot_x1 = chest_inventory_elements["left-frame"]["width"]
@@ -284,6 +293,7 @@ def get_chest_slots_images(chest_image: Optional[np.ndarray] = None, slots_coord
             chest_image, chest_top_left, chest_bottom_right, chest_size = check_and_get_chest_image()
         else:
             chest_image = copy.copy(chest_image)
+        save_image_for_function("get_chest_slots_images", "chest_image", chest_image)
         if slots_coordinates is None:
             app_logger.debug("slots_coordinates is None")
             chest_width, chest_height = chest_image.shape[1], chest_image.shape[0]
@@ -323,6 +333,7 @@ def find_item_pattern_in_item_image(item_image: np.ndarray, items_quantity_mask:
         app_logger.debug("find_item_pattern_in_item_image was used")
         app_logger.debug(f"threshold_pixels: {threshold_pixels}")
         app_logger.debug(f"threshold_pattern: {threshold_pattern}")
+        save_image_for_function("find_item_pattern_in_item_image", "item_image", item_image)
         quantity_mask_inverted = cv2.bitwise_not(items_quantity_mask)
         best_match = (None, 0)
         for key, pattern_info in patterns.items():
@@ -444,7 +455,3 @@ def calc_and_get_screenshoot_sloot_coordinates(slot_coordinates: Tuple[Tuple[int
         )
     app_logger.debug(f"new_slot_coordinates: {new_slot_coordinates}")
     return new_slot_coordinates
-
-
-
-

@@ -76,7 +76,13 @@ def get_pattern_settings() -> Dict[str, any]:
 slots_pattern_path = os.path.join(PATTERNS_DIR_PATH, f'eq-slots_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}.png')
 slots_pattern_mask_path = os.path.join(PATTERNS_DIR_PATH, f'eq-slots_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_mask.png')
 
-pickaxe_pattern_path = os.path.join(PATTERNS_DIR_PATH, f'pickaxe_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_full.png')
+# pickaxe_pattern_path = os.path.join(PATTERNS_DIR_PATH, f'pickaxe_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_full.png')
+pickaxe_patterns_paths = {
+    "diamond": os.path.join(PATTERNS_DIR_PATH, f'pickaxe_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_full_diamond.png'),
+    "enchanted-diamond": os.path.join(PATTERNS_DIR_PATH, f'pickaxe_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_full_enchanted-diamond.png'),
+    "netherite": os.path.join(PATTERNS_DIR_PATH, f'pickaxe_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_full_netherite.png'),
+    "enchanted-netherite": os.path.join(PATTERNS_DIR_PATH, f'pickaxe_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_full_enchanted-netherite.png'),
+}
 pickaxe_pattern_mask_path = os.path.join(PATTERNS_DIR_PATH, f'pickaxe_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_full_mask.png')
 
 # axe_pattern_path = os.path.join(PATTERNS_DIR_PATH, f'axe_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_full.png')

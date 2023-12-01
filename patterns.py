@@ -1,6 +1,6 @@
 import array
 from app_config import item_destruction_patterns_paths, slots_pattern_path, slots_pattern_mask_path, \
-    pickaxe_pattern_path, pickaxe_pattern_mask_path, eq_inventory_patterns_paths, chest_inventory_patterns_paths, \
+    pickaxe_patterns_paths, pickaxe_pattern_mask_path, eq_inventory_patterns_paths, chest_inventory_patterns_paths, \
     items_quantity_pattern, axe_patterns_paths, axe_pattern_mask_path, items_patterns_paths
 from image_operations import convert_cv_image_to_gray, load_cv_image
 from logger import app_logger
@@ -37,12 +37,13 @@ def load_pickaxe_patterns() -> None:
     """
     global pickaxe_patterns
     try:
-        pickaxe_pattern = convert_cv_image_to_gray(load_cv_image(pickaxe_pattern_path))
-        pickaxe_patterns["pickaxe_pattern"] = pickaxe_pattern
-        if pickaxe_pattern is None:
-            app_logger.warning("Not loaded pickaxe_pattern")
+        for key, path in pickaxe_patterns_paths.items():
+            pickaxe_pattern = convert_cv_image_to_gray(load_cv_image(path))
+            pickaxe_patterns[key] = pickaxe_pattern
+            if pickaxe_pattern is None:
+                app_logger.warning(f"Not loaded axe pattern for key: {key}")
         pickaxe_pattern_mask = convert_cv_image_to_gray(load_cv_image(pickaxe_pattern_mask_path))
-        pickaxe_patterns["pickaxe_pattern_mask"] = pickaxe_pattern_mask
+        pickaxe_patterns["mask"] = pickaxe_pattern_mask
         if pickaxe_pattern_mask is None:
             app_logger.warning("Not loaded pickaxe_pattern_mask")
         app_logger.info("pickaxe_patterns was loaded")

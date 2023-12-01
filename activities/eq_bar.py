@@ -15,35 +15,43 @@ from screenshooter import get_last_screenshot, get_screenshot
 eq_slot_top_left = None
 eq_slot_bottom_right = None
 
-def find_pickaxe_pattern(image: np.ndarray, threshold: float = 0.935) -> Optional[Tuple[Tuple[int, int], Tuple[int, int]]]: #TODO: przenieść część wspólną do jednej osobnej funkcji razem z find_eq_slots_pattern
+def find_pickaxe_pattern(image: np.ndarray, threshold: float = 0.92) -> Optional[Tuple[Tuple[int, int], Tuple[int, int]]]:
     """
-    Finds the pickaxe pattern in a given image using template matching.
+    Finds the best matching pickaxe pattern in a given image using template matching.
 
     Args:
-        image: The image to search for the pickaxe pattern.
-        threshold: The threshold value for template matching, default is 0.935.
+        image (np.ndarray): The image to search for pickaxe patterns.
+        threshold (float): The threshold value for template matching, default is 0.935.
 
     Returns:
-        A tuple containing the top-left and bottom-right coordinates of the found pickaxe pattern, or None if not found.
+        Optional[Tuple[Tuple[int, int], Tuple[int, int]]]: A tuple containing the top-left and bottom-right
+        coordinates of the best matching pickaxe pattern, or None if no pattern exceeds the threshold.
     """
     app_logger.debug("find_pickaxe_pattern was used")
     app_logger.debug(f"used threshold: {threshold}")
     try:
         image_gray = convert_cv_image_to_gray(image)
-        result = cv2.matchTemplate(image_gray, pickaxe_patterns["pickaxe_pattern"], cv2.TM_CCORR_NORMED, mask=pickaxe_patterns["pickaxe_pattern_mask"])
-        _, max_val, _, max_loc = cv2.minMaxLoc(result)
-        app_logger.debug(f"pickaxe max_val: {max_val} max_loc: {max_loc}")
-        if max_val > threshold:
-            top_left = max_loc
-            w, h = pickaxe_patterns["pickaxe_pattern"].shape[1], pickaxe_patterns["pickaxe_pattern"].shape[0]
+        best_match = (None, 0, None)  # Tuple to store best match coordinates, value, and size (w, h)
+        for key, pattern in pickaxe_patterns.items():
+            if "mask" in key:  # Skip mask entries
+                continue
+            result = cv2.matchTemplate(image_gray, pattern, cv2.TM_CCORR_NORMED, mask=pickaxe_patterns["mask"])
+            _, max_val, _, max_loc = cv2.minMaxLoc(result)
+            app_logger.debug(f"{key} pickaxe max_val: {max_val} max_loc:{max_loc}")
+            if max_val > best_match[1] and max_val > threshold:
+                w, h = pattern.shape[1], pattern.shape[0]
+                best_match = (max_loc, max_val, (w, h))
+        if best_match[1] > threshold:
+            top_left = best_match[0]
+            w, h = best_match[2]
             bottom_right = (top_left[0] + w, top_left[1] + h)
-            app_logger.debug(f'pickaxe was found in - top_left: {top_left} bottom_right: {bottom_right}')
+            app_logger.debug(f'Best matching pickaxe found - top_left: {top_left} bottom_right: {bottom_right}')
             return top_left, bottom_right
-        else:
-            app_logger.info('pickaxe pattern was not found.')
-            return None
+        app_logger.info('No pickaxe pattern exceeded the threshold.')
+        return None
     except Exception as ex:
         app_logger.error(ex)
+
 
 
 def find_eq_slots_pattern(image: np.ndarray, threshold: float = 0.9) -> Optional[Tuple[Tuple[int, int], Tuple[int, int]]]: # requires a slot set to 9
@@ -200,7 +208,7 @@ def check_pickaxe_damage_to_repair(image_pickaxe: Optional[np.ndarray] = None) -
         app_logger.info(f"check_pickaxe_damage_to_repair: False")
         return False
 
-def find_axe_pattern(image: np.ndarray, threshold: float = 0.95) -> Optional[Tuple[Tuple[int, int], Tuple[int, int]]]:
+def find_axe_pattern(image: np.ndarray, threshold: float = 0.92) -> Optional[Tuple[Tuple[int, int], Tuple[int, int]]]:
     """
     Finds the best matching axe pattern in a given image using template matching.
 

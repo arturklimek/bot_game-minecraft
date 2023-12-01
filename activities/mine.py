@@ -94,7 +94,7 @@ def items_stored_procedure() -> None:
                     calc_and_get_screenshoot_sloot_coordinates(slot_coordinates, chest_top_left, chest_bottom_right))
             for slot_to_click in screen_coordinates_to_click:
                 shift_click_at_coordinates_in_game_window(slot_to_click)
-            app_logger.debug(f"slots_coordinates_to_stored have {len(screen_coordinates_to_click)} elements")
+            app_logger.debug(f"screen_coordinates_to_click have {len(screen_coordinates_to_click)} elements")
             time.sleep(return_random_wait_interval_time(0.1, 0.5))
             keyboard.press_and_release(get_hotkey_inventory())
             app_logger.debug(f"items_stored_procedure press and release: {get_hotkey_inventory()}")

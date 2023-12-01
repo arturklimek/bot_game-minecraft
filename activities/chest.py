@@ -382,6 +382,7 @@ def shift_click_at_coordinates_in_game_window(slots_coordinates: Tuple[Tuple[int
     app_logger.debug(f"Taked slots_coordinates: {slots_coordinates}")
     window_coordinates = get_game_window_coordinates(get_game_window_name())
     if window_coordinates is None:
+        app_logger.debug(f"window_coordinates is: {window_coordinates}")
         return
     window_x, window_y = window_coordinates
     slot_top_left, slot_bottom_right = slots_coordinates

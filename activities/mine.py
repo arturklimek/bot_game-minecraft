@@ -74,12 +74,17 @@ def items_stored_procedure() -> None:
             app_logger.debug(f"geted {len(slots_images)} slot images")
             item_quantity_mask = convert_cv_image_to_gray(load_cv_image(items_quantity_pattern))
             slots_coordinates_to_stored = []
-            slots_images_to_analize = slots_images[0:eq_slots_amount + eq_inventory_amount]
-            slots_coordinates_to_analize = slots_coordinates[0:eq_slots_amount + eq_inventory_amount]
+            slots_amount = eq_slots_amount + eq_inventory_amount
+            slots_images_to_analize = slots_images[0:slots_amount]
+            app_logger.debug(f"slots_images_to_analize have {len(slots_images_to_analize)} elements.")
+            slots_coordinates_to_analize = slots_coordinates[0:slots_amount]
+            app_logger.debug(f"slots_coordinates_to_analize have {len(slots_coordinates_to_analize)} elements: {slots_coordinates_to_analize}")
             for i, slot in enumerate(slots_images_to_analize):
-                if i >= eq_slots_amount + eq_inventory_amount:
+                if i >= slots_amount:
+                    app_logger.debug(f"i: {i} is greater than or equal to eq_slots_amount + eq_inventory_amount: {slots_amount} - break")
                     break
                 if i + 1 in get_protected_slots():
+                    app_logger.debug(f"i: {i} +1 is in protected_slots - continue")
                     continue
                 selected_item = find_item_pattern_in_item_image(slot, item_quantity_mask, items_patterns)
                 app_logger.debug(f"selected_item: {selected_item}")
@@ -117,15 +122,15 @@ def items_stored_procedure() -> None:
                 app_logger.debug(f"slots_coordinates have {len(slots_coordinates)} elements: {slots_coordinates}")
                 slots_images = get_chest_slots_images(cropped_chest_image, slots_coordinates)
                 app_logger.debug(f"slots_images have {len(slots_images)} elements")
-                slots_images_to_analize = slots_images[0:eq_slots_amount + eq_inventory_amount]
+                slots_images_to_analize = slots_images[0:slots_amount]
                 app_logger.debug(f"slots_images_to_analize have {len(slots_images_to_analize)} elements")
-                slots_coordinates_to_analize = slots_coordinates[0:eq_slots_amount + eq_inventory_amount]
+                slots_coordinates_to_analize = slots_coordinates[0:slots_amount]
                 app_logger.debug(
                     f"slots_coordinates_to_analize have {len(slots_coordinates_to_analize)} elements: {slots_coordinates_to_analize}")
                 screen_coordinates_to_click.clear()
                 app_logger.debug(f"screen_coordinates_to_click was clear")
                 for i, slot_image in enumerate(slots_images_to_analize):
-                    if i >= eq_slots_amount + eq_inventory_amount:
+                    if i >= slots_amount:
                         break
                     if i + 1 in get_protected_slots():
                         continue

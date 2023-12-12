@@ -48,6 +48,8 @@ game_hotkeys:
   moving_left: 30
   moving_right: 32
   moving_up: 17
+# game_latest_log_path - Path of the last log file that is changed by the game in real time (required to analyze chat text messages), default value 'C:\Users\Artur\AppData\Roaming\.minecraft\logs\latest.log' 
+game_latest_log_path: C:\Users\Artur\AppData\Roaming\.minecraft\logs\latest.log
 # homes - Teleport command settings to key locations used in the scrip. 
 #      'repair' - location used for repairing tools, default value '/home repair'. 
 #      'mining' - location of mining, default value '/home mine' 

@@ -12,17 +12,22 @@ PATTERNS_DIR_PATH = os.path.join(APP_PATH, 'patterns')
 game_window_name = 'Minecraft'
 
 save_images_flags = {
-    "find_chest_big_pattern": True,
-    "get_chest_big_image": True,
-    "find_chest_small_pattern": True,
-    "get_chest_small_image": True,
-    "check_and_get_chest_image": True,
-    "get_slots_chest_coordinates": True,
-    "get_chest_slots_images": True,
-    "find_item_pattern_in_item_image": True,
+    "find_chest_big_pattern": False,
+    "get_chest_big_image": False,
+    "find_chest_small_pattern": False,
+    "get_chest_small_image": False,
+    "check_and_get_chest_image": False,
+    "get_slots_chest_coordinates": False,
+    "get_chest_slots_images": False,
+    "find_item_pattern_in_item_image": False,
 }
 
-def get_save_images_flags():
+game_latest_log_path = os.path.join('C:', os.sep, 'Users', 'Artur', 'AppData', 'Roaming', '.minecraft', 'logs', 'latest.log')
+
+def get_game_latest_log_path() -> str:
+    return game_latest_log_path
+
+def get_save_images_flags() -> dict:
     return save_images_flags
 
 def get_game_window_name() -> str:
@@ -483,6 +488,7 @@ def get_config_dict():
     tmp_dict["chat_messages_list"] = chat_messages
     tmp_dict["chat_messages_frequency_min"] = chat_messages_frequency_min
     tmp_dict["tmp_home_flag"] = tmp_home_flag
+    tmp_dict["game_latest_log_path"] = game_latest_log_path
     return tmp_dict
 
 def set_config_from_dict(config_dict):
@@ -531,6 +537,7 @@ def set_config_from_dict(config_dict):
     global chat_messages
     global chat_messages_frequency_min
     global tmp_home_flag
+    global game_latest_log_path
     if config_dict is not None:
         # if "pattern_settings" in config_dict:
         #     pattern_settings = config_dict["pattern_settings"]
@@ -584,6 +591,8 @@ def set_config_from_dict(config_dict):
             chat_messages_frequency_min = config_dict["chat_messages_frequency_min"]
         if "tmp_home_flag" in config_dict:
             tmp_home_flag = config_dict["tmp_home_flag"]
+        if "game_latest_log_path" in config_dict:
+            game_latest_log_path = config_dict["game_latest_log_path"]
         app_logger.info(f"The configuration was loaded: {config_dict}")
     else:
         app_logger.info(f"Taked config dict is None")
@@ -608,6 +617,7 @@ comments = {
     'chat_messages_list': f"# chat_messages_list - List of messages sent to the chat \n",
     'chat_messages_frequency_min': f"# chat_messages_frequency_min - Frequency of sending chat messages, default value '{chat_messages_frequency_min}' \n",
     'tmp_home_flag': f"# tmp_home_flag - A value of True or False, determines whether the program should use set and go home temporary, default value '{tmp_home_flag}' \n",
+    'game_latest_log_path': f"# game_latest_log_path - Path of the last log file that is changed by the game in real time (required to analyze chat text messages), default value '{game_latest_log_path}' \n",
 }
 
 def encode_special_characters(string: str) -> str:

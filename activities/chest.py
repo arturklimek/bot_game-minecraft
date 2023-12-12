@@ -195,7 +195,7 @@ def check_and_get_chest_image(image_screenshoot: Optional[np.ndarray] = None) ->
     else:
         image = copy.copy(image_screenshoot)
     try:
-        save_image_for_function("check_and_get_chest_image", "image_screenshoot", image_screenshoot)
+        save_image_for_function("check_and_get_chest_image", "image", image)
         chest_pattern = find_chest_big_pattern(image)
         chest_size = chest_big_inventory_amount
         if not chest_pattern:

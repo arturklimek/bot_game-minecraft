@@ -79,12 +79,15 @@ def save_cv_image(image: np.ndarray, output_folder: str = OUTPUTS_DIR_PATH, file
         filename (str, optional): The name of the file. Defaults to a timestamp if not provided.
     """
     try:
-        if filename is None:
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"{timestamp}.png"
-        file_path = os.path.join(output_folder, filename)
-        cv2.imwrite(file_path, image)
-        app_logger.info(f"Image saved as {file_path}")
+        if image is not None:
+            if filename is None:
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                filename = f"{timestamp}.png"
+            file_path = os.path.join(output_folder, filename)
+            cv2.imwrite(file_path, image)
+            app_logger.info(f"Image saved as {file_path}")
+        else:
+            app_logger.warning("Taked image is None")
     except Exception as ex:
         app_logger.error(ex)
 

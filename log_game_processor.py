@@ -8,6 +8,15 @@ from logger import app_logger
 def log_new_line(line: str) -> None:
     app_logger.debug(f"New line in game latest log file: {line.strip()}")
 
+def check_risk_nickname(nickname: str) -> bool:
+    risk_nicks_list = list(map(lambda x: x.lower().strip(), get_risk_nicks_list()))
+    if nickname.lower().strip() in risk_nicks_list:
+        app_logger.debug(f"Nick: {nickname} IS in risk_nicks_list")
+        return True
+    else:
+        app_logger.debug(f"Nick: {nickname} IS NOT in risk_nicks_list")
+        return False
+
 def watcher(file_path: str = get_game_latest_log_path(), action: Callable[[str], None] = log_new_line) -> None:
     """
     Monitors a log file for new entries and performs an action on each new line.
@@ -32,7 +41,7 @@ def watcher(file_path: str = get_game_latest_log_path(), action: Callable[[str],
     except Exception as e:
         app_logger.error(f"An unexpected error occurred: {e}")
 
-def start_watcher_thread(action: Callable[[str], None] = log_new_line) -> None:
+def start_messages_watcher_thread(action: Callable[[str], None] = log_new_line) -> None:
     """
     Starts the watcher function in a separate thread.
 
@@ -72,7 +81,6 @@ def is_player_chat_message(log_line: str) -> bool:
             return False
     else:
         app_logger.debug("The readed line form game logs contain unknown content")
-        return None
 
 def is_player_private_message(log_line: str) -> bool:
     """

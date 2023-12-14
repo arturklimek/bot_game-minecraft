@@ -19,7 +19,7 @@ def clear_reply_data() -> None:
     global reply_data
     reply_data = {}
 
-def update_sender_data(log_line: str) -> None:
+def update_reply_data(log_line: str) -> None:
     global reply_data
     player_nickname = ""
     message_content = ""

@@ -5,42 +5,42 @@ from typing import Callable
 from app_config import get_game_latest_log_path, get_risk_nicks_list, get_messages_respond_dict
 from logger import app_logger
 
-sender_player_data = {}
+reply_data = {}
 
-def get_sender_player_data() -> dict:
-    return sender_player_data
+def get_reply_data() -> dict:
+    return reply_data
 
-def set_sender_player_data(player_data: dict) -> None:
-    global sender_player_data
-    app_logger.debug(f"change sender_player_data: {sender_player_data} to nev value: {player_data}")
-    sender_player_data = player_data
+def set_reply_data(player_data: dict) -> None:
+    global reply_data
+    app_logger.debug(f"change sender_player_data: {reply_data} to nev value: {player_data}")
+    reply_data = player_data
 
-def clear_sender_player_data() -> None:
-    global sender_player_data
-    sender_player_data = {}
+def clear_reply_data() -> None:
+    global reply_data
+    reply_data = {}
 
-def check_line_for_player_messages(line: str) -> None:
-    global sender_player_data
+def update_sender_data(log_line: str) -> None:
+    global reply_data
     player_nickname = ""
     message_content = ""
-    if is_player_chat_message(line):
-        player_nickname = extract_nick_from_player_chat_message(line).lower().strip()
-        message_content = extract_content_from_player_chat_message(line).lower().strip()
-    elif is_player_private_message(line):
-        player_nickname = extract_nick_from_player_private_message(line).lower().strip()
-        message_content = extract_content_from_player_private_message(line).lower().strip()
+    if is_player_chat_message(log_line):
+        player_nickname = extract_nick_from_player_chat_message(log_line).lower().strip()
+        message_content = extract_content_from_player_chat_message(log_line).lower().strip()
+    elif is_player_private_message(log_line):
+        player_nickname = extract_nick_from_player_private_message(log_line).lower().strip()
+        message_content = extract_content_from_player_private_message(log_line).lower().strip()
     if player_nickname and message_content:
         if check_risk_nickname(player_nickname):
             messages_respond_dict = get_messages_respond_dict()
             answer = "?"
             if message_content in messages_respond_dict.keys():
                 answer = messages_respond_dict[message_content]
-            sender_player_data = {
+            reply_data = {
                 "nickname": player_nickname,
                 "answer":answer
             }
             app_logger.debug(
-                f"detected player_nickname: {player_nickname} in risk_nicks_list, set sender_player_data value to: {sender_player_data}")
+                f"detected player_nickname: {player_nickname} in risk_nicks_list, set sender_player_data value to: {reply_data}")
 
 def check_risk_nickname(nickname: str) -> bool:
     risk_nicks_list = list(map(lambda x: x.lower().strip(), get_risk_nicks_list()))
@@ -51,7 +51,7 @@ def check_risk_nickname(nickname: str) -> bool:
         app_logger.debug(f"Nick: {nickname} IS NOT in risk_nicks_list")
         return False
 
-def watcher(file_path: str = get_game_latest_log_path(), action: Callable[[str], None] = check_line_for_player_messages) -> None:
+def watcher(file_path: str = get_game_latest_log_path(), action: Callable[[str], None] = update_sender_data) -> None:
     """
     Monitors a log file for new entries and performs an action on each new line.
 
@@ -76,7 +76,7 @@ def watcher(file_path: str = get_game_latest_log_path(), action: Callable[[str],
     except Exception as e:
         app_logger.error(f"An unexpected error occurred: {e}")
 
-def start_messages_watcher_thread(action: Callable[[str], None] = check_line_for_player_messages) -> None:
+def start_messages_watcher_thread(action: Callable[[str], None] = update_sender_data) -> None:
     """
     Starts the watcher function in a separate thread.
 

@@ -40,6 +40,16 @@ def get_save_images_flags() -> dict:
 def get_game_window_name() -> str:
     return game_window_name
 
+messages_respond_dict = {
+    '.': '?',
+    '?': '?',
+    'halo': 'Co tam?',
+    'zyjesz': '?',
+    'Artur': '?',
+}
+def get_messages_respond_dict() -> dict:
+    return messages_respond_dict
+
 config_file_path = os.path.join(APP_PATH, 'config.yaml')
 
 def get_config_file_path() -> str:
@@ -497,6 +507,7 @@ def get_config_dict():
     tmp_dict["tmp_home_flag"] = tmp_home_flag
     tmp_dict["game_latest_log_path"] = game_latest_log_path
     tmp_dict["risk_nicks_list"] = risk_nicks_list
+    tmp_dict["messages_respond_dict"] = messages_respond_dict
     return tmp_dict
 
 def set_config_from_dict(config_dict):
@@ -547,6 +558,7 @@ def set_config_from_dict(config_dict):
     global tmp_home_flag
     global game_latest_log_path
     global risk_nicks_list
+    global messages_respond_dict
     if config_dict is not None:
         # if "pattern_settings" in config_dict:
         #     pattern_settings = config_dict["pattern_settings"]
@@ -604,6 +616,8 @@ def set_config_from_dict(config_dict):
             game_latest_log_path = config_dict["game_latest_log_path"]
         if "risk_nicks_list" in config_dict:
             risk_nicks_list = config_dict["risk_nicks_list"]
+        if "messages_respond_dict" in config_dict:
+            messages_respond_dict = config_dict["messages_respond_dict"]
         app_logger.info(f"The configuration was loaded: {config_dict}")
     else:
         app_logger.info(f"Taked config dict is None")
@@ -630,6 +644,7 @@ comments = {
     'tmp_home_flag': f"# tmp_home_flag - A value of True or False, determines whether the program should use set and go home temporary, default value '{tmp_home_flag}' \n",
     'game_latest_log_path': f"# game_latest_log_path - Path of the last log file that is changed by the game in real time (required to analyze chat text messages), default value '{game_latest_log_path}' \n",
     'risk_nicks_list': f"# risk_nicks_list - List of nicks that are a threat (usually a list of administration) from which messages are analyzed and appropriate actions are performed according to the configuration., default value '{risk_nicks_list}' \n",
+    'messages_respond_dict': f"# messages_respond_dict - Response dictionary used to reply to messages of people on the list of endangered nicknames: The first value is the content of the message received from the sender, the second value is the content of the reply. The default value for content from outside the dictionary is: '?', default value '{messages_respond_dict}' \n",
 }
 
 def encode_special_characters(string: str) -> str:

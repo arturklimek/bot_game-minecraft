@@ -36,7 +36,6 @@ def send_chat_notification() -> None:
     except Exception as ex:
         app_logger.error(ex)
 
-
 def send_on_chat(text: str) -> None:
     """
     Sends a specified text message in the game chat.
@@ -59,6 +58,24 @@ def send_on_chat(text: str) -> None:
     time.sleep(return_random_wait_interval_time(0.75,1.5))
     keyboard.press_and_release(get_hotkey_enter())
     app_logger.debug(f"Press and release {get_hotkey_enter()}")
+
+def send_chat_message_to_player(nickname: str = "", reply_text: str = "") -> None:
+    message_text = ""
+    if nickname:
+        message_text = nickname + " "
+        app_logger.debug("nickname is empty")
+    if reply_text:
+        message_text = message_text + reply_text
+        send_on_chat(message_text)
+    else:
+        app_logger.debug("can not send player chat message - reply_text is empty")
+
+def send_private_message_to_player(nickname: str = "", reply_text: str = "") -> None:
+    if nickname and reply_text:
+        message_text = f"/msg {nickname} {reply_text}"
+        send_on_chat(message_text)
+    else:
+        app_logger.debug("can not send player private message - reply_text or reply_text is empty")
 
 def tp_to_repair_home() -> None:
     """

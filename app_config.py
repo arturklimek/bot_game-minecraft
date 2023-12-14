@@ -27,6 +27,13 @@ game_latest_log_path = os.path.join('C:', os.sep, 'Users', 'Artur', 'AppData', '
 def get_game_latest_log_path() -> str:
     return game_latest_log_path
 
+risk_nicks_list = [
+    "Artur",
+]
+
+def get_risk_nicks_list() -> list:
+    return risk_nicks_list
+
 def get_save_images_flags() -> dict:
     return save_images_flags
 
@@ -489,6 +496,7 @@ def get_config_dict():
     tmp_dict["chat_messages_frequency_min"] = chat_messages_frequency_min
     tmp_dict["tmp_home_flag"] = tmp_home_flag
     tmp_dict["game_latest_log_path"] = game_latest_log_path
+    tmp_dict["risk_nicks_list"] = risk_nicks_list
     return tmp_dict
 
 def set_config_from_dict(config_dict):
@@ -538,6 +546,7 @@ def set_config_from_dict(config_dict):
     global chat_messages_frequency_min
     global tmp_home_flag
     global game_latest_log_path
+    global risk_nicks_list
     if config_dict is not None:
         # if "pattern_settings" in config_dict:
         #     pattern_settings = config_dict["pattern_settings"]
@@ -593,6 +602,8 @@ def set_config_from_dict(config_dict):
             tmp_home_flag = config_dict["tmp_home_flag"]
         if "game_latest_log_path" in config_dict:
             game_latest_log_path = config_dict["game_latest_log_path"]
+        if "risk_nicks_list" in config_dict:
+            risk_nicks_list = config_dict["risk_nicks_list"]
         app_logger.info(f"The configuration was loaded: {config_dict}")
     else:
         app_logger.info(f"Taked config dict is None")
@@ -618,6 +629,7 @@ comments = {
     'chat_messages_frequency_min': f"# chat_messages_frequency_min - Frequency of sending chat messages, default value '{chat_messages_frequency_min}' \n",
     'tmp_home_flag': f"# tmp_home_flag - A value of True or False, determines whether the program should use set and go home temporary, default value '{tmp_home_flag}' \n",
     'game_latest_log_path': f"# game_latest_log_path - Path of the last log file that is changed by the game in real time (required to analyze chat text messages), default value '{game_latest_log_path}' \n",
+    'risk_nicks_list': f"# risk_nicks_list - List of nicks that are a threat (usually a list of administration) from which messages are analyzed and appropriate actions are performed according to the configuration., default value '{risk_nicks_list}' \n",
 }
 
 def encode_special_characters(string: str) -> str:

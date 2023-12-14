@@ -116,7 +116,9 @@ def extract_nick_from_player_chat_message(log_line: str) -> str:
                     if len(chat_sections) > 2:
                         name_section = chat_sections[-3]
                         player_name = name_section.split(" ")[-1]
-                        return player_name #TODO: dodać odpowiednie loggery
+                        app_logger.debug(f"player_name: {player_name}")
+                        return player_name
+            app_logger.debug(f"Can not extrack nick from log_line: {log_line}")
         except Exception as ex:
             app_logger.error(f"Error extracting player name: {ex}")
     return ""
@@ -141,10 +143,11 @@ def extract_nick_from_player_private_message(log_line: str) -> str:
         if start_idx != -1 and end_idx != -1:
             sender_segment = log_line[start_idx:end_idx]
             sender_nickname = sender_segment.split()[-1]
+            app_logger.debug(f"sender_nickname: {sender_nickname.strip()}")
             return sender_nickname.strip()
-        return ""
-    # TODO: dodać odpowiednie loggery
-
+        else:
+            app_logger.debug(f"Can not extract player nickname form log_line: {log_line}")
+            return ""
 
 def extract_content_from_player_chat_message(log_line: str) -> str:
     """
@@ -166,8 +169,11 @@ def extract_content_from_player_chat_message(log_line: str) -> str:
                     break
             if last_part:
                 message = last_part.split("]: ", 1)
-                if len(message) > 1:#TODO: dodać odpowiednie loggery
+                if len(message) > 1:
+                    app_logger.debug(f"message: {message[1]}")
                     return message[1]
+            else:
+                app_logger.debug(f"Can not extract content from log_line: {log_line}")
         except Exception as ex:
             app_logger.error(f"Error extracting player name: {ex}")
     return ""
@@ -189,7 +195,8 @@ def extract_content_from_player_private_message(log_line: str) -> str:
         start_idx = log_line.find("-> ja]") + len("-> ja]")
         if start_idx != -1:
             message_content = log_line[start_idx:].strip()
+            app_logger.debug(f"message_content: {message_content}")
             return message_content
-        return ""
-    #TODO: dodać odpowiednie loggery
-
+        else:
+            app_logger.debug(f"Can not extract content form log_line: {log_line}")
+            return ""

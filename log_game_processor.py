@@ -35,12 +35,15 @@ def update_reply_data(log_line: str) -> None:
             answer = "?"
             if message_content in messages_respond_dict.keys():
                 answer = messages_respond_dict[message_content]
+                app_logger.debug(f"message_content is in messages_respond_dict, change answer value: {answer}")
             reply_data = {
                 "nickname": player_nickname,
                 "answer":answer
             }
             app_logger.debug(
                 f"detected player_nickname: {player_nickname} in risk_nicks_list, set sender_player_data value to: {reply_data}")
+    else:
+        app_logger.debug(f"Needed variable is empty, player_nickname: {player_nickname} message_content: {message_content}")
 
 def check_risk_nickname(nickname: str) -> bool:
     risk_nicks_list = list(map(lambda x: x.lower().strip(), get_risk_nicks_list()))

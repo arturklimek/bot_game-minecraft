@@ -12,14 +12,35 @@ def get_sender_player_data() -> dict:
 
 def set_sender_player_data(player_data: dict) -> None:
     global sender_player_data
+    app_logger.debug(f"change sender_player_data: {sender_player_data} to nev value: {player_data}")
     sender_player_data = player_data
 
 def clear_sender_player_data() -> None:
     global sender_player_data
     sender_player_data = {}
 
-def log_new_line(line: str) -> None:
-    app_logger.debug(f"New line in game latest log file: {line.strip()}")
+def check_line_for_player_messages(line: str) -> None:
+    global sender_player_data
+    player_nickname = ""
+    message_content = ""
+    if is_player_chat_message(line):
+        player_nickname = extract_nick_from_player_chat_message(line).lower().strip()
+        message_content = extract_content_from_player_chat_message(line).lower().strip()
+    elif is_player_private_message(line):
+        player_nickname = extract_nick_from_player_private_message(line).lower().strip()
+        message_content = extract_content_from_player_private_message(line).lower().strip()
+    if player_nickname and message_content:
+        if check_risk_nickname(player_nickname):
+            messages_respond_dict = get_messages_respond_dict()
+            answer = "?"
+            if message_content in messages_respond_dict.keys():
+                answer = messages_respond_dict[message_content]
+            sender_player_data = {
+                "nickname": player_nickname,
+                "answer":answer
+            }
+            app_logger.debug(
+                f"detected player_nickname: {player_nickname} in risk_nicks_list, set sender_player_data value to: {sender_player_data}")
 
 def check_risk_nickname(nickname: str) -> bool:
     risk_nicks_list = list(map(lambda x: x.lower().strip(), get_risk_nicks_list()))
@@ -30,7 +51,7 @@ def check_risk_nickname(nickname: str) -> bool:
         app_logger.debug(f"Nick: {nickname} IS NOT in risk_nicks_list")
         return False
 
-def watcher(file_path: str = get_game_latest_log_path(), action: Callable[[str], None] = log_new_line) -> None:
+def watcher(file_path: str = get_game_latest_log_path(), action: Callable[[str], None] = check_line_for_player_messages) -> None:
     """
     Monitors a log file for new entries and performs an action on each new line.
 
@@ -46,6 +67,7 @@ def watcher(file_path: str = get_game_latest_log_path(), action: Callable[[str],
                 if not line:
                     time.sleep(0.5)
                     continue
+                app_logger.debug(f"Readed line: {line}")
                 action(line)
     except FileNotFoundError:
         app_logger.error(f"The file at {file_path} was not found.")
@@ -54,7 +76,7 @@ def watcher(file_path: str = get_game_latest_log_path(), action: Callable[[str],
     except Exception as e:
         app_logger.error(f"An unexpected error occurred: {e}")
 
-def start_messages_watcher_thread(action: Callable[[str], None] = log_new_line) -> None:
+def start_messages_watcher_thread(action: Callable[[str], None] = check_line_for_player_messages) -> None:
     """
     Starts the watcher function in a separate thread.
 

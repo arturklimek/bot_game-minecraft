@@ -20,6 +20,19 @@ def clear_reply_data() -> None:
     reply_data = {}
 
 def update_reply_data(log_line: str) -> None:
+    """
+    Updates reply data based on the content of a log line from the game.
+
+    This function processes a log line to extract a player's nickname and the content of their message.
+    If the nickname is identified as risky, it prepares a reply using a predefined response dictionary.
+    The extracted and processed information is then stored in a global `reply_data` dictionary.
+
+    Args:
+        log_line (str): The log line from the game to be analyzed.
+
+    Global Variables:
+        reply_data (dict): A global dictionary updated with the nickname of the player and the corresponding reply.
+    """
     global reply_data
     player_nickname = ""
     message_content = ""
@@ -38,7 +51,7 @@ def update_reply_data(log_line: str) -> None:
                 app_logger.debug(f"message_content is in messages_respond_dict, change answer value: {answer}")
             reply_data = {
                 "nickname": player_nickname,
-                "answer":answer
+                "answer": answer
             }
             app_logger.debug(
                 f"detected player_nickname: {player_nickname} in risk_nicks_list, set sender_player_data value to: {reply_data}")

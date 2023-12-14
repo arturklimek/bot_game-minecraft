@@ -2,8 +2,21 @@ import re
 import threading
 import time
 from typing import Callable
-from app_config import get_game_latest_log_path, get_risk_nicks_list
+from app_config import get_game_latest_log_path, get_risk_nicks_list, get_messages_respond_dict
 from logger import app_logger
+
+sender_player_data = {}
+
+def get_sender_player_data() -> dict:
+    return sender_player_data
+
+def set_sender_player_data(player_data: dict) -> None:
+    global sender_player_data
+    sender_player_data = player_data
+
+def clear_sender_player_data() -> None:
+    global sender_player_data
+    sender_player_data = {}
 
 def log_new_line(line: str) -> None:
     app_logger.debug(f"New line in game latest log file: {line.strip()}")
@@ -31,7 +44,7 @@ def watcher(file_path: str = get_game_latest_log_path(), action: Callable[[str],
             while True:
                 line = file.readline()
                 if not line:
-                    time.sleep(20)
+                    time.sleep(0.5)
                     continue
                 action(line)
     except FileNotFoundError:

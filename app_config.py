@@ -50,6 +50,16 @@ messages_respond_dict = {
 def get_messages_respond_dict() -> dict:
     return messages_respond_dict
 
+chat_message_answer_flag = False
+
+def get_chat_message_answer_flag() -> bool:
+    return chat_message_answer_flag
+
+private_message_answer_flag = True
+
+def get_private_message_answer_flag() -> bool:
+    return private_message_answer_flag
+
 config_file_path = os.path.join(APP_PATH, 'config.yaml')
 
 def get_config_file_path() -> str:
@@ -508,6 +518,8 @@ def get_config_dict():
     tmp_dict["game_latest_log_path"] = game_latest_log_path
     tmp_dict["risk_nicks_list"] = risk_nicks_list
     tmp_dict["messages_respond_dict"] = messages_respond_dict
+    tmp_dict["chat_message_answer_flag"] = chat_message_answer_flag
+    tmp_dict["private_message_answer_flag"] = private_message_answer_flag
     return tmp_dict
 
 def set_config_from_dict(config_dict):
@@ -559,6 +571,8 @@ def set_config_from_dict(config_dict):
     global game_latest_log_path
     global risk_nicks_list
     global messages_respond_dict
+    global chat_message_answer_flag
+    global private_message_answer_flag
     if config_dict is not None:
         # if "pattern_settings" in config_dict:
         #     pattern_settings = config_dict["pattern_settings"]
@@ -618,6 +632,10 @@ def set_config_from_dict(config_dict):
             risk_nicks_list = config_dict["risk_nicks_list"]
         if "messages_respond_dict" in config_dict:
             messages_respond_dict = config_dict["messages_respond_dict"]
+        if "chat_message_answer_flag" in config_dict:
+            chat_message_answer_flag = config_dict["chat_message_answer_flag"]
+        if "private_message_answer_flag" in config_dict:
+            private_message_answer_flag = config_dict["private_message_answer_flag"]
         app_logger.info(f"The configuration was loaded: {config_dict}")
     else:
         app_logger.info(f"Taked config dict is None")
@@ -645,6 +663,8 @@ comments = {
     'game_latest_log_path': f"# game_latest_log_path - Path of the last log file that is changed by the game in real time (required to analyze chat text messages), default value '{game_latest_log_path}' \n",
     'risk_nicks_list': f"# risk_nicks_list - List of nicks that are a threat (usually a list of administration) from which messages are analyzed and appropriate actions are performed according to the configuration., default value '{risk_nicks_list}' \n",
     'messages_respond_dict': f"# messages_respond_dict - Response dictionary used to reply to messages of people on the list of endangered nicknames: The first value is the content of the message received from the sender, the second value is the content of the reply. The default value for content from outside the dictionary is: '?', default value '{messages_respond_dict}' \n",
+    'chat_message_answer_flag': f"# chat_message_answer_flag - Flag on whether the program should respond to messages appearing in the public chat directed to the set nickname., default value '{chat_message_answer_flag}' \n",
+    'private_message_answer_flag': f"# private_message_answer_flag - A flag regarding whether the program should respond to private messages that appear in the chat, default value '{private_message_answer_flag}' \n",
 }
 
 def encode_special_characters(string: str) -> str:

@@ -27,6 +27,11 @@ game_latest_log_path = os.path.join('C:', os.sep, 'Users', 'Artur', 'AppData', '
 def get_game_latest_log_path() -> str:
     return game_latest_log_path
 
+client_player_nickname = ""
+
+def get_client_player_nickname() -> str:
+    return client_player_nickname
+
 risk_nicks_list = [
     "Artur",
 ]
@@ -520,6 +525,7 @@ def get_config_dict():
     tmp_dict["messages_respond_dict"] = messages_respond_dict
     tmp_dict["chat_message_answer_flag"] = chat_message_answer_flag
     tmp_dict["private_message_answer_flag"] = private_message_answer_flag
+    tmp_dict["client_player_nickname"] = client_player_nickname
     return tmp_dict
 
 def set_config_from_dict(config_dict):
@@ -573,6 +579,7 @@ def set_config_from_dict(config_dict):
     global messages_respond_dict
     global chat_message_answer_flag
     global private_message_answer_flag
+    global client_player_nickname
     if config_dict is not None:
         # if "pattern_settings" in config_dict:
         #     pattern_settings = config_dict["pattern_settings"]
@@ -636,6 +643,8 @@ def set_config_from_dict(config_dict):
             chat_message_answer_flag = config_dict["chat_message_answer_flag"]
         if "private_message_answer_flag" in config_dict:
             private_message_answer_flag = config_dict["private_message_answer_flag"]
+        if "client_player_nickname" in config_dict:
+            client_player_nickname = config_dict["client_player_nickname"]
         app_logger.info(f"The configuration was loaded: {config_dict}")
     else:
         app_logger.info(f"Taked config dict is None")
@@ -665,6 +674,7 @@ comments = {
     'messages_respond_dict': f"# messages_respond_dict - Response dictionary used to reply to messages of people on the list of endangered nicknames: The first value is the content of the message received from the sender, the second value is the content of the reply. The default value for content from outside the dictionary is: '?', default value '{messages_respond_dict}' \n",
     'chat_message_answer_flag': f"# chat_message_answer_flag - Flag on whether the program should respond to messages appearing in the public chat directed to the set nickname., default value '{chat_message_answer_flag}' \n",
     'private_message_answer_flag': f"# private_message_answer_flag - A flag regarding whether the program should respond to private messages that appear in the chat, default value '{private_message_answer_flag}' \n",
+    'client_player_nickname': f"# client_player_nickname - Name (nick) of the player of the user using the program (needed to analyze public chat messages)' \n",
 }
 
 def encode_special_characters(string: str) -> str:

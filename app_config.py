@@ -674,7 +674,7 @@ comments = {
     'messages_respond_dict': f"# messages_respond_dict - Response dictionary used to reply to messages of people on the list of endangered nicknames: The first value is the content of the message received from the sender, the second value is the content of the reply. The default value for content from outside the dictionary is: '?', default value '{messages_respond_dict}' \n",
     'chat_message_answer_flag': f"# chat_message_answer_flag - Flag on whether the program should respond to messages appearing in the public chat directed to the set nickname., default value '{chat_message_answer_flag}' \n",
     'private_message_answer_flag': f"# private_message_answer_flag - A flag regarding whether the program should respond to private messages that appear in the chat, default value '{private_message_answer_flag}' \n",
-    'client_player_nickname': f"# client_player_nickname - Name (nick) of the player of the user using the program (needed to analyze public chat messages)' \n",
+    'client_player_nickname': f"# client_player_nickname - Name (nick) of the player of the user using the program (needed to analyze public chat messages). NOTE: An empty string will make the program respond to every message of the person in the 'risk_nicks_list'.' \n",
 }
 
 def encode_special_characters(string: str) -> str:

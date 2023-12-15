@@ -65,6 +65,16 @@ private_message_answer_flag = True
 def get_private_message_answer_flag() -> bool:
     return private_message_answer_flag
 
+counter_risk_messages_to_afk = 0
+
+def get_counter_risk_messages_to_afk() -> int:
+    return counter_risk_messages_to_afk
+
+counter_risk_messages_to_lobby = 0
+
+def get_counter_risk_messages_to_lobby() -> int:
+    return counter_risk_messages_to_lobby
+
 config_file_path = os.path.join(APP_PATH, 'config.yaml')
 
 def get_config_file_path() -> str:
@@ -525,7 +535,8 @@ def get_config_dict():
     tmp_dict["messages_respond_dict"] = messages_respond_dict
     tmp_dict["chat_message_answer_flag"] = chat_message_answer_flag
     tmp_dict["private_message_answer_flag"] = private_message_answer_flag
-    tmp_dict["client_player_nickname"] = client_player_nickname
+    tmp_dict["counter_risk_messages_to_afk"] = counter_risk_messages_to_afk
+    tmp_dict["counter_risk_messages_to_lobby"] = counter_risk_messages_to_lobby
     return tmp_dict
 
 def set_config_from_dict(config_dict):
@@ -580,6 +591,8 @@ def set_config_from_dict(config_dict):
     global chat_message_answer_flag
     global private_message_answer_flag
     global client_player_nickname
+    global counter_risk_messages_to_afk
+    global counter_risk_messages_to_lobby
     if config_dict is not None:
         # if "pattern_settings" in config_dict:
         #     pattern_settings = config_dict["pattern_settings"]
@@ -645,6 +658,10 @@ def set_config_from_dict(config_dict):
             private_message_answer_flag = config_dict["private_message_answer_flag"]
         if "client_player_nickname" in config_dict:
             client_player_nickname = config_dict["client_player_nickname"]
+        if "counter_risk_messages_to_afk" in config_dict:
+            counter_risk_messages_to_afk = config_dict["counter_risk_messages_to_afk"]
+        if "counter_risk_messages_to_lobby" in config_dict:
+            counter_risk_messages_to_lobby = config_dict["counter_risk_messages_to_lobby"]
         app_logger.info(f"The configuration was loaded: {config_dict}")
     else:
         app_logger.info(f"Taked config dict is None")
@@ -674,7 +691,9 @@ comments = {
     'messages_respond_dict': f"# messages_respond_dict - Response dictionary used to reply to messages of people on the list of endangered nicknames: The first value is the content of the message received from the sender, the second value is the content of the reply. The default value for content from outside the dictionary is: '?', default value '{messages_respond_dict}' \n",
     'chat_message_answer_flag': f"# chat_message_answer_flag - Flag on whether the program should respond to messages appearing in the public chat directed to the set nickname., default value '{chat_message_answer_flag}' \n",
     'private_message_answer_flag': f"# private_message_answer_flag - A flag regarding whether the program should respond to private messages that appear in the chat, default value '{private_message_answer_flag}' \n",
-    'client_player_nickname': f"# client_player_nickname - Name (nick) of the player of the user using the program (needed to analyze public chat messages). NOTE: An empty string will make the program respond to every message of the person in the 'risk_nicks_list'.' \n",
+    'client_player_nickname': f"# client_player_nickname - Name (nick) of the player of the user using the program (needed to analyze public chat messages). NOTE: An empty string will make the program respond to every message of the person in the 'risk_nicks_list'. \n",
+    'counter_risk_messages_to_afk': f"# counter_risk_messages_to_afk - Number of messages from risk nicks (from the risk_nicks_list) after which the program goes afk on the spawn, value 0 - no afk, default value '{counter_risk_messages_to_afk}\n",
+    'counter_risk_messages_to_lobby': f"# counter_risk_messages_to_lobby - The number of messages from risk nicks (from the risk_nicks_list) after which the program exits to the lobby and completely stops the action, value 0 - no action execution, default value '{counter_risk_messages_to_lobby}\n",
 }
 
 def encode_special_characters(string: str) -> str:

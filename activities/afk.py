@@ -52,7 +52,7 @@ def afk() -> bool:
                 time.sleep(5)
                 tp_to_spawn()
                 time.sleep(5)
-                afk_time = draw_afk_time()
+                afk_time = draw_break_afk_time()
                 app_logger.info(f"Drawed afk_time: {afk_time}")
                 time.sleep(afk_time)
                 afk_counter = draw_afk_interval()
@@ -80,7 +80,7 @@ def draw_afk_interval() -> int:
     app_logger.debug(f"new_draw_value: {new_drwa_value}")
     return new_drwa_value
 
-def draw_afk_time() -> int:
+def draw_afk_time(values: list, weights: list) -> int:
     """
     Determines a random duration for the AFK action.
 
@@ -89,9 +89,17 @@ def draw_afk_time() -> int:
     Returns:
         A randomly generated integer representing the duration in seconds of the AFK action.
     """
-    app_logger.debug("draw_afk_time was used")
-    values = [1, 2, 3, 4, 5]
-    weights = [10, 20, 30, 25, 15]
+    app_logger.debug(f"draw_afk_time was used - values: {values} weights: {weights}")
     new_drwa_value = weighted_random_choice(values, weights)*60
     app_logger.debug(f"new_draw_value: {new_drwa_value}")
     return new_drwa_value
+
+def draw_break_afk_time() -> int:
+    values = [1, 2, 3, 4, 5]
+    weights = [10, 20, 30, 25, 15]
+    return draw_afk_time(values, weights)
+
+def draw_risk_afk_time() -> int:
+    values = [10, 12, 14, 16, 18, 20, 22, 24, 30]
+    weights = [10, 12, 14, 17, 14, 12, 10, 8, 3]
+    return draw_afk_time(values, weights)

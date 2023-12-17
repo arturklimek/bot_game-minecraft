@@ -288,7 +288,7 @@ def set_items_stored_list(new_items_stored_list: List[str]) -> None:
     items_stored_list = new_items_stored_list
 
 chat_messages_flag = True
-chat_messages = ['&6&lUWAGA! &f&lKupię &9&lMroczna Materia &7- &e&l2000&6&l$ &f&lza sztukę! &7- &b&l/msg MineArturVIP &7- &f&lNie ma mnie? Nie odpisuję? Napisz na DSC: &b&lMineArturVIP#6699 &f&llub do innego członka &7[&b&lS&f&lB&7&l-&f&lM&b&laf&9&lia&7]']
+chat_messages = ['&2&lUWAGA! &f&lKupię &6&lGąbki &7- &e&l100&6&l$ &f&lza sztukę! &a&l(2,9k za 29 sztuk / 6,4k za stack) &7- &b&l/msg &7- &f&lNie ma mnie? Nie odpisuję? Napisz do innego członka &7[&b&lS&f&lB&7&l-&f&lM&b&laf&9&lia&7]']
 chat_messages_frequency_min = 15
 
 def get_chat_messages_flag() -> bool:

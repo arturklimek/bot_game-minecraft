@@ -30,7 +30,7 @@ def get_afk_counter() -> int:
     """
     return afk_counter
 
-def afk() -> bool:
+def afk_break() -> bool:
     """
     Simulates an AFK (Away From Keyboard) behavior based on a cofigurable flag and intervals.
 
@@ -95,11 +95,29 @@ def draw_afk_time(values: list, weights: list) -> int:
     return new_drwa_value
 
 def draw_break_afk_time() -> int:
+    """
+    Randomly selects a break AFK time based on predefined values and their respective weights.
+
+    This function uses a weighted random selection to choose a break AFK time from a set of predefined values.
+    Each value represents the time in minutes and has an associated weight that determines its selection probability.
+
+    Returns:
+        int: A randomly selected break AFK time in minutes.
+    """
     values = [1, 2, 3, 4, 5]
     weights = [10, 20, 30, 25, 15]
     return draw_afk_time(values, weights)
 
 def draw_risk_afk_time() -> int:
+    """
+    Randomly selects a risk AFK time based on a set of values and their corresponding weights.
+
+    This function uses a weighted random selection to choose a risk AFK time from a predefined list of values.
+    The values represent the time in minutes and are weighted to influence their probability of being selected.
+
+    Returns:
+        int: A randomly selected risk AFK time in minutes, based on weighted probabilities.
+    """
     values = [10, 12, 14, 16, 18, 20, 22, 24, 30]
     weights = [10, 12, 14, 17, 14, 12, 10, 8, 3]
     return draw_afk_time(values, weights)

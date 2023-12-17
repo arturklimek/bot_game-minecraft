@@ -1,11 +1,13 @@
-import re
+import sys
 import threading
 import time
+from datetime import datetime, timedelta
 from typing import Callable
-
-from activities.chat import send_private_message_to_player, send_chat_message_to_player
+from activities.afk import afk_on_spawn
+from activities.chat import send_private_message_to_player, send_chat_message_to_player, send_on_chat
 from app_config import get_game_latest_log_path, get_risk_nicks_list, get_messages_respond_dict, \
-    get_chat_message_answer_flag, get_private_message_answer_flag, get_client_player_nickname
+    get_chat_message_answer_flag, get_private_message_answer_flag, get_client_player_nickname, \
+    get_counter_risk_messages_to_lobby, get_counter_risk_messages_to_afk
 from logger import app_logger
 
 reply_data = {}
@@ -13,10 +15,18 @@ reply_data = {}
 def get_reply_data() -> dict:
     return reply_data
 
-def set_reply_data(player_data: dict) -> None:
+life_time_risk_messages = 5
+counter_risk_messages = 0
+
+def get_counter_risk_messages() -> int:
+    return counter_risk_messages
+
+timestamp_last_riks_message = None
+
+def set_reply_data(new_reply_data: dict) -> None:
     global reply_data
-    app_logger.debug(f"change sender_player_data: {reply_data} to nev value: {player_data}")
-    reply_data = player_data
+    app_logger.debug(f"change sender_player_data: {reply_data} to nev value: {new_reply_data}")
+    reply_data = new_reply_data
 
 def clear_reply_data() -> None:
     global reply_data
@@ -36,7 +46,9 @@ def update_reply_data(log_line: str) -> None:
     Global Variables:
         reply_data (dict): A global dictionary updated with the nickname of the player and the corresponding reply.
     """
+    global counter_risk_messages
     global reply_data
+    global timestamp_last_riks_message
     private_message_status = False
     player_nickname = ""
     message_content = ""
@@ -62,17 +74,32 @@ def update_reply_data(log_line: str) -> None:
             if message_content in messages_respond_dict.keys():
                 answer = messages_respond_dict[message_content]
                 app_logger.debug(f"message_content is in messages_respond_dict, change answer value: {answer}")
+            if timestamp_last_riks_message:
+                time_difference = datetime.now() - timestamp_last_riks_message
+                if time_difference <= timedelta(minutes=life_time_risk_messages):
+                    counter_risk_messages = counter_risk_messages + 1
+                else:
+                    counter_risk_messages = 0
             reply_data = {
                 "private": private_message_status,
                 "nickname": player_nickname,
-                "answer": answer
+                "answer": answer,
             }
+            timestamp_last_riks_message = datetime.now()
             app_logger.info(
                 f"detected message from player_nickname: {player_nickname} in risk_nicks_list, set sender_player_data value to: {reply_data}")
     else:
         app_logger.debug(f"Needed variable is empty, player_nickname: {player_nickname} message_content: {message_content}")
 
 def make_reply() -> bool: # TODO: dodać zależność odpowiedzi na podstawie konfiguracji - odpowiednich flag // lub w update_reply_data + licznik ...
+    """
+    Sends a reply message based on the data stored in the 'reply_data' dictionary.
+
+    This function checks if 'reply_data' contains valid data and sends either a private or a public chat message to the player depending on the 'private' flag in the dictionary. After sending the message, it clears the 'reply_data' dictionary.
+
+    Returns:
+        bool: True if a reply was sent, False if 'reply_data' is empty.
+    """
     global reply_data
     if reply_data:
         if reply_data["private"]:
@@ -80,13 +107,55 @@ def make_reply() -> bool: # TODO: dodać zależność odpowiedzi na podstawie ko
         else:
             send_chat_message_to_player(nickname=reply_data["nickname"], reply_text=reply_data["answer"])
         reply_data.clear()
-        app_logger.debug()
+        app_logger.debug(f"make_reply send reply - reply_data: {reply_data}")
         return True
     else:
         app_logger.debug("Return False - reply_data is empty")
         return False
 
+def make_risk_afk() -> None:
+    """
+    Initiates an AFK action based on the number of risk messages received.
+
+    This function checks if the number of risk messages ('counter_risk_messages') has reached a threshold specified in 'get_counter_risk_messages_to_afk'. If the threshold is met, it triggers an AFK action at the spawn location for a duration calculated based on certain criteria.
+    """
+    global counter_risk_messages
+    if get_counter_risk_messages_to_afk() > 0:
+        if counter_risk_messages >= get_counter_risk_messages_to_afk():
+            afk_time = 0
+            afk_on_spawn(afk_time)
+
+def make_risk_exit() -> None:
+    """
+    Exits the program if the number of risk messages reaches a certain threshold.
+
+    This function checks if the count of risk messages ('counter_risk_messages') has reached a set limit, specified in 'get_counter_risk_messages_to_lobby'. If the limit is reached, it sends a command to move the player to the lobby and then exits the program.
+
+    Note:
+        The exit command currently stops the entire program. It is recommended to change this behavior to only disable certain tasks or functions instead of exiting the entire application.
+    """
+    if get_counter_risk_messages_to_lobby() > 0:
+        if counter_risk_messages >= get_counter_risk_messages_to_lobby():
+            lobby_command = "/lobby 1"
+            time.sleep(1)
+            app_logger.info(f"Go to Lobby - execute command: {lobby_command}")
+            send_on_chat(lobby_command)
+            time.sleep(5)
+            app_logger.info("Exit Program")
+            sys.exit() #TODO: change exit to disable working tasks - not all program
+
 def check_risk_nickname(nickname: str) -> bool:
+    """
+    Checks if a given nickname is in the list of risk nicknames.
+
+    This function compares the provided nickname, after converting it to lowercase and stripping any whitespace, against a list of predefined 'risk' nicknames. The list of risk nicknames is obtained from the 'get_risk_nicks_list' function and is also processed to be in lowercase and stripped of whitespace.
+
+    Args:
+        nickname (str): The player's nickname to be checked.
+
+    Returns:
+        bool: True if the nickname is found in the risk nicknames list, False otherwise.
+    """
     risk_nicks_list = list(map(lambda x: x.lower().strip(), get_risk_nicks_list()))
     if nickname.lower().strip() in risk_nicks_list:
         app_logger.debug(f"Nick: {nickname} IS in risk_nicks_list")

@@ -60,6 +60,16 @@ def afk_break() -> bool:
         return False
 
 def afk_on_spawn(afk_time: int = 0) -> None:
+    """
+    Executes an AFK (Away From Keyboard) routine on the spawn location in the game.
+
+    This function teleports the player to the game's spawn location and keeps them AFK for a specified duration.
+    The function waits for a brief period before and after teleporting to ensure smooth execution of the command.
+    It is primarily used to avoid in-game idle detection mechanisms by simulating player activity.
+
+    Args:
+        afk_time (int): The time in seconds to remain AFK at the spawn location. Defaults to 0 seconds.
+    """
     time.sleep(2)
     tp_to_spawn()
     time.sleep(5)

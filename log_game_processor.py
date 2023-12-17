@@ -94,7 +94,7 @@ def update_reply_data(log_line: str) -> None:
     else:
         app_logger.debug(f"Needed variable is empty, player_nickname: {player_nickname} message_content: {message_content}")
 
-def make_reply() -> bool: # TODO: dodać zależność odpowiedzi na podstawie konfiguracji - odpowiednich flag // lub w update_reply_data + licznik ...
+def make_reply() -> bool:
     """
     Sends a reply message based on the data stored in the 'reply_data' dictionary.
 
@@ -116,28 +116,56 @@ def make_reply() -> bool: # TODO: dodać zależność odpowiedzi na podstawie ko
         app_logger.debug("Return False - reply_data is empty")
         return False
 
-def make_risk_afk() -> None:
+def check_risk_afk() -> bool:
     """
-    Initiates an AFK action based on the number of risk messages received.
+    Checks if the number of risky messages has reached a threshold for triggering AFK status.
 
-    This function checks if the number of risk messages ('counter_risk_messages') has reached a threshold specified in 'get_counter_risk_messages_to_afk'. If the threshold is met, it triggers an AFK action at the spawn location for a duration calculated based on certain criteria.
+    This function compares the current count of risky messages against a predefined threshold. If the number of risky messages equals or exceeds this threshold, it indicates that an AFK status should be triggered.
+
+    Returns:
+        bool: True if the threshold for triggering AFK status is reached, False otherwise.
     """
     global counter_risk_messages
     if get_counter_risk_messages_to_afk() > 0:
         if counter_risk_messages >= get_counter_risk_messages_to_afk():
-            afk_time = draw_risk_afk_time()
-            app_logger.info(f"Go AFK on spawn (too many risky messages) for afk_time: {afk_time}")
-            afk_on_spawn(afk_time)
-            app_logger.debug("AFK time over")
+            return True
+    return False
+def make_risk_afk() -> None:
+    """
+    Initiates an AFK procedure if the threshold for risky messages is reached.
+
+    This function triggers an AFK status, moving the player to a 'safe' spawn location for a duration determined by `draw_risk_afk_time`. This is used to mitigate risks associated with excessive risky messages.
+
+    The duration of the AFK is logged for monitoring purposes.
+    """
+    if check_risk_afk():
+        afk_time = draw_risk_afk_time()
+        app_logger.info(f"Go AFK on spawn (too many risky messages) for afk_time: {afk_time}")
+        afk_on_spawn(afk_time)
+        app_logger.debug("AFK time over")
+
+def check_risk_exit() -> bool:
+    """
+    Checks if the number of risky messages has reached a threshold for triggering an exit to the lobby.
+
+    This function assesses whether the current count of risky messages has reached a specified limit, beyond which it is deemed safer for the player to exit to the game's lobby.
+
+    Returns:
+        bool: True if the threshold for triggering an exit to the lobby is reached, False otherwise.
+    """
+    if get_counter_risk_messages_to_lobby() > 0:
+        if counter_risk_messages >= get_counter_risk_messages_to_lobby():
+            return True
+    return False
 
 def make_risk_exit() -> None:
     """
-    Exits the program if the number of risk messages reaches a certain threshold.
+    Checks if the number of risky messages has reached a threshold for triggering an exit to the lobby.
 
-    This function checks if the count of risk messages ('counter_risk_messages') has reached a set limit, specified in 'get_counter_risk_messages_to_lobby'. If the limit is reached, it sends a command to move the player to the lobby and then exits the program.
+    This function assesses whether the current count of risky messages has reached a specified limit, beyond which it is deemed safer for the player to exit to the server lobby.
 
-    Note:
-        The exit command currently stops the entire program. It is recommended to change this behavior to only disable certain tasks or functions instead of exiting the entire application.
+    Returns:
+        bool: True if the threshold for triggering an exit to the lobby is reached, False otherwise.
     """
     if get_counter_risk_messages_to_lobby() > 0:
         if counter_risk_messages >= get_counter_risk_messages_to_lobby():
@@ -146,8 +174,8 @@ def make_risk_exit() -> None:
             app_logger.info(f"Go to Lobby (too many risky messages) - execute command: {lobby_command}")
             send_on_chat(lobby_command)
             time.sleep(5)
-            app_logger.info("Exit Program")
-            sys.exit() #TODO: change exit to disable working tasks - not all program
+            # app_logger.info("Exit Program")
+            # sys.exit() #TODO: change exit to disable working tasks - not all program
 
 def check_risk_nickname(nickname: str) -> bool:
     """

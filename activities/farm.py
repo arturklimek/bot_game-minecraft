@@ -12,7 +12,7 @@ from activities.chat import tp_to_farm_home, sellall_inventory, tp_to_spawn, set
 from activities.eq_bar import get_item_slot_number, get_axe_image, check_axe_damage_to_repair, check_and_update_eq_coordinates
 from activities.repair import repair_item
 from app_config import get_farm_number, get_farm_floors_number, get_farm_floor_time_moving, \
-    get_tmp_home_flag, get_hotkey_moving_left, get_hotkey_moving_right, get_hotkeys_slots
+    get_tmp_home_flag, get_hotkey_moving_left, get_hotkey_moving_right, get_hotkeys_slots, get_farm_sell_frequency
 from delay import return_random_wait_interval_time
 from logger import app_logger
 from screenshooter import get_last_screenshot
@@ -37,6 +37,7 @@ def farm_procedure() -> None:
     """
     global current_moving_direction
     global is_running_farm_procedure
+    sell_counter = 0
     app_logger.debug("Starting farm_procedure")
     try:
         if is_running_farm_procedure:
@@ -98,8 +99,11 @@ def farm_procedure() -> None:
                             current_moving_direction = get_hotkey_moving_right()
                         app_logger.debug(f"current_moving_direction was set to: {current_moving_direction}")
                         time.sleep(return_random_wait_interval_time(0.1, 0.5))
-                        if ((floor + 1) % 2) == 0:
+                        if sell_counter <= get_farm_sell_frequency():
                             sellall_inventory()
+                            sell_counter = 0
+                        else:
+                            sell_counter = sell_counter + 1
                         time.sleep(return_random_wait_interval_time(0.1, 0.5))
                         keyboard.press_and_release(get_hotkeys_slots()[9])
                         app_logger.debug(f"Press and release {get_hotkeys_slots()[9]}")

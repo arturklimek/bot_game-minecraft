@@ -9,6 +9,7 @@ from activities.mine import toggle_mine_procedure
 from app_config import OUTPUTS_DIR_PATH, PATTERNS_DIR_PATH, setup_config_file, get_button_mine_procedure, \
     get_button_farm_procedure
 from clicker import setup_autoclicer_hotkeys
+from log_game_processor import start_messages_watcher_thread
 from logger import app_logger
 from patterns import load_patterns_all
 from screenshooter import start_screenshot_thread
@@ -74,6 +75,8 @@ def main() -> NoReturn:
     update_chest_patterns_sizes()
     setup_buttons()
     start_screenshot_thread()
+
+    start_messages_watcher_thread()
 
     print("Application started.")
     app_logger.info(f"Application started")

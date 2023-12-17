@@ -49,12 +49,8 @@ def afk_break() -> bool:
         else:
             afk_counter = afk_counter - 1
             if afk_counter <= 0:
-                time.sleep(5)
-                tp_to_spawn()
-                time.sleep(5)
                 afk_time = draw_break_afk_time()
-                app_logger.info(f"Drawed afk_time: {afk_time}")
-                time.sleep(afk_time)
+                afk_on_spawn(afk_time)
                 afk_counter = draw_afk_interval()
                 app_logger.info(f"Drawed afk_counter: {afk_counter}")
                 return True
@@ -62,6 +58,13 @@ def afk_break() -> bool:
                 return False
     else:
         return False
+
+def afk_on_spawn(afk_time: int = 0) -> None:
+    time.sleep(2)
+    tp_to_spawn()
+    time.sleep(5)
+    app_logger.info(f"Sleep for afk_time: {afk_time}")
+    time.sleep(afk_time)
 
 def draw_afk_interval() -> int:
     """

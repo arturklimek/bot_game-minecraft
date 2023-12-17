@@ -9,7 +9,7 @@ from typing import Optional
 import keyboard
 import pyautogui
 import activities.eq_bar
-from activities.afk import afk
+from activities.afk import afk_break
 from activities.chat import tp_to_mining_home, send_on_chat, sellall_inventory, tp_to_chest_home, tp_to_spawn, \
     send_chat_notification
 from activities.chest import check_and_get_chest_image, get_slots_chest_coordinates, get_chest_slots_images, \
@@ -400,7 +400,7 @@ def mine_procedure() -> None:
                     time.sleep(0.8)
                     stored_flag = False
                     app_logger.debug(f"stored_flag was set to {stored_flag}")
-            if afk():
+            if afk_break():
                 current_moving_direction = get_hotkey_moving_right()
                 app_logger.debug(f"current_moving_direction was set to: {current_moving_direction}")
                 tp_to_mining_home()

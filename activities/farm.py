@@ -7,7 +7,7 @@ import time
 import keyboard
 import pyautogui
 
-from activities.afk import afk, get_afk_counter
+from activities.afk import afk_break, get_afk_counter
 from activities.chat import tp_to_farm_home, sellall_inventory, tp_to_spawn, set_tmp_home, tp_to_tmp_home
 from activities.eq_bar import get_item_slot_number, get_axe_image, check_axe_damage_to_repair, check_and_update_eq_coordinates
 from activities.repair import repair_item
@@ -149,15 +149,15 @@ def farm_procedure() -> None:
                                 if get_afk_counter()-1 <= 0:
                                     set_tmp_home()
                                     time.sleep(return_random_wait_interval_time(0.2, 0.5))
-                                    afk()
+                                    afk_break()
                                     time.sleep(return_random_wait_interval_time(0.5, 1))
                                     tp_to_tmp_home()
                                 else:
-                                    afk()
+                                    afk_break()
                             else:
-                                afk()
+                                afk_break()
                         else:
-                            if afk():
+                            if afk_break():
                                 if floor + 1 < get_farm_floors_number():
                                     repeat_farm = True
                                     app_logger.debug(f"repeat_farm was set to {repeat_farm}")

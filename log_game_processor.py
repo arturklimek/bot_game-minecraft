@@ -3,7 +3,7 @@ import threading
 import time
 from datetime import datetime, timedelta
 from typing import Callable
-from activities.afk import afk_on_spawn
+from activities.afk import afk_on_spawn, draw_risk_afk_time
 from activities.chat import send_private_message_to_player, send_chat_message_to_player, send_on_chat
 from app_config import get_game_latest_log_path, get_risk_nicks_list, get_messages_respond_dict, \
     get_chat_message_answer_flag, get_private_message_answer_flag, get_client_player_nickname, \
@@ -76,16 +76,19 @@ def update_reply_data(log_line: str) -> None:
                 app_logger.debug(f"message_content is in messages_respond_dict, change answer value: {answer}")
             if timestamp_last_riks_message:
                 time_difference = datetime.now() - timestamp_last_riks_message
+                app_logger.debug(f"time_difference: {time_difference}")
                 if time_difference <= timedelta(minutes=life_time_risk_messages):
                     counter_risk_messages = counter_risk_messages + 1
                 else:
                     counter_risk_messages = 0
+                app_logger.debug(f"New counter_risk_messages: {counter_risk_messages}")
             reply_data = {
                 "private": private_message_status,
                 "nickname": player_nickname,
                 "answer": answer,
             }
             timestamp_last_riks_message = datetime.now()
+            app_logger.debug(f"New timestamp_last_riks_message: {timestamp_last_riks_message}")
             app_logger.info(
                 f"detected message from player_nickname: {player_nickname} in risk_nicks_list, set sender_player_data value to: {reply_data}")
     else:
@@ -122,8 +125,10 @@ def make_risk_afk() -> None:
     global counter_risk_messages
     if get_counter_risk_messages_to_afk() > 0:
         if counter_risk_messages >= get_counter_risk_messages_to_afk():
-            afk_time = 0
+            afk_time = draw_risk_afk_time()
+            app_logger.info(f"Go AFK on spawn (too many risky messages) for afk_time: {afk_time}")
             afk_on_spawn(afk_time)
+            app_logger.debug("AFK time over")
 
 def make_risk_exit() -> None:
     """
@@ -138,7 +143,7 @@ def make_risk_exit() -> None:
         if counter_risk_messages >= get_counter_risk_messages_to_lobby():
             lobby_command = "/lobby 1"
             time.sleep(1)
-            app_logger.info(f"Go to Lobby - execute command: {lobby_command}")
+            app_logger.info(f"Go to Lobby (too many risky messages) - execute command: {lobby_command}")
             send_on_chat(lobby_command)
             time.sleep(5)
             app_logger.info("Exit Program")

@@ -24,6 +24,16 @@ save_images_flags = {
 
 game_latest_log_path = os.path.join('C:', os.sep, 'Users', 'Artur', 'AppData', 'Roaming', '.minecraft', 'logs', 'latest.log')
 
+coordinates_screen_XYZ = {
+    "x1": 3,
+    "y1": 246,
+    "x2": 561,
+    "y2": 273,
+}
+
+def get_coordinates_screen_XYZ() -> dict:
+    return coordinates_screen_XYZ
+
 def get_game_latest_log_path() -> str:
     return game_latest_log_path
 
@@ -552,6 +562,7 @@ def get_config_dict():
     tmp_dict["counter_risk_messages_to_lobby"] = counter_risk_messages_to_lobby
     tmp_dict["farm_sell_frequency"] = farm_sell_frequency
     tmp_dict["reply_all_nicks_flag"] = reply_all_nicks_flag
+    tmp_dict["coordinates_screen_XYZ"] = coordinates_screen_XYZ
     return tmp_dict
 
 def set_config_from_dict(config_dict):
@@ -610,6 +621,7 @@ def set_config_from_dict(config_dict):
     global counter_risk_messages_to_lobby
     global farm_sell_frequency
     global reply_all_nicks_flag
+    global coordinates_screen_XYZ
     if config_dict is not None:
         # if "pattern_settings" in config_dict:
         #     pattern_settings = config_dict["pattern_settings"]
@@ -683,6 +695,8 @@ def set_config_from_dict(config_dict):
             farm_sell_frequency = config_dict["farm_sell_frequency"]
         if "reply_all_nicks_flag" in config_dict:
             reply_all_nicks_flag = config_dict["reply_all_nicks_flag"]
+        if "coordinates_screen_XYZ" in config_dict:
+            coordinates_screen_XYZ = config_dict["coordinates_screen_XYZ"]
         app_logger.info(f"The configuration was loaded: {config_dict}")
     else:
         app_logger.info(f"Taked config dict is None")
@@ -716,7 +730,8 @@ comments = {
     'counter_risk_messages_to_afk': f"# counter_risk_messages_to_afk - Number of messages from risk nicks (from the risk_nicks_list) after which the program goes afk on the spawn, value 0 - no afk, default value '{counter_risk_messages_to_afk}\n",
     'counter_risk_messages_to_lobby': f"# counter_risk_messages_to_lobby - The number of messages from risk nicks (from the risk_nicks_list) after which the program exits to the lobby and completely stops the action, value 0 - no action execution, default value '{counter_risk_messages_to_lobby}\n",
     'farm_sell_frequency': f"# farm_sell_frequency - Determines the number of floors of the farm between sales (value <=0 will sell items on each floor), default value '{farm_sell_frequency}\n",
-    'reply_all_nicks_flag': f"# reply_all_nicks_flag - True or False flag indicating whether the program should respond to messages from nicks outside the list (risk_nicks_list), default value '{farm_sell_frequency}\n",
+    'reply_all_nicks_flag': f"# reply_all_nicks_flag - True or False flag indicating whether the program should respond to messages from nicks outside the list (risk_nicks_list), default value '{reply_all_nicks_flag}\n",
+    'coordinates_screen_XYZ': f"# coordinates_screen_XYZ - Coordinates on the screen of the XYZ field displayed on the screen after pressing 'F3', default value '{coordinates_screen_XYZ}\n",
 }
 
 def encode_special_characters(string: str) -> str:

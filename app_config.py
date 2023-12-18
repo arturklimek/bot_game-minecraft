@@ -34,6 +34,16 @@ coordinates_screen_XYZ = {
 def get_coordinates_screen_XYZ() -> dict:
     return coordinates_screen_XYZ
 
+coordinates_screen_Facing = {
+    "x1": 3,
+    "y1": 327,
+    "x2": 775,
+    "y2": 354,
+}
+
+def get_coordinates_screen_Facing() -> dict:
+    return coordinates_screen_Facing
+
 def get_game_latest_log_path() -> str:
     return game_latest_log_path
 
@@ -563,6 +573,7 @@ def get_config_dict():
     tmp_dict["farm_sell_frequency"] = farm_sell_frequency
     tmp_dict["reply_all_nicks_flag"] = reply_all_nicks_flag
     tmp_dict["coordinates_screen_XYZ"] = coordinates_screen_XYZ
+    tmp_dict["coordinates_screen_Facing"] = coordinates_screen_Facing
     return tmp_dict
 
 def set_config_from_dict(config_dict):
@@ -622,6 +633,7 @@ def set_config_from_dict(config_dict):
     global farm_sell_frequency
     global reply_all_nicks_flag
     global coordinates_screen_XYZ
+    global coordinates_screen_Facing
     if config_dict is not None:
         # if "pattern_settings" in config_dict:
         #     pattern_settings = config_dict["pattern_settings"]
@@ -697,6 +709,8 @@ def set_config_from_dict(config_dict):
             reply_all_nicks_flag = config_dict["reply_all_nicks_flag"]
         if "coordinates_screen_XYZ" in config_dict:
             coordinates_screen_XYZ = config_dict["coordinates_screen_XYZ"]
+        if "coordinates_screen_Facing" in config_dict:
+            coordinates_screen_Facing = config_dict["coordinates_screen_Facing"]
         app_logger.info(f"The configuration was loaded: {config_dict}")
     else:
         app_logger.info(f"Taked config dict is None")
@@ -732,6 +746,7 @@ comments = {
     'farm_sell_frequency': f"# farm_sell_frequency - Determines the number of floors of the farm between sales (value <=0 will sell items on each floor), default value '{farm_sell_frequency}\n",
     'reply_all_nicks_flag': f"# reply_all_nicks_flag - True or False flag indicating whether the program should respond to messages from nicks outside the list (risk_nicks_list), default value '{reply_all_nicks_flag}\n",
     'coordinates_screen_XYZ': f"# coordinates_screen_XYZ - Coordinates on the screen of the XYZ field displayed on the screen after pressing 'F3', default value '{coordinates_screen_XYZ}\n",
+    'coordinates_screen_Facing': f"# coordinates_screen_Facing - Coordinates on the screen of the Facing field displayed on the screen after pressing 'F3' (Note - the size of this field changes depending on the content), default value '{coordinates_screen_Facing}\n",
 }
 
 def encode_special_characters(string: str) -> str:

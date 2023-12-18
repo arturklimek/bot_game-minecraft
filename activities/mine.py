@@ -24,6 +24,8 @@ from app_config import items_quantity_pattern, get_repair_mining_pickaxe_frequen
 from clicker import click_right_mouse_button
 from delay import return_random_wait_interval_time
 from image_operations import convert_cv_image_to_gray, load_cv_image
+from log_game_processor import get_reply_data, check_risk_exit, check_risk_afk, make_reply, make_risk_afk, \
+    make_risk_exit
 from logger import app_logger
 from patterns import items_patterns
 from screenshooter import get_last_screenshot
@@ -42,6 +44,13 @@ repair_flag = False
 pickaxe_slot = 9
 
 # last_farm_time = None
+
+def get_is_running_mine_procedure() -> bool:
+    return is_running_mine_procedure
+
+def set_is_running_mine_procedure(state: bool = False) -> None:
+    global is_running_mine_procedure
+    is_running_mine_procedure = state
 
 def items_stored_procedure() -> None:
     """
@@ -233,13 +242,51 @@ def move_direction_and_mine() -> None:
         app_logger.debug(f"Press and relase: {get_hotkeys_slots()[pickaxe_slot]} - pickaxe_slot: {pickaxe_slot}")
         pyautogui.mouseDown(button='left')
         app_logger.debug(f"Pressing 'left'")
-        for _ in range(tmp_moving_time*2):
+        for time_iteration in range(tmp_moving_time*2):
             if not is_running_mine_procedure:
                 app_logger.debug(f"is_running_mine_procedure is {is_running_mine_procedure} - break")
                 break
             if not moving_flag:
                 app_logger.debug(f"moving_flag is {moving_flag} - break")
                 break
+            if get_reply_data():
+                # remaining_time = tmp_moving_time*2 - time_iteration*0.5
+                pyautogui.mouseUp(button='left')
+                app_logger.debug(f"Release 'left'")
+                if get_moving_hold_shift():
+                    keyboard.release('shift')
+                    app_logger.debug(f"Release 'shift'")
+                keyboard.release(current_moving_direction)
+                app_logger.debug(f"Release {current_moving_direction}")
+                make_reply()
+                time.sleep(2)
+                if check_risk_exit():
+                    time.sleep(1)
+                    make_risk_exit()
+                    time.sleep(1)
+                    set_is_running_mine_procedure(False)
+                    # global is_running_mine_procedure
+                    # is_running_mine_procedure = False
+                    # toggle_mine_procedure()
+                    return
+                if check_risk_afk():
+                    time.sleep(1)
+                    make_risk_afk()
+                    time.sleep(1)
+                    current_moving_direction = get_hotkey_moving_right()
+                    app_logger.debug(f"current_moving_direction was set to: {current_moving_direction}")
+                    tp_to_mining_home()
+                    return
+                app_logger.debug(f"Pressing {current_moving_direction}")
+                keyboard.press(current_moving_direction)
+                if get_moving_hold_shift():
+                    keyboard.press('shift')
+                    app_logger.debug(f"Pressing 'shift'")
+                keyboard.press_and_release(get_hotkeys_slots()[pickaxe_slot])
+                app_logger.debug(
+                    f"Press and relase: {get_hotkeys_slots()[pickaxe_slot]} - pickaxe_slot: {pickaxe_slot}")
+                pyautogui.mouseDown(button='left')
+                app_logger.debug(f"Pressing 'left'")
             time.sleep(0.5)
         pyautogui.mouseUp(button='left')
         app_logger.debug(f"Release 'left'")

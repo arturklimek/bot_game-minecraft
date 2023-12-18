@@ -286,7 +286,7 @@ eq_limit_to_stored = 33
 def get_eq_limit_to_stored() -> int:
     return eq_limit_to_stored
 
-items_stored_list = ["diamond", "emerald", "gold-ore", "iron-ingot", "iron-ore"]
+items_stored_list = ["diamond", "emerald", "gold-ore", "iron-ingot", "iron-ore", "diamond-block"]
 
 def get_items_stored_list():
     return items_stored_list
@@ -396,6 +396,10 @@ items_patterns_paths = {
     "cobblestone": {
         "pattern": os.path.join(PATTERNS_DIR_PATH, f'item_cobblestone_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}.png'),
         "mask": os.path.join(PATTERNS_DIR_PATH, f'item_cobblestone_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_mask.png')
+    },
+    "diamond-block": {
+        "pattern": os.path.join(PATTERNS_DIR_PATH, f'item_diamond-block_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}.png'),
+        "mask": os.path.join(PATTERNS_DIR_PATH, f'item_diamond-block_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_mask.png')
     },
 }
 

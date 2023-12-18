@@ -169,6 +169,7 @@ def get_repair_mining_pickaxe_frequency() -> int:
 farm_number = 2
 farm_floors_number = 15
 farm_floor_time_moving = 34
+farm_sell_frequency = 0
 
 tmp_home_flag = True
 
@@ -180,6 +181,9 @@ def get_farm_floors_number() -> int:
 
 def get_farm_floor_time_moving() -> int:
     return farm_floor_time_moving
+
+def get_farm_sell_frequency() -> int:
+    return farm_sell_frequency
 
 def get_tmp_home_flag() -> bool:
     return tmp_home_flag
@@ -537,6 +541,7 @@ def get_config_dict():
     tmp_dict["private_message_answer_flag"] = private_message_answer_flag
     tmp_dict["counter_risk_messages_to_afk"] = counter_risk_messages_to_afk
     tmp_dict["counter_risk_messages_to_lobby"] = counter_risk_messages_to_lobby
+    tmp_dict["farm_sell_frequency"] = farm_sell_frequency
     return tmp_dict
 
 def set_config_from_dict(config_dict):
@@ -593,6 +598,7 @@ def set_config_from_dict(config_dict):
     global client_player_nickname
     global counter_risk_messages_to_afk
     global counter_risk_messages_to_lobby
+    global farm_sell_frequency
     if config_dict is not None:
         # if "pattern_settings" in config_dict:
         #     pattern_settings = config_dict["pattern_settings"]
@@ -662,6 +668,8 @@ def set_config_from_dict(config_dict):
             counter_risk_messages_to_afk = config_dict["counter_risk_messages_to_afk"]
         if "counter_risk_messages_to_lobby" in config_dict:
             counter_risk_messages_to_lobby = config_dict["counter_risk_messages_to_lobby"]
+        if "farm_sell_frequency" in config_dict:
+            farm_sell_frequency = config_dict["farm_sell_frequency"]
         app_logger.info(f"The configuration was loaded: {config_dict}")
     else:
         app_logger.info(f"Taked config dict is None")
@@ -694,6 +702,7 @@ comments = {
     'client_player_nickname': f"# client_player_nickname - Name (nick) of the player of the user using the program (needed to analyze public chat messages). NOTE: An empty string will make the program respond to every message of the person in the 'risk_nicks_list'. \n",
     'counter_risk_messages_to_afk': f"# counter_risk_messages_to_afk - Number of messages from risk nicks (from the risk_nicks_list) after which the program goes afk on the spawn, value 0 - no afk, default value '{counter_risk_messages_to_afk}\n",
     'counter_risk_messages_to_lobby': f"# counter_risk_messages_to_lobby - The number of messages from risk nicks (from the risk_nicks_list) after which the program exits to the lobby and completely stops the action, value 0 - no action execution, default value '{counter_risk_messages_to_lobby}\n",
+    'farm_sell_frequency': f"# farm_sell_frequency - Determines the number of floors of the farm between sales (value <=0 will sell items on each floor), default value '{farm_sell_frequency}\n",
 }
 
 def encode_special_characters(string: str) -> str:

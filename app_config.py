@@ -745,8 +745,8 @@ comments = {
     'counter_risk_messages_to_lobby': f"# counter_risk_messages_to_lobby - The number of messages from risk nicks (from the risk_nicks_list) after which the program exits to the lobby and completely stops the action, value 0 - no action execution, default value '{counter_risk_messages_to_lobby}\n",
     'farm_sell_frequency': f"# farm_sell_frequency - Determines the number of floors of the farm between sales (value <=0 will sell items on each floor), default value '{farm_sell_frequency}\n",
     'reply_all_nicks_flag': f"# reply_all_nicks_flag - True or False flag indicating whether the program should respond to messages from nicks outside the list (risk_nicks_list), default value '{reply_all_nicks_flag}\n",
-    'coordinates_screen_XYZ': f"# coordinates_screen_XYZ - Coordinates on the screen of the XYZ field displayed on the screen after pressing 'F3', default value '{coordinates_screen_XYZ}\n",
-    'coordinates_screen_Facing': f"# coordinates_screen_Facing - Coordinates on the screen of the Facing field displayed on the screen after pressing 'F3' (Note - the size of this field changes depending on the content), default value '{coordinates_screen_Facing}\n",
+    'coordinates_screen_XYZ': f"# coordinates_screen_XYZ - Coordinates on the screen of the XYZ field displayed on the screen after pressing 'F3' (USE show_config_coordinates.bat to show this coordinates), default value '{coordinates_screen_XYZ}\n",
+    'coordinates_screen_Facing': f"# coordinates_screen_Facing - Coordinates on the screen of the Facing field displayed on the screen after pressing 'F3' (Note - the size of this field changes depending on the content) (USE show_config_coordinates.bat to show this coordinates), default value '{coordinates_screen_Facing}\n",
 }
 
 def encode_special_characters(string: str) -> str:

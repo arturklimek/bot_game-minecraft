@@ -14,6 +14,8 @@ from activities.repair import repair_item
 from app_config import get_farm_number, get_farm_floors_number, get_farm_floor_time_moving, \
     get_tmp_home_flag, get_hotkey_moving_left, get_hotkey_moving_right, get_hotkeys_slots, get_farm_sell_frequency
 from delay import return_random_wait_interval_time
+from log_game_processor import get_reply_data, make_reply, check_risk_exit, make_risk_exit, check_risk_afk, \
+    make_risk_afk
 from logger import app_logger
 from screenshooter import get_last_screenshot
 
@@ -22,150 +24,201 @@ axe_slot = 8
 farm_procedure_thread = None
 is_running_farm_procedure = False
 
-def farm_procedure() -> None:
+def get_is_running_farm_procedure() -> bool:
+    return is_running_farm_procedure
+
+def set_is_running_farm_procedure(new_state) -> None:
+    global is_running_farm_procedure
+    is_running_farm_procedure = new_state
+
+def make_farm(farm_number) -> bool:
     """
-    Executes the farming procedure for a specified number of farms.
+    Executes the farming routine for a specified farm number.
 
-    This function automates the farming process in each farm. It iterates over a set number of farms, performing actions like teleporting to the farm location, using the axe for farming, selling inventory, and repairing the axe if necessary. The procedure includes navigation and interaction controls.
+    This function automates the farming process on a given farm instance. It includes selling inventory, updating equipment coordinates, teleporting to specific farm homes, and automating the farm harvest process. The routine adapts the movement direction based on the farm number and handles various checks, such as stopping the process based on certain conditions.
 
-    Globals:
-        current_moving_direction (str): The current direction the character is moving in the game.
-        is_running_farm_procedure (bool): Flag to check if the farm procedure is currently running.
+    Args:
+        farm_number: The number identifying the specific farm to be automated.
 
-    Note:
-        This function depends on various configuration settings like farm number, floor time moving, and more. It also relies on the state of global variables to manage the flow of the procedure.
+    Returns:
+        bool: Returns False, if the faring procedure is interrupted or terminated before time and the further part of the autofarm is not to be continued. Returns True if an error has occurred but the autofarm operation is to continue.
+
+    Raises:
+        Exception: If an unexpected error occurs during the farming process.
     """
     global current_moving_direction
+    try:
+        repeat_farm = True
+        while repeat_farm:
+            sell_counter = 0
+            repeat_farm = False
+            app_logger.debug(f"repeat_farm was set to {repeat_farm}")
+            if (farm_number % 2) == 0:
+                current_moving_direction = get_hotkey_moving_left()
+            else:
+                current_moving_direction = get_hotkey_moving_right()
+            app_logger.debug(f"current_moving_direction was set to: {current_moving_direction}")
+            keyboard.press_and_release(get_hotkeys_slots()[9])
+            app_logger.debug(f"Press and release {get_hotkeys_slots()[9]}")
+            time.sleep(return_random_wait_interval_time(0.5, 1))
+            check_and_update_eq_coordinates()
+            tp_to_farm_home(farm_number + 1)
+            time.sleep(return_random_wait_interval_time(0.2, 0.4))
+            keyboard.press_and_release(get_hotkeys_slots()[9])
+            app_logger.debug(f"Press and release {get_hotkeys_slots()[9]}")
+            time.sleep(return_random_wait_interval_time(0.1, 0.5))
+            sellall_inventory()
+            time.sleep(return_random_wait_interval_time(0.5, 1))
+            change_axe_slot_number()
+            time.sleep(return_random_wait_interval_time(0.2, 0.4))
+            keyboard.press("shift")
+            app_logger.debug(f"Pressing 'shift'")
+            keyboard.press_and_release(get_hotkeys_slots()[axe_slot])
+            app_logger.debug(f"Press and release {get_hotkeys_slots()[axe_slot]}")
+            time.sleep(0.5)
+            keyboard.release("shift")
+            app_logger.debug(f"Release 'shift'")
+            app_logger.debug(f"farm_floors_number is {get_farm_floors_number()}")
+            for floor in range(int(get_farm_floors_number())):
+                keyboard.press_and_release(get_hotkeys_slots()[axe_slot])
+                app_logger.debug(f"Press and release {get_hotkeys_slots()[axe_slot]}")
+                time.sleep(0.2)
+                pyautogui.mouseDown(button='left')
+                app_logger.debug(f"Press mouse left")
+                keyboard.press(current_moving_direction)
+                app_logger.debug(f"Press {current_moving_direction} for {get_farm_floor_time_moving()} secounds")
+                app_logger.debug(f"farm_floor_time_moving is {get_farm_floor_time_moving()}")
+                for time_iteration in range(int(get_farm_floor_time_moving() * 2)):
+                    from activities.mine import is_running_mine_procedure
+                    if not is_running_mine_procedure and not is_running_farm_procedure:
+                        pyautogui.mouseUp(button='left')
+                        keyboard.release(current_moving_direction)
+                        return False
+                    if get_reply_data():
+                        pyautogui.mouseUp(button='left')
+                        app_logger.debug(f"Release mouse left")
+                        keyboard.release(current_moving_direction)
+                        app_logger.debug(f"Release {current_moving_direction}")
+                        time.sleep(1)
+                        make_reply()
+                        time.sleep(2)
+                        if check_risk_exit():
+                            time.sleep(1)
+                            make_risk_exit()
+                            time.sleep(1)
+                            set_is_running_farm_procedure(False)
+                            return False
+                        if check_risk_afk(): #TODO: add other action if get_tmp_home_flag() is used (is True)
+                            time.sleep(1)
+                            make_risk_afk()
+                            time.sleep(1)
+                            return True
+                        pyautogui.mouseDown(button='left')
+                        app_logger.debug(f"Press mouse left")
+                        keyboard.press(current_moving_direction)
+                        app_logger.debug(f"Press {current_moving_direction}")
+                    time.sleep(0.5)
+                pyautogui.mouseUp(button='left')
+                app_logger.debug(f"Release mouse left")
+                keyboard.release(current_moving_direction)
+                app_logger.debug(f"Release {current_moving_direction}")
+                if current_moving_direction == get_hotkey_moving_right():
+                    current_moving_direction = get_hotkey_moving_left()
+                elif current_moving_direction == get_hotkey_moving_left():
+                    current_moving_direction = get_hotkey_moving_right()
+                app_logger.debug(f"current_moving_direction was set to: {current_moving_direction}")
+                time.sleep(return_random_wait_interval_time(0.1, 0.5))
+                if sell_counter <= get_farm_sell_frequency():
+                    sellall_inventory()
+                    sell_counter = 0
+                else:
+                    sell_counter = sell_counter + 1
+                time.sleep(return_random_wait_interval_time(0.1, 0.5))
+                keyboard.press_and_release(get_hotkeys_slots()[9])
+                app_logger.debug(f"Press and release {get_hotkeys_slots()[9]}")
+                time.sleep(return_random_wait_interval_time(0.5, 1))
+                last_image = copy.copy(get_last_screenshot())
+                check_and_update_eq_coordinates()
+                eq_slot_x1, eq_slot_y1 = activities.eq_bar.eq_slot_top_left
+                eq_slot_x2, eq_slot_y2 = activities.eq_bar.eq_slot_bottom_right
+                cropped_slots_image = last_image[eq_slot_y1:eq_slot_y2, eq_slot_x1:eq_slot_x2]
+                axe_image_result = get_axe_image(cropped_slots_image)
+                if axe_image_result is not None:
+                    cropped_pickaxe_image, axe_top_left, axe_bottom_right = axe_image_result
+                    change_axe_slot_number(axe_top_left, axe_bottom_right)
+                    if check_axe_damage_to_repair(cropped_pickaxe_image):
+                        keyboard.press_and_release(get_hotkeys_slots()[9])
+                        app_logger.debug(f"Press and release {get_hotkeys_slots()[9]}")
+                        time.sleep(return_random_wait_interval_time(1, 1.5))
+                        check_and_update_eq_coordinates()
+                        time.sleep(return_random_wait_interval_time(0.1, 0.5))
+                        keyboard.press_and_release(get_hotkeys_slots()[axe_slot])
+                        app_logger.debug(f"Press and release {get_hotkeys_slots()[axe_slot]}")
+                        time.sleep(return_random_wait_interval_time(0.1, 0.2))
+                        if get_tmp_home_flag():
+                            app_logger.debug(f"tmp_home_flag {get_tmp_home_flag()}")
+                            set_tmp_home()
+                            time.sleep(return_random_wait_interval_time(0.2, 0.5))
+                            repair_item()
+                            time.sleep(return_random_wait_interval_time(0.5, 1))
+                            tp_to_tmp_home()
+                        else:
+                            repair_item()
+                            if floor + 1 < get_farm_floors_number():
+                                repeat_farm = True
+                                app_logger.debug(f"repeat_farm was set to {repeat_farm}")
+                                break
+                        keyboard.press_and_release(get_hotkeys_slots()[axe_slot])
+                        app_logger.debug(f"Press and release {get_hotkeys_slots()[axe_slot]}")
+                        time.sleep(return_random_wait_interval_time(1, 1.5))
+                    else:
+                        app_logger.debug("Taked check_axe_damage_to_repair is None")
+                else:
+                    app_logger.debug(f"Taked axe_image_result is None")
+                if get_tmp_home_flag():
+                    app_logger.debug(f"tmp_home_flag {get_tmp_home_flag()}")
+                    afk_counter = get_afk_counter()
+                    if afk_counter is not None:
+                        if get_afk_counter() - 1 <= 0:
+                            set_tmp_home()
+                            time.sleep(return_random_wait_interval_time(0.2, 0.5))
+                            afk_break()
+                            time.sleep(return_random_wait_interval_time(0.5, 1))
+                            tp_to_tmp_home()
+                        else:
+                            afk_break()
+                    else:
+                        afk_break()
+                else:
+                    if afk_break():
+                        if floor + 1 < get_farm_floors_number():
+                            repeat_farm = True
+                            app_logger.debug(f"repeat_farm was set to {repeat_farm}")
+                            break
+    except Exception as ex:
+        app_logger.error(ex)
+
+def farm_procedure() -> None:
+    """
+    Manages and coordinates the overall farming procedure.
+
+    This function controls the execution of the farming process over a specified number of farms. It iteratively invokes the make_farm function for each farm. The process checks if the farming procedure should continue or stop based on various conditions, including user-defined settings and in-game occurrences.
+
+    Side effects:
+        - Sets the global variable `is_running_farm_procedure` to False if the farming process is interrupted or if a condition for termination is met.
+
+    Raises:
+        Exception: If an unexpected error occurs during the farming process.
+    """
     global is_running_farm_procedure
-    sell_counter = 0
     app_logger.debug("Starting farm_procedure")
     try:
         if is_running_farm_procedure:
             app_logger.debug(f"farm_number is {get_farm_number()}")
             for farm in range(int(get_farm_number())):
-                repeat_farm = True
-                while repeat_farm:
-                    repeat_farm = False
-                    app_logger.debug(f"repeat_farm was set to {repeat_farm}")
-                    if (farm % 2) == 0:
-                        current_moving_direction = get_hotkey_moving_left()
-                    else:
-                        current_moving_direction = get_hotkey_moving_right()
-                    app_logger.debug(f"current_moving_direction was set to: {current_moving_direction}")
-                    keyboard.press_and_release(get_hotkeys_slots()[9])
-                    app_logger.debug(f"Press and release {get_hotkeys_slots()[9]}")
-                    time.sleep(return_random_wait_interval_time(0.5, 1))
-                    check_and_update_eq_coordinates()
-                    tp_to_farm_home(farm + 1)
-                    time.sleep(return_random_wait_interval_time(0.2, 0.4))
-                    keyboard.press_and_release(get_hotkeys_slots()[9])
-                    app_logger.debug(f"Press and release {get_hotkeys_slots()[9]}")
-                    time.sleep(return_random_wait_interval_time(0.1, 0.5))
-                    sellall_inventory()
-                    time.sleep(return_random_wait_interval_time(0.5, 1))
-                    change_axe_slot_number()
-                    time.sleep(return_random_wait_interval_time(0.2, 0.4))
-                    keyboard.press("shift")
-                    app_logger.debug(f"Pressing 'shift'")
-                    keyboard.press_and_release(get_hotkeys_slots()[axe_slot])
-                    app_logger.debug(f"Press and release {get_hotkeys_slots()[axe_slot]}")
-                    time.sleep(0.5)
-                    keyboard.release("shift")
-                    app_logger.debug(f"Release 'shift'")
-                    app_logger.debug(f"farm_floors_number is {get_farm_floors_number()}")
-                    for floor in range(int(get_farm_floors_number())):
-                        keyboard.press_and_release(get_hotkeys_slots()[axe_slot])
-                        app_logger.debug(f"Press and release {get_hotkeys_slots()[axe_slot]}")
-                        time.sleep(0.2)
-                        pyautogui.mouseDown(button='left')
-                        app_logger.debug(f"Press mouse left")
-                        keyboard.press(current_moving_direction)
-                        app_logger.debug(f"Press {current_moving_direction} for {get_farm_floor_time_moving()} secounds")
-                        app_logger.debug(f"farm_floor_time_moving is {get_farm_floor_time_moving()}")
-                        for _ in range(int(get_farm_floor_time_moving() * 2)):
-                            from activities.mine import is_running_mine_procedure
-                            if not is_running_mine_procedure and not is_running_farm_procedure:
-                                pyautogui.mouseUp(button='left')
-                                keyboard.release(current_moving_direction)
-                                return
-                            time.sleep(0.5)
-                        pyautogui.mouseUp(button='left')
-                        app_logger.debug(f"Release mouse left")
-                        keyboard.release(current_moving_direction)
-                        app_logger.debug(f"Release {current_moving_direction}")
-                        if current_moving_direction == get_hotkey_moving_right():
-                            current_moving_direction = get_hotkey_moving_left()
-                        elif current_moving_direction == get_hotkey_moving_left():
-                            current_moving_direction = get_hotkey_moving_right()
-                        app_logger.debug(f"current_moving_direction was set to: {current_moving_direction}")
-                        time.sleep(return_random_wait_interval_time(0.1, 0.5))
-                        if sell_counter <= get_farm_sell_frequency():
-                            sellall_inventory()
-                            sell_counter = 0
-                        else:
-                            sell_counter = sell_counter + 1
-                        time.sleep(return_random_wait_interval_time(0.1, 0.5))
-                        keyboard.press_and_release(get_hotkeys_slots()[9])
-                        app_logger.debug(f"Press and release {get_hotkeys_slots()[9]}")
-                        time.sleep(return_random_wait_interval_time(0.5, 1))
-                        last_image = copy.copy(get_last_screenshot())
-                        check_and_update_eq_coordinates()
-                        eq_slot_x1, eq_slot_y1 = activities.eq_bar.eq_slot_top_left
-                        eq_slot_x2, eq_slot_y2 = activities.eq_bar.eq_slot_bottom_right
-                        cropped_slots_image = last_image[eq_slot_y1:eq_slot_y2, eq_slot_x1:eq_slot_x2]
-                        axe_image_result = get_axe_image(cropped_slots_image)
-                        if axe_image_result is not None:
-                            cropped_pickaxe_image, axe_top_left, axe_bottom_right = axe_image_result
-                            change_axe_slot_number(axe_top_left, axe_bottom_right)
-                            if check_axe_damage_to_repair(cropped_pickaxe_image):
-                                keyboard.press_and_release(get_hotkeys_slots()[9])
-                                app_logger.debug(f"Press and release {get_hotkeys_slots()[9]}")
-                                time.sleep(return_random_wait_interval_time(1, 1.5))
-                                check_and_update_eq_coordinates()
-                                time.sleep(return_random_wait_interval_time(0.1, 0.5))
-                                keyboard.press_and_release(get_hotkeys_slots()[axe_slot])
-                                app_logger.debug(f"Press and release {get_hotkeys_slots()[axe_slot]}")
-                                time.sleep(return_random_wait_interval_time(0.1, 0.2))
-                                if get_tmp_home_flag():
-                                    app_logger.debug(f"tmp_home_flag {get_tmp_home_flag()}")
-                                    set_tmp_home()
-                                    time.sleep(return_random_wait_interval_time(0.2, 0.5))
-                                    repair_item()
-                                    time.sleep(return_random_wait_interval_time(0.5, 1))
-                                    tp_to_tmp_home()
-                                else:
-                                    repair_item()
-                                    if floor + 1 < get_farm_floors_number():
-                                        repeat_farm = True
-                                        app_logger.debug(f"repeat_farm was set to {repeat_farm}")
-                                        break
-                                keyboard.press_and_release(get_hotkeys_slots()[axe_slot])
-                                app_logger.debug(f"Press and release {get_hotkeys_slots()[axe_slot]}")
-                                time.sleep(return_random_wait_interval_time(1, 1.5))
-                            else:
-                                app_logger.debug("Taked check_axe_damage_to_repair is None")
-                        else:
-                            app_logger.debug(f"Taked axe_image_result is None")
-                        if get_tmp_home_flag():
-                            app_logger.debug(f"tmp_home_flag {get_tmp_home_flag()}")
-                            afk_counter = get_afk_counter()
-                            if afk_counter is not None:
-                                if get_afk_counter()-1 <= 0:
-                                    set_tmp_home()
-                                    time.sleep(return_random_wait_interval_time(0.2, 0.5))
-                                    afk_break()
-                                    time.sleep(return_random_wait_interval_time(0.5, 1))
-                                    tp_to_tmp_home()
-                                else:
-                                    afk_break()
-                            else:
-                                afk_break()
-                        else:
-                            if afk_break():
-                                if floor + 1 < get_farm_floors_number():
-                                    repeat_farm = True
-                                    app_logger.debug(f"repeat_farm was set to {repeat_farm}")
-                                    break
+                if make_farm(farm) is False:
+                    is_running_farm_procedure= False
+                    return
     except Exception as ex:
         app_logger.error(ex)
 

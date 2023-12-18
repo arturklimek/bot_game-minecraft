@@ -258,6 +258,7 @@ def move_direction_and_mine() -> None:
                     app_logger.debug(f"Release 'shift'")
                 keyboard.release(current_moving_direction)
                 app_logger.debug(f"Release {current_moving_direction}")
+                time.sleep(1)
                 make_reply()
                 time.sleep(2)
                 if check_risk_exit():

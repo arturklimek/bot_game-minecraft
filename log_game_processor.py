@@ -7,7 +7,7 @@ from activities.afk import afk_on_spawn, draw_risk_afk_time
 from activities.chat import send_private_message_to_player, send_chat_message_to_player, send_on_chat
 from app_config import get_game_latest_log_path, get_risk_nicks_list, get_messages_respond_dict, \
     get_chat_message_answer_flag, get_private_message_answer_flag, get_client_player_nickname, \
-    get_counter_risk_messages_to_lobby, get_counter_risk_messages_to_afk
+    get_counter_risk_messages_to_lobby, get_counter_risk_messages_to_afk, get_reply_all_nicks_flag
 from logger import app_logger
 
 reply_data = {}
@@ -67,7 +67,7 @@ def update_reply_data(log_line: str) -> None:
             message_content = extract_content_from_player_private_message(log_line).lower().strip()
             private_message_status = True
     if player_nickname and message_content:
-        if check_risk_nickname(player_nickname):
+        if check_risk_nickname(player_nickname) or get_reply_all_nicks_flag():
             # app_logger.info("Find chat msessage sended from nick: {player_nickname}")
             messages_respond_dict = get_messages_respond_dict()
             answer = "?"

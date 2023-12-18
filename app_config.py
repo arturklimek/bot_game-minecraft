@@ -39,6 +39,11 @@ risk_nicks_list = [
 def get_risk_nicks_list() -> list:
     return risk_nicks_list
 
+reply_all_nicks_flag = False
+
+def get_reply_all_nicks_flag() -> bool:
+    return reply_all_nicks_flag
+
 def get_save_images_flags() -> dict:
     return save_images_flags
 
@@ -542,6 +547,7 @@ def get_config_dict():
     tmp_dict["counter_risk_messages_to_afk"] = counter_risk_messages_to_afk
     tmp_dict["counter_risk_messages_to_lobby"] = counter_risk_messages_to_lobby
     tmp_dict["farm_sell_frequency"] = farm_sell_frequency
+    tmp_dict["reply_all_nicks_flag"] = reply_all_nicks_flag
     return tmp_dict
 
 def set_config_from_dict(config_dict):
@@ -599,6 +605,7 @@ def set_config_from_dict(config_dict):
     global counter_risk_messages_to_afk
     global counter_risk_messages_to_lobby
     global farm_sell_frequency
+    global reply_all_nicks_flag
     if config_dict is not None:
         # if "pattern_settings" in config_dict:
         #     pattern_settings = config_dict["pattern_settings"]
@@ -670,6 +677,8 @@ def set_config_from_dict(config_dict):
             counter_risk_messages_to_lobby = config_dict["counter_risk_messages_to_lobby"]
         if "farm_sell_frequency" in config_dict:
             farm_sell_frequency = config_dict["farm_sell_frequency"]
+        if "reply_all_nicks_flag" in config_dict:
+            reply_all_nicks_flag = config_dict["reply_all_nicks_flag"]
         app_logger.info(f"The configuration was loaded: {config_dict}")
     else:
         app_logger.info(f"Taked config dict is None")
@@ -703,6 +712,7 @@ comments = {
     'counter_risk_messages_to_afk': f"# counter_risk_messages_to_afk - Number of messages from risk nicks (from the risk_nicks_list) after which the program goes afk on the spawn, value 0 - no afk, default value '{counter_risk_messages_to_afk}\n",
     'counter_risk_messages_to_lobby': f"# counter_risk_messages_to_lobby - The number of messages from risk nicks (from the risk_nicks_list) after which the program exits to the lobby and completely stops the action, value 0 - no action execution, default value '{counter_risk_messages_to_lobby}\n",
     'farm_sell_frequency': f"# farm_sell_frequency - Determines the number of floors of the farm between sales (value <=0 will sell items on each floor), default value '{farm_sell_frequency}\n",
+    'reply_all_nicks_flag': f"# reply_all_nicks_flag - True or False flag indicating whether the program should respond to messages from nicks outside the list (risk_nicks_list), default value '{farm_sell_frequency}\n",
 }
 
 def encode_special_characters(string: str) -> str:

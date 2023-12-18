@@ -1,0 +1,1 @@
+python .\show_screen_coordinates.py

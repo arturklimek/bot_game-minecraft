@@ -1,6 +1,6 @@
 import sys
 import time
-from typing import Optional
+from typing import Optional, NoReturn
 import cv2
 import numpy as np
 from app_config import read_config_file
@@ -23,7 +23,7 @@ def display_rectangle(image: Optional[np.ndarray] = None, coordinates: dict = {}
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-if __name__ == "__main__":
+def main() -> NoReturn:
     coordinates_keys_to_show = ["coordinates_screen_XYZ", "coordinates_screen_Facing"]
     config = read_config_file()
     print("The screenshot will be taken in 5s. Please make the focus on the game window.")
@@ -32,7 +32,7 @@ if __name__ == "__main__":
     if image is None:
         print("Image is empty, try again")
         sys.exit()
-    print("Press 'q' to close image")
+    print("Press 'any key to close image")
     for coordinates in coordinates_keys_to_show:
         if coordinates in config:
             print(f"Show: {coordinates}")
@@ -40,3 +40,10 @@ if __name__ == "__main__":
             display_rectangle(image=image.copy(), coordinates=config[coordinates], window_name=coordinates)
         else:
             print(f"Can not find '{coordinates}' in readed config")
+
+if __name__ == "__main__":
+    while True:
+        main()
+        user_input = input("Send 'q' to quit or any other key to try again: ")
+        if user_input.lower() == 'q':
+            break

@@ -65,7 +65,16 @@ mine_coordinate_range = {
 def get_mine_coordinate_range() -> dict:
     return mine_coordinate_range
 
-farm_coordinate_range = {
+farm_coordinate_range = [
+{
+    'x1': 0,
+    'x2': 0,
+    'y1': 0,
+    'y2': 0,
+    'z1': 0,
+    'z2': 0,
+},
+{
     'x1': 0,
     'x2': 0,
     'y1': 0,
@@ -73,6 +82,7 @@ farm_coordinate_range = {
     'z1': 0,
     'z2': 0,
 }
+]
 
 def get_farm_coordinate_range() -> dict:
     return farm_coordinate_range
@@ -799,8 +809,8 @@ comments = {
     'reply_all_nicks_flag': f"# reply_all_nicks_flag - True or False flag indicating whether the program should respond to messages from nicks outside the list (risk_nicks_list), default value '{reply_all_nicks_flag}\n",
     'coordinates_screen_XYZ': f"# coordinates_screen_XYZ - Coordinates on the screen of the XYZ field displayed on the screen after pressing 'F3' (USE show_config_coordinates.bat to show this coordinates), default value '{coordinates_screen_XYZ}\n",
     'coordinates_screen_Facing': f"# coordinates_screen_Facing - Coordinates on the screen of the Facing field displayed on the screen after pressing 'F3' (Note - the size of this field changes depending on the content) (USE show_config_coordinates.bat to show this coordinates), default value '{coordinates_screen_Facing}\n",
-    'mine_coordinate_range': f"# mine_coordinate_range - List of the range of acceptable fla automine coordinates (for example, from x1=100 to x2=120). When any of the coordinates extracted from the analysis (coordinates_screen_XYZ) is out of range then the program aborts.\n",
-    'farm_coordinate_range': f"# farm_coordinate_range - List of the range of acceptable fla autofarm coordinates (for example, from y=-40 to y2=-20). When any of the coordinates extracted from the analysis (coordinates_screen_XYZ) is out of range then the program aborts.\n",
+    'mine_coordinate_range': f"# mine_coordinate_range - Dict of the range of acceptable fla automine coordinates (for example, from x1=100 to x2=120). When any of the coordinates extracted from the analysis (coordinates_screen_XYZ) is out of range then the program aborts.\n",
+    'farm_coordinate_range': f"# farm_coordinate_range - List containing dictionaries of the range of acceptable autofarm coordinates (for example, from y=-40 to y2=-20). When any of the coordinates extracted from the analysis (coordinates_screen_XYZ) is out of range then the program aborts.\n",
     'coordinates_problem_messages_list': f"# coordinates_problem_messages_list - List of messages that will be sent to the public chat in case of a problem with coordinates - an empty list will not send any message, default value '{coordinates_problem_messages_list}\n",
 }
 

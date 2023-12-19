@@ -1,3 +1,4 @@
+import datetime
 import threading
 from typing import Optional, Tuple
 
@@ -7,12 +8,16 @@ import time
 import keyboard
 import pyautogui
 
-from activities.afk import afk_break, get_afk_counter
-from activities.chat import tp_to_farm_home, sellall_inventory, tp_to_spawn, set_tmp_home, tp_to_tmp_home
+from activities.afk import afk_break, get_afk_counter, draw_risk_afk_time, afk_on_spawn
+from activities.chat import tp_to_farm_home, sellall_inventory, tp_to_spawn, set_tmp_home, tp_to_tmp_home, send_on_chat, \
+    send_random_message_coordinates_problem
 from activities.eq_bar import get_item_slot_number, get_axe_image, check_axe_damage_to_repair, check_and_update_eq_coordinates
+from activities.mine import random_double_move_mouse
 from activities.repair import repair_item
 from app_config import get_farm_number, get_farm_floors_number, get_farm_floor_time_moving, \
-    get_tmp_home_flag, get_hotkey_moving_left, get_hotkey_moving_right, get_hotkeys_slots, get_farm_sell_frequency
+    get_tmp_home_flag, get_hotkey_moving_left, get_hotkey_moving_right, get_hotkeys_slots, get_farm_sell_frequency, \
+    get_coordinates_screen_XYZ_analysis_flag, get_farm_coordinate_range
+from coordinate_analyzer import get_coordinates_XYZ, check_coordinates_compatibility_XYZ
 from delay import return_random_wait_interval_time
 from log_game_processor import get_reply_data, make_reply, check_risk_exit, make_risk_exit, check_risk_afk, \
     make_risk_afk
@@ -23,6 +28,10 @@ axe_slot = 8
 
 farm_procedure_thread = None
 is_running_farm_procedure = False
+
+max_coordinates_without_moving = 3
+max_coordinates_without_data = 5
+max_coordinates_out_of_range = 3
 
 def get_is_running_farm_procedure() -> bool:
     return is_running_farm_procedure
@@ -47,9 +56,15 @@ def make_farm(farm_number) -> bool:
         Exception: If an unexpected error occurs during the farming process.
     """
     global current_moving_direction
+    coordinate_analyze_flag = get_coordinates_screen_XYZ_analysis_flag()
     try:
         repeat_farm = True
         while repeat_farm:
+            last_iteration_time = datetime.datetime.now()
+            last_coordinates = {}
+            coordinates_without_moving = 0
+            coordinates_without_data = 0
+            coordinates_out_of_range = 0
             sell_counter = 0
             repeat_farm = False
             app_logger.debug(f"repeat_farm was set to {repeat_farm}")
@@ -95,10 +110,7 @@ def make_farm(farm_number) -> bool:
                         keyboard.release(current_moving_direction)
                         return False
                     if get_reply_data():
-                        pyautogui.mouseUp(button='left')
-                        app_logger.debug(f"Release mouse left")
-                        keyboard.release(current_moving_direction)
-                        app_logger.debug(f"Release {current_moving_direction}")
+                        release_farm_buttons()
                         time.sleep(1)
                         make_reply()
                         time.sleep(2)
@@ -113,10 +125,79 @@ def make_farm(farm_number) -> bool:
                             make_risk_afk()
                             time.sleep(1)
                             return True
-                        pyautogui.mouseDown(button='left')
-                        app_logger.debug(f"Press mouse left")
-                        keyboard.press(current_moving_direction)
-                        app_logger.debug(f"Press {current_moving_direction}")
+                        press_farm_buttons()
+                    if coordinate_analyze_flag:
+                        current_time = datetime.datetime.now()
+                        time_difference = current_time - last_iteration_time
+                        if time_difference.total_seconds() < 1:
+                            app_logger.debug("Less than 1 second has passed since the last iteration")
+                        else:
+                            coordinates_range = get_farm_coordinate_range()[farm_number]
+                            app_logger.debug(f"coordinates_range: {coordinates_range}")
+                            current_coordinates = get_coordinates_XYZ()
+                            coordinate_state = check_coordinates_compatibility_XYZ(coordinates_range,
+                                                                                   current_coordinates)
+                            if coordinate_state is False:
+                                coordinates_without_data = 0
+                                coordinates_out_of_range = coordinates_out_of_range + 1
+                                app_logger.debug(
+                                    f"coordinate_state is {coordinate_state}, set coordinates_out_of_range to value: {coordinates_out_of_range}")
+                                pass
+                            elif coordinate_state is True:
+                                coordinates_without_data = 0
+                                coordinates_out_of_range = 0
+                                app_logger.debug(
+                                    f"coordinate_state is {coordinate_state} - SET coordinates_without_data: {coordinates_without_data} and coordinates_out_of_range: {coordinates_out_of_range}")
+                                pass
+                            else:
+                                coordinates_without_data = coordinates_without_data + 1
+                                app_logger.debug(
+                                    f"coordinate_state is {coordinate_state} - set coordinates_without_data to value: {coordinates_without_data}")
+                            if last_coordinates:
+                                if last_coordinates == current_coordinates:
+                                    coordinates_without_moving = coordinates_without_moving + 1
+                                    app_logger.debug(
+                                        f"coordinates do not change - set coordinates_without_moving to value: {coordinates_without_moving} last_coordinates: {last_coordinates} current_coordinates: {current_coordinates}")
+                                else:
+                                    coordinates_without_moving = 0
+                            if coordinates_without_moving > max_coordinates_without_moving:
+                                app_logger.warning(
+                                    f"coordinates_without_moving: {coordinates_without_moving} exceeded the max value: {max_coordinates_without_moving}")
+                                release_farm_buttons()
+                                random_double_move_mouse()
+                                time.sleep(1)
+                                send_random_message_coordinates_problem()
+                                app_logger.info(f"Go to Lobby (too many coordinates without moving)")
+                                go_lobby_exit_farm()
+                                return False
+                            if coordinates_without_data > max_coordinates_without_data:
+                                app_logger.warning(
+                                    f"coordinates_without_data: {coordinates_without_data} exceeded the max value: {max_coordinates_without_data}")
+                                release_farm_buttons()
+                                time.sleep(1)
+                                send_random_message_coordinates_problem()
+                                afk_time = draw_risk_afk_time()
+                                app_logger.info(
+                                    f"Go AFK on spawn (too many coordinates without data) for afk_time: {afk_time}")
+                                afk_on_spawn(afk_time)
+                                app_logger.debug("AFK time over")
+                                time.sleep(1)
+                                current_moving_direction = get_hotkey_moving_right()
+                                app_logger.debug(f"current_moving_direction was set to: {current_moving_direction}")
+                                tp_to_farm_home()
+                                return True
+                            if coordinates_out_of_range > max_coordinates_out_of_range:
+                                app_logger.warning(
+                                    f"coordinates_out_of_range: {coordinates_out_of_range} exceeded the max value: {max_coordinates_out_of_range}")
+                                release_farm_buttons()
+                                random_double_move_mouse()
+                                time.sleep(1)
+                                send_random_message_coordinates_problem()
+                                app_logger.info(f"Go to Lobby (too many coordinates out of range)")
+                                go_lobby_exit_farm()
+                                return False
+                            last_coordinates = current_coordinates
+                            last_iteration_time = current_time
                     time.sleep(0.5)
                 pyautogui.mouseUp(button='left')
                 app_logger.debug(f"Release mouse left")
@@ -197,6 +278,26 @@ def make_farm(farm_number) -> bool:
                             break
     except Exception as ex:
         app_logger.error(ex)
+
+def go_lobby_exit_farm() -> None:
+    lobby_command = "/lobby 1"
+    time.sleep(1)
+    app_logger.info(f"Go to Lobby - execute command: {lobby_command}")
+    send_on_chat(lobby_command)
+    time.sleep(5)
+    set_is_running_farm_procedure(False)
+
+def release_farm_buttons() -> None:
+    app_logger.debug(f"Release mouse left")
+    pyautogui.mouseUp(button='left')
+    app_logger.debug(f"Release {current_moving_direction}")
+    keyboard.release(current_moving_direction)
+
+def press_farm_buttons() -> None:
+    app_logger.debug(f"Press mouse left")
+    pyautogui.mouseDown(button='left')
+    app_logger.debug(f"Press {current_moving_direction}")
+    keyboard.press(current_moving_direction)
 
 def farm_procedure() -> None:
     """

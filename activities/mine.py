@@ -1,15 +1,14 @@
 import copy
-import os
 import random
 import threading
 import time
-from datetime import datetime
+import datetime
 from typing import Optional
-
 import keyboard
+import mouse
 import pyautogui
 import activities.eq_bar
-from activities.afk import afk_break
+from activities.afk import afk_break, draw_risk_afk_time, afk_on_spawn
 from activities.chat import tp_to_mining_home, send_on_chat, sellall_inventory, tp_to_chest_home, tp_to_spawn, \
     send_chat_notification
 from activities.chest import check_and_get_chest_image, get_slots_chest_coordinates, get_chest_slots_images, \
@@ -20,8 +19,11 @@ from activities.eq_bar import check_pickaxe_damage_to_repair, get_pickaxe_image,
 from activities.equipment import check_inventory_full, check_slot_free
 from activities.repair import repair_item
 from app_config import items_quantity_pattern, get_repair_mining_pickaxe_frequency, get_hotkey_inventory, \
-    get_hotkey_moving_up, get_hotkey_moving_left, get_hotkey_moving_right, get_hotkeys_slots, get_protected_slots, set_protected_slots, get_moving_time, get_moving_hold_shift, get_items_stored_list
+    get_hotkey_moving_up, get_hotkey_moving_left, get_hotkey_moving_right, get_hotkeys_slots, get_protected_slots, \
+    set_protected_slots, get_moving_time, get_moving_hold_shift, get_items_stored_list, \
+    get_coordinates_screen_XYZ_analysis_flag, get_mine_coordinate_range, get_coordinates_problem_messages_list
 from clicker import click_right_mouse_button
+from coordinate_analyzer import check_coordinates_compatibility_XYZ, get_coordinates_XYZ
 from delay import return_random_wait_interval_time
 from image_operations import convert_cv_image_to_gray, load_cv_image
 from log_game_processor import get_reply_data, check_risk_exit, check_risk_afk, make_reply, make_risk_afk, \
@@ -42,6 +44,10 @@ moving_flag = True
 stored_flag = False
 repair_flag = False
 pickaxe_slot = 9
+
+max_coordinates_without_moving = 3
+max_coordinates_without_data = 5
+max_coordinates_out_of_range = 3
 
 # last_farm_time = None
 
@@ -229,19 +235,19 @@ def move_direction_and_mine() -> None:
     """
     global moving_flag
     global current_moving_direction
+    coordinate_analyze_flag = get_coordinates_screen_XYZ_analysis_flag()
     app_logger.debug("Starting move_direction")
     tmp_moving_time = random.randint(int(get_moving_time()*0.8),int(get_moving_time()*1.2))
     app_logger.debug(f"tmp_moving_time was draw to value: {tmp_moving_time}")
     if is_running_mine_procedure and current_moving_direction:
-        app_logger.debug(f"Pressing {current_moving_direction} for {get_moving_time()} seconds")
-        keyboard.press(current_moving_direction)
-        if get_moving_hold_shift():
-            keyboard.press('shift')
-            app_logger.debug(f"Pressing 'shift'")
         keyboard.press_and_release(get_hotkeys_slots()[pickaxe_slot])
         app_logger.debug(f"Press and relase: {get_hotkeys_slots()[pickaxe_slot]} - pickaxe_slot: {pickaxe_slot}")
-        pyautogui.mouseDown(button='left')
-        app_logger.debug(f"Pressing 'left'")
+        press_mine_buttons()
+        last_iteration_time = datetime.datetime.now()
+        last_coordinates = {}
+        coordinates_without_moving = 0
+        coordinates_without_data = 0
+        coordinates_out_of_range = 0
         for time_iteration in range(tmp_moving_time*2):
             if not is_running_mine_procedure:
                 app_logger.debug(f"is_running_mine_procedure is {is_running_mine_procedure} - break")
@@ -251,13 +257,7 @@ def move_direction_and_mine() -> None:
                 break
             if get_reply_data():
                 # remaining_time = tmp_moving_time*2 - time_iteration*0.5
-                pyautogui.mouseUp(button='left')
-                app_logger.debug(f"Release 'left'")
-                if get_moving_hold_shift():
-                    keyboard.release('shift')
-                    app_logger.debug(f"Release 'shift'")
-                keyboard.release(current_moving_direction)
-                app_logger.debug(f"Release {current_moving_direction}")
+                release_mine_buttons()
                 time.sleep(1)
                 make_reply()
                 time.sleep(2)
@@ -278,24 +278,78 @@ def move_direction_and_mine() -> None:
                     app_logger.debug(f"current_moving_direction was set to: {current_moving_direction}")
                     tp_to_mining_home()
                     return
-                app_logger.debug(f"Pressing {current_moving_direction}")
-                keyboard.press(current_moving_direction)
-                if get_moving_hold_shift():
-                    keyboard.press('shift')
-                    app_logger.debug(f"Pressing 'shift'")
                 keyboard.press_and_release(get_hotkeys_slots()[pickaxe_slot])
                 app_logger.debug(
                     f"Press and relase: {get_hotkeys_slots()[pickaxe_slot]} - pickaxe_slot: {pickaxe_slot}")
-                pyautogui.mouseDown(button='left')
-                app_logger.debug(f"Pressing 'left'")
+                press_mine_buttons()
+            if coordinate_analyze_flag:
+                current_time = datetime.datetime.now()
+                time_difference = current_time - last_iteration_time
+                if time_difference.total_seconds() < 1:
+                    app_logger.debug("Less than 1 second has passed since the last iteration")
+                else:
+                    coordinates_range = get_mine_coordinate_range()
+                    app_logger.debug(f"coordinates_range: {coordinates_range}")
+                    current_coordinates = get_coordinates_XYZ()
+                    coordinate_state = check_coordinates_compatibility_XYZ(coordinates_range, current_coordinates)
+                    if coordinate_state is False:
+                        coordinates_without_data = 0
+                        coordinates_out_of_range = coordinates_out_of_range + 1
+                        app_logger.debug(f"coordinate_state is {coordinate_state}, set coordinates_out_of_range to value: {coordinates_out_of_range}")
+                        pass
+                    elif coordinate_state is True:
+                        coordinates_without_data = 0
+                        coordinates_out_of_range = 0
+                        app_logger.debug(f"coordinate_state is {coordinate_state} - SET coordinates_without_data: {coordinates_without_data} and coordinates_out_of_range: {coordinates_out_of_range}")
+                        pass
+                    else:
+                        coordinates_without_data = coordinates_without_data + 1
+                        app_logger.debug(f"coordinate_state is {coordinate_state} - set coordinates_without_data to value: {coordinates_without_data}")
+
+                    if last_coordinates:
+                        if last_coordinates == current_coordinates:
+                            coordinates_without_moving = coordinates_without_moving + 1
+                            app_logger.debug(f"coordinates do not change - set coordinates_without_moving to value: {coordinates_without_moving} last_coordinates: {last_coordinates} current_coordinates: {current_coordinates}")
+                        else:
+                            coordinates_without_moving = 0
+                    if coordinates_without_moving > max_coordinates_without_moving:
+                        app_logger.warning(f"coordinates_without_moving: {coordinates_without_moving} exceeded the max value: {max_coordinates_without_moving}")
+                        release_mine_buttons()
+                        random_double_move_mouse()
+                        time.sleep(1)
+                        send_random_message_coordinates_problem()
+                        app_logger.info(f"Go to Lobby (too many coordinates without moving)")
+                        go_lobby_exit_mine()
+                        return
+                    if coordinates_without_data > max_coordinates_without_data:
+                        app_logger.warning(
+                            f"coordinates_without_data: {coordinates_without_data} exceeded the max value: {max_coordinates_without_data}")
+                        release_mine_buttons()
+                        time.sleep(1)
+                        send_random_message_coordinates_problem()
+                        afk_time = draw_risk_afk_time()
+                        app_logger.info(f"Go AFK on spawn (too many coordinates without data) for afk_time: {afk_time}")
+                        afk_on_spawn(afk_time)
+                        app_logger.debug("AFK time over")
+                        time.sleep(1)
+                        current_moving_direction = get_hotkey_moving_right()
+                        app_logger.debug(f"current_moving_direction was set to: {current_moving_direction}")
+                        tp_to_mining_home()
+                        return
+                    if coordinates_out_of_range > max_coordinates_out_of_range:
+                        app_logger.warning(
+                            f"coordinates_out_of_range: {coordinates_out_of_range} exceeded the max value: {max_coordinates_out_of_range}")
+                        release_mine_buttons()
+                        random_double_move_mouse()
+                        time.sleep(1)
+                        send_random_message_coordinates_problem()
+                        app_logger.info(f"Go to Lobby (too many coordinates out of range)")
+                        go_lobby_exit_mine()
+                        return
+                    last_coordinates = current_coordinates
+                    last_iteration_time = current_time
             time.sleep(0.5)
-        pyautogui.mouseUp(button='left')
-        app_logger.debug(f"Release 'left'")
-        if get_moving_hold_shift():
-            keyboard.release('shift')
-            app_logger.debug(f"Release 'shift'")
-        keyboard.release(current_moving_direction)
-        app_logger.debug(f"Release {current_moving_direction}")
+        release_mine_buttons()
         if is_running_mine_procedure:
             if current_moving_direction == get_hotkey_moving_right():
                 current_moving_direction = get_hotkey_moving_left()
@@ -305,6 +359,80 @@ def move_direction_and_mine() -> None:
                 app_logger.debug(f"Change current_moving_direction to hotkey_moving_right: {get_hotkey_moving_right()}")
         else:
             app_logger.debug(f"is_running_mine_procedure is: {is_running_mine_procedure}")
+
+def release_mine_buttons() -> None:
+    """
+    Releases the keys and mouse buttons used for mining.
+
+    This function releases the 'left' mouse button and, if configured, the 'shift' key.
+    It also releases the current movement direction key being pressed.
+    It's typically used to stop the mining action in the game.
+    """
+    app_logger.debug(f"Release 'left'")
+    pyautogui.mouseUp(button='left')
+    if get_moving_hold_shift():
+        app_logger.debug(f"Release 'shift'")
+        keyboard.release('shift')
+    app_logger.debug(f"Release {current_moving_direction}")
+    keyboard.release(current_moving_direction)
+
+def press_mine_buttons() -> None:
+    """
+    Presses the keys and mouse buttons required for mining.
+
+    This function presses the current movement direction key, the 'left' mouse button for mining,
+    and, if configured, holds the 'shift' key.
+    It's used to initiate or continue the mining action in the game.
+    """
+    app_logger.debug(f"Pressing {current_moving_direction}")
+    keyboard.press(current_moving_direction)
+    if get_moving_hold_shift():
+        app_logger.debug(f"Pressing 'shift'")
+        keyboard.press('shift')
+    app_logger.debug(f"Pressing 'left'")
+    pyautogui.mouseDown(button='left')
+
+def random_double_move_mouse() -> None:
+    """
+    Performs a random double movement of the mouse.
+
+    This function randomly moves the mouse in the x and y directions and then back.
+    It simulates natural mouse movement during gaming, particularly useful in scenarios like mining in Minecraft.
+    """
+    x_mouse_move = random.randint(20, 50)
+    y_mouse_move = random.randint(0, 5)
+    app_logger.debug(f"x: {x_mouse_move} y: {y_mouse_move}")
+    mouse.move(x_mouse_move * random.choice([-1, 1]), y_mouse_move, absolute=False, duration=1)
+    time_sleep = random.uniform(0.5, 2)
+    app_logger.debug(f"time_sleep: {time_sleep}")
+    time.sleep(time_sleep)
+    mouse.move(x_mouse_move * random.choice([-1, 1]), 0, absolute=False, duration=1)
+
+def go_lobby_exit_mine() -> None:
+    """
+    Sends the player to the lobby and stops the mining procedure.
+
+    This function sends a command to the game chat to teleport the player to the game's lobby.
+    It also sets the flag to stop the mining procedure.
+    """
+    lobby_command = "/lobby 1"
+    time.sleep(1)
+    app_logger.info(f"Go to Lobby - execute command: {lobby_command}")
+    send_on_chat(lobby_command)
+    time.sleep(5)
+    set_is_running_mine_procedure(False)
+
+def send_random_message_coordinates_problem() -> None:
+    """
+    Sends a random chat message from a predefined list when a coordinate problem is detected.
+
+    This function selects a random message from a list of predefined messages regarding coordinate problems
+    and sends it to the game chat.
+    """
+    if len(get_coordinates_problem_messages_list()) > 0:
+        tmp_message = random.choice(get_coordinates_problem_messages_list())
+        if tmp_message:
+            send_on_chat(tmp_message)
 
 def pickaxe_damage_checker() -> None:
     """

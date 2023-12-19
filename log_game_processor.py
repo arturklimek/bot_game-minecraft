@@ -82,6 +82,9 @@ def update_reply_data(log_line: str) -> None:
                 else:
                     counter_risk_messages = 0
                 app_logger.debug(f"New counter_risk_messages: {counter_risk_messages}")
+            else:
+                counter_risk_messages = 1
+                app_logger.debug(f"New counter_risk_messages: {counter_risk_messages}")
             reply_data = {
                 "private": private_message_status,
                 "nickname": player_nickname,
@@ -110,7 +113,7 @@ def make_reply() -> bool:
         else:
             send_chat_message_to_player(nickname=reply_data["nickname"], reply_text=reply_data["answer"])
         reply_data.clear()
-        app_logger.debug(f"make_reply send reply - reply_data: {reply_data}")
+        app_logger.info(f"make_reply send reply - reply_data: {reply_data}")
         return True
     else:
         app_logger.debug("Return False - reply_data is empty")

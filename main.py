@@ -7,8 +7,9 @@ from activities.equipment import update_eq_patterns_sizes
 from activities.farm import toggle_farm_procedure
 from activities.mine import toggle_mine_procedure
 from app_config import OUTPUTS_DIR_PATH, PATTERNS_DIR_PATH, setup_config_file, get_button_mine_procedure, \
-    get_button_farm_procedure
+    get_button_farm_procedure, get_coordinates_screen_XYZ_analysis_flag
 from clicker import setup_autoclicer_hotkeys
+from coordinate_analyzer import start_analyzer_XYZ_thread
 from log_game_processor import start_messages_watcher_thread
 from logger import app_logger
 from patterns import load_patterns_all
@@ -64,10 +65,9 @@ def main() -> NoReturn:
     Performs initial setup including loading configuration, preparing folders, loading patterns, updating sizes, setting up buttons, and starting the screenshot thread.
     Waits for a specific keypress ('-' on numpad) to stop the application.
     Logs the start and stop of the application.
-
-    TODO: dodać zabezpieczenia aby aplikacja wykonywała czynności tylko gdy okno gry jest aktywne (ma focus)
-    TODO: dodanie procedury która sprawi, że okno będzie aktywne oraz zmieni cztery razy tryb okna gry klikajac f11 -  problem występuje przy trybie pełnoekranowym oraz alt+tab
     """
+    # TODO: dodać zabezpieczenia aby aplikacja wykonywała czynności tylko gdy okno gry jest aktywne (ma focus)
+    # TODO: dodanie procedury która sprawi, że okno będzie aktywne oraz zmieni cztery razy tryb okna gry klikajac f11 -  problem występuje przy trybie pełnoekranowym oraz alt+tab
     setup_config_file()
     prepare_folders()
     load_patterns_all()
@@ -75,8 +75,10 @@ def main() -> NoReturn:
     update_chest_patterns_sizes()
     setup_buttons()
     start_screenshot_thread()
-
     start_messages_watcher_thread()
+
+    if get_coordinates_screen_XYZ_analysis_flag():
+        start_analyzer_XYZ_thread()
 
     print("Application started.")
     app_logger.info(f"Application started")

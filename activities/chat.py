@@ -1,10 +1,11 @@
+import random
 import time
 from datetime import datetime, timedelta
 import keyboard
 from app_config import get_command_sethome, get_command_home_tmp, get_command_spawn, \
     get_command_home_repair, get_command_home_mining, get_command_home_chest, get_command_home_farm, \
     get_command_sell_inventory, get_hotkey_enter, get_hotkey_chat, get_chat_messages_flag, \
-    get_chat_messages_frequency_min, get_chat_messages
+    get_chat_messages_frequency_min, get_chat_messages, get_coordinates_problem_messages_list
 from delay import return_random_wait_interval_time
 from logger import app_logger
 
@@ -159,3 +160,16 @@ def sellall_inventory() -> None:
     app_logger.debug("sellall_inventory was used")
     time.sleep(return_random_wait_interval_time())
     send_on_chat(get_command_sell_inventory())
+
+
+def send_random_message_coordinates_problem() -> None:
+    """
+    Sends a random chat message from a predefined list when a coordinate problem is detected.
+
+    This function selects a random message from a list of predefined messages regarding coordinate problems
+    and sends it to the game chat.
+    """
+    if len(get_coordinates_problem_messages_list()) > 0:
+        tmp_message = random.choice(get_coordinates_problem_messages_list())
+        if tmp_message:
+            send_on_chat(tmp_message)

@@ -10,7 +10,7 @@ import pyautogui
 import activities.eq_bar
 from activities.afk import afk_break, draw_risk_afk_time, afk_on_spawn
 from activities.chat import tp_to_mining_home, send_on_chat, sellall_inventory, tp_to_chest_home, tp_to_spawn, \
-    send_chat_notification
+    send_chat_notification, send_random_message_coordinates_problem
 from activities.chest import check_and_get_chest_image, get_slots_chest_coordinates, get_chest_slots_images, \
     eq_slots_amount, eq_inventory_amount, find_item_pattern_in_item_image, calc_and_get_screenshoot_sloot_coordinates, \
     shift_click_at_coordinates_in_game_window, chest_inventory_elements
@@ -21,7 +21,7 @@ from activities.repair import repair_item
 from app_config import items_quantity_pattern, get_repair_mining_pickaxe_frequency, get_hotkey_inventory, \
     get_hotkey_moving_up, get_hotkey_moving_left, get_hotkey_moving_right, get_hotkeys_slots, get_protected_slots, \
     set_protected_slots, get_moving_time, get_moving_hold_shift, get_items_stored_list, \
-    get_coordinates_screen_XYZ_analysis_flag, get_mine_coordinate_range, get_coordinates_problem_messages_list
+    get_coordinates_screen_XYZ_analysis_flag, get_mine_coordinate_range
 from clicker import click_right_mouse_button
 from coordinate_analyzer import check_coordinates_compatibility_XYZ, get_coordinates_XYZ
 from delay import return_random_wait_interval_time
@@ -421,18 +421,6 @@ def go_lobby_exit_mine() -> None:
     send_on_chat(lobby_command)
     time.sleep(5)
     set_is_running_mine_procedure(False)
-
-def send_random_message_coordinates_problem() -> None:
-    """
-    Sends a random chat message from a predefined list when a coordinate problem is detected.
-
-    This function selects a random message from a list of predefined messages regarding coordinate problems
-    and sends it to the game chat.
-    """
-    if len(get_coordinates_problem_messages_list()) > 0:
-        tmp_message = random.choice(get_coordinates_problem_messages_list())
-        if tmp_message:
-            send_on_chat(tmp_message)
 
 def pickaxe_damage_checker() -> None:
     """

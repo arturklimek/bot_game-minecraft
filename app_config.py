@@ -20,12 +20,13 @@ save_images_flags = {
     "get_slots_chest_coordinates": False,
     "get_chest_slots_images": False,
     "find_item_pattern_in_item_image": False,
+    "extract_text_from_image": False,
 }
 
 game_latest_log_path = os.path.join('C:', os.sep, 'Users', 'Artur', 'AppData', 'Roaming', '.minecraft', 'logs', 'latest.log')
 
 coordinates_screen_XYZ = {
-    "x1": 3,
+    "x1": 66,
     "y1": 246,
     "x2": 561,
     "y2": 273,
@@ -33,6 +34,11 @@ coordinates_screen_XYZ = {
 
 def get_coordinates_screen_XYZ() -> dict:
     return coordinates_screen_XYZ
+
+coordinates_screen_XYZ_analysis_flag = True
+
+def get_coordinates_screen_XYZ_analysis_flag() -> bool:
+    return coordinates_screen_XYZ_analysis_flag
 
 coordinates_screen_Facing = {
     "x1": 3,

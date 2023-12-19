@@ -36,6 +36,7 @@ if __name__ == "__main__":
     for coordinates in coordinates_keys_to_show:
         if coordinates in config:
             print(f"Show: {coordinates}")
+            print(f"Coordinates: {config[coordinates]}")
             display_rectangle(image=image.copy(), coordinates=config[coordinates], window_name=coordinates)
         else:
             print(f"Can not find '{coordinates}' in readed config")

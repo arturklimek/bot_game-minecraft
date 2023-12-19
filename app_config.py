@@ -25,6 +25,9 @@ save_images_flags = {
 
 game_latest_log_path = os.path.join('C:', os.sep, 'Users', 'Artur', 'AppData', 'Roaming', '.minecraft', 'logs', 'latest.log')
 
+def get_game_latest_log_path() -> str:
+    return game_latest_log_path
+
 coordinates_screen_XYZ = {
     "x1": 66,
     "y1": 246,
@@ -50,8 +53,39 @@ coordinates_screen_Facing = {
 def get_coordinates_screen_Facing() -> dict:
     return coordinates_screen_Facing
 
-def get_game_latest_log_path() -> str:
-    return game_latest_log_path
+mine_coordinate_range = {
+    'x1': 0,
+    'x2': 0,
+    'y1': 0,
+    'y2': 0,
+    'z1': 0,
+    'z2': 0,
+}
+
+def get_mine_coordinate_range() -> dict:
+    return mine_coordinate_range
+
+farm_coordinate_range = {
+    'x1': 0,
+    'x2': 0,
+    'y1': 0,
+    'y2': 0,
+    'z1': 0,
+    'z2': 0,
+}
+
+def get_farm_coordinate_range() -> dict:
+    return farm_coordinate_range
+
+coordinates_problem_messages_list = [
+    "aha?",
+    "?",
+    "xd",
+    "xd?"
+]
+
+def get_coordinates_problem_messages_list() -> list:
+    return coordinates_problem_messages_list
 
 client_player_nickname = ""
 
@@ -580,6 +614,9 @@ def get_config_dict():
     tmp_dict["reply_all_nicks_flag"] = reply_all_nicks_flag
     tmp_dict["coordinates_screen_XYZ"] = coordinates_screen_XYZ
     tmp_dict["coordinates_screen_Facing"] = coordinates_screen_Facing
+    tmp_dict["mine_coordinate_range"] = mine_coordinate_range
+    tmp_dict["farm_coordinate_range"] = farm_coordinate_range
+    tmp_dict["coordinates_problem_messages_list"] = coordinates_problem_messages_list
     return tmp_dict
 
 def set_config_from_dict(config_dict):
@@ -640,6 +677,9 @@ def set_config_from_dict(config_dict):
     global reply_all_nicks_flag
     global coordinates_screen_XYZ
     global coordinates_screen_Facing
+    global mine_coordinate_range
+    global farm_coordinate_range
+    global coordinates_problem_messages_list
     if config_dict is not None:
         # if "pattern_settings" in config_dict:
         #     pattern_settings = config_dict["pattern_settings"]
@@ -717,6 +757,12 @@ def set_config_from_dict(config_dict):
             coordinates_screen_XYZ = config_dict["coordinates_screen_XYZ"]
         if "coordinates_screen_Facing" in config_dict:
             coordinates_screen_Facing = config_dict["coordinates_screen_Facing"]
+        if "mine_coordinate_range" in config_dict:
+            mine_coordinate_range = config_dict["mine_coordinate_range"]
+        if "farm_coordinate_range" in config_dict:
+            farm_coordinate_range = config_dict["farm_coordinate_range"]
+        if "coordinates_problem_messages_list" in config_dict:
+            coordinates_problem_messages_list = config_dict["coordinates_problem_messages_list"]
         app_logger.info(f"The configuration was loaded: {config_dict}")
     else:
         app_logger.info(f"Taked config dict is None")
@@ -753,6 +799,9 @@ comments = {
     'reply_all_nicks_flag': f"# reply_all_nicks_flag - True or False flag indicating whether the program should respond to messages from nicks outside the list (risk_nicks_list), default value '{reply_all_nicks_flag}\n",
     'coordinates_screen_XYZ': f"# coordinates_screen_XYZ - Coordinates on the screen of the XYZ field displayed on the screen after pressing 'F3' (USE show_config_coordinates.bat to show this coordinates), default value '{coordinates_screen_XYZ}\n",
     'coordinates_screen_Facing': f"# coordinates_screen_Facing - Coordinates on the screen of the Facing field displayed on the screen after pressing 'F3' (Note - the size of this field changes depending on the content) (USE show_config_coordinates.bat to show this coordinates), default value '{coordinates_screen_Facing}\n",
+    'mine_coordinate_range': f"# mine_coordinate_range - List of the range of acceptable fla automine coordinates (for example, from x1=100 to x2=120). When any of the coordinates extracted from the analysis (coordinates_screen_XYZ) is out of range then the program aborts.\n",
+    'farm_coordinate_range': f"# farm_coordinate_range - List of the range of acceptable fla autofarm coordinates (for example, from y=-40 to y2=-20). When any of the coordinates extracted from the analysis (coordinates_screen_XYZ) is out of range then the program aborts.\n",
+    'coordinates_problem_messages_list': f"# coordinates_problem_messages_list - List of messages that will be sent to the public chat in case of a problem with coordinates - an empty list will not send any message, default value '{coordinates_problem_messages_list}\n",
 }
 
 def encode_special_characters(string: str) -> str:

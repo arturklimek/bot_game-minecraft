@@ -170,51 +170,26 @@ def convert_to_int(float_value: float) -> int:
     except ValueError:
         return None
 
-def check_in_range(value: int, range_start: int, range_end: int) -> bool:
+def check_coordinates(x: float, range_start: float, range_end: float) -> bool:
     """
-    Checks if a value is within a specified range.
+    Determines whether a coordinate value is within a specified range considering potential OCR errors.
 
     Args:
-        value (int): The value to be checked.
-        range_start (int): The starting value of the range.
-        range_end (int): The ending value of the range.
+        x (float): The coordinate value to check.
+        range_start (float): The starting value of the range.
+        range_end (float): The ending value of the range.
 
     Returns:
-        bool: True if the value is within the range, False otherwise.
+        bool: True if the coordinate is within the range or its absolute value is within the range when considering OCR errors.
     """
     if range_start > range_end:
         range_start, range_end = range_end, range_start
-    return range_start <= value <= range_end
-
-def check_coordinates(x: int, range_start: int, range_end: int) -> bool:
-    """
-    Determines whether a coordinate value is within a specified range.
-    Adjusts for OCR errors where negative numbers may be read as positive.
-
-    Args:
-        x (int): The coordinate value to check.
-        range_start (int): The starting value of the range.
-        range_end (int): The ending value of the range.
-
-    Returns:
-        bool: True if the coordinate is within the range, False otherwise.
-    """
-    # if range_start > range_end:
-    #     range_start, range_end = range_end, range_start
-    #
-    # if range_start < 0 and range_end < 0:
-    #     # If x is positive, treat it as negative
-    #     x = -abs(x)
-    if range_start > range_end:
-        range_start, range_end = range_end, range_start
-
-    if range_start < 0 and range_end < 0:
-        in_range = range_start <= abs(x) <= range_end
-    elif range_start * range_end <= 0:
-        in_range = range_start <= x <= range_end or range_start <= abs(x) <= range_end
-    else:
-        in_range = range_start <= x <= range_end
-    # in_range = range_start <= x <= range_end
+    in_range = range_start <= x <= range_end
+    if not in_range:
+        if range_start < 0 and range_end < 0:
+            in_range = range_start <= -x <= range_end
+        elif range_start * range_end <= 0:
+            in_range = range_start <= abs(x) <= range_end
     app_logger.debug(f"check_coordinates return: {in_range}")
     return in_range
 
@@ -250,9 +225,9 @@ def check_coordinates_compatibility_XYZ(coordinate_range: dict = {}, current_coo
         if all(isinstance(value, int) for value in [x, y, z, x1, x2, y1, y2, z1, z2]):
             app_logger.debug(f"x: {x} x1: {x1} x2: {x2}")
             x_flag = check_coordinates(x, x1, x2)
-            app_logger.debug(f"x: {y} x1: {y1} x2: {y2}")
+            app_logger.debug(f"y: {y} y1: {y1} y2: {y2}")
             y_flag = check_coordinates(y, y1, y2)
-            app_logger.debug(f"x: {z} x1: {z1} x2: {z2}")
+            app_logger.debug(f"z: {z} z1: {z1} z2: {z2}")
             z_flag = check_coordinates(z, z1, z2)
             app_logger.debug(f"x_flag: {x_flag} y_flag: {y_flag} z_flag: {z_flag}")
             if x_flag and y_flag and z_flag:

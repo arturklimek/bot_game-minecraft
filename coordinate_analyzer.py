@@ -14,15 +14,6 @@ from screenshooter import get_last_screenshot
 #to install PyTorch on Windows: pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 # more on site: https://pytorch.org/
 
-coordinates_flag_XYZ = False
-coordinates_flag_Facing = False
-
-def get_coordinates_flag_XYZ() -> bool:
-    return coordinates_flag_XYZ
-
-def get_coordinates_flag_Facing() -> bool:
-    return coordinates_flag_Facing
-
 analysis_frequency = 1
 
 coordinates_XYZ = {}
@@ -94,7 +85,7 @@ def extract_text_from_image(image: Optional[np.ndarray] = None, coordinates: dic
         for text in results:
             extracted_text = extracted_text + " " + text
         app_logger.debug(f"extracted_text: {extracted_text}")
-        return extracted_text #TODO: add loggers
+        return extracted_text
     except Exception as ex:
         app_logger.error(ex)
 
@@ -120,6 +111,7 @@ def coordinates_analyzer_loop_XYZ() -> None:
             continue
         image = get_last_screenshot()
         if image is not None:
+            app_logger.debug(f"Used coordinates: {coordinates}")
             output_str = extract_text_from_image(image, coordinates)
             output_str.replace('~', '-')
             output_str.replace('/', ' ')
@@ -147,6 +139,7 @@ def coordinates_analyzer_loop_XYZ() -> None:
                 app_logger.debug(f"The list does not have the required length, output_list: {output_list}")
         else:
             app_logger.warning("Taked image is empty.")
+            time.sleep(0.5)
             continue
         last_iteration_time = current_time
 
@@ -161,3 +154,116 @@ def start_analyzer_XYZ_thread() -> None:
     watcher_thread = threading.Thread(target=coordinates_analyzer_loop_XYZ)
     watcher_thread.daemon = True
     watcher_thread.start()
+
+def convert_to_int(float_value: float) -> int:
+    """
+    Converts a floating-point value to an integer.
+
+    Args:
+        float_value (float): The floating-point value to be converted.
+
+    Returns:
+        int: The converted integer value, or None if the conversion fails due to an invalid input.
+    """
+    try:
+        return int(float_value)
+    except ValueError:
+        return None
+
+def check_in_range(value: int, range_start: int, range_end: int) -> bool:
+    """
+    Checks if a value is within a specified range.
+
+    Args:
+        value (int): The value to be checked.
+        range_start (int): The starting value of the range.
+        range_end (int): The ending value of the range.
+
+    Returns:
+        bool: True if the value is within the range, False otherwise.
+    """
+    if range_start > range_end:
+        range_start, range_end = range_end, range_start
+    return range_start <= value <= range_end
+
+def check_coordinates(x: int, range_start: int, range_end: int) -> bool:
+    """
+    Determines whether a coordinate value is within a specified range.
+    Adjusts for OCR errors where negative numbers may be read as positive.
+
+    Args:
+        x (int): The coordinate value to check.
+        range_start (int): The starting value of the range.
+        range_end (int): The ending value of the range.
+
+    Returns:
+        bool: True if the coordinate is within the range, False otherwise.
+    """
+    # if range_start > range_end:
+    #     range_start, range_end = range_end, range_start
+    #
+    # if range_start < 0 and range_end < 0:
+    #     # If x is positive, treat it as negative
+    #     x = -abs(x)
+    if range_start > range_end:
+        range_start, range_end = range_end, range_start
+
+    if range_start < 0 and range_end < 0:
+        in_range = range_start <= abs(x) <= range_end
+    elif range_start * range_end <= 0:
+        in_range = range_start <= x <= range_end or range_start <= abs(x) <= range_end
+    else:
+        in_range = range_start <= x <= range_end
+    # in_range = range_start <= x <= range_end
+    app_logger.debug(f"check_coordinates return: {in_range}")
+    return in_range
+
+def check_coordinates_compatibility_XYZ(coordinate_range: dict = {}, current_coordinates_XYZ: dict = None):
+    """
+    Checks if the current XYZ coordinates are within the specified range.
+
+    Args:
+        coordinate_range (dict): A dictionary containing the range for XYZ coordinates.
+
+    Returns:
+        bool: True if all XYZ coordinates are within the range, False if one or more are out of range, or None if key requirements are not met or an error occurs.
+    """
+    if current_coordinates_XYZ is None:
+        current_coordinates_XYZ = get_coordinates_XYZ()
+    if not coordinate_range:
+        app_logger.debug("Taked coordinate_range is empty - return")
+        return
+    app_logger.debug(f"coordinate_range: {coordinate_range}")
+    if not current_coordinates_XYZ:
+        app_logger.debug("Taked current_coordinates_XYZ is empty - return")
+        return
+    app_logger.debug(f"current_coordinates_XYZ: {current_coordinates_XYZ}")
+    try:
+        if not all(key in current_coordinates_XYZ for key in ["x", "y", "z"]):
+            app_logger.debug("current_coordinates_XYZ does not have the required keys")
+            return
+        if not all(key in coordinate_range for key in ["x1", "x2", "y1", "y2", "z1", "z2"]):
+            app_logger.debug("coordinate_range does not have the required keys")
+            return
+        x, y, z = (convert_to_int(current_coordinates_XYZ[key]) for key in ["x", "y", "z"])
+        x1, x2, y1, y2, z1, z2 = (convert_to_int(coordinate_range[key]) for key in ["x1", "x2", "y1", "y2", "z1", "z2"])
+        if all(isinstance(value, int) for value in [x, y, z, x1, x2, y1, y2, z1, z2]):
+            app_logger.debug(f"x: {x} x1: {x1} x2: {x2}")
+            x_flag = check_coordinates(x, x1, x2)
+            app_logger.debug(f"x: {y} x1: {y1} x2: {y2}")
+            y_flag = check_coordinates(y, y1, y2)
+            app_logger.debug(f"x: {z} x1: {z1} x2: {z2}")
+            z_flag = check_coordinates(z, z1, z2)
+            app_logger.debug(f"x_flag: {x_flag} y_flag: {y_flag} z_flag: {z_flag}")
+            if x_flag and y_flag and z_flag:
+                app_logger.debug("ALL of XYZ coordinates is in range - return True")
+                return True
+            else:
+                app_logger.debug("One of XYZ coordinates is out of range - return False")
+                return False
+        else:
+            app_logger.debug("One or more coordinates are not integer values")
+            return
+    except Exception as ex:
+        app_logger.error(ex)
+        return

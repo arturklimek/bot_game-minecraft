@@ -1,7 +1,6 @@
 import copy
 import time
 from typing import Optional, Tuple, List
-
 import cv2
 import keyboard
 import numpy as np

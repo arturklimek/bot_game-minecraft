@@ -1,6 +1,5 @@
 import os
 from typing import Dict, Set, List
-
 import yaml
 import urllib.parse
 from logger import app_logger
@@ -29,10 +28,10 @@ def get_game_latest_log_path() -> str:
     return game_latest_log_path
 
 coordinates_screen_XYZ = {
-    "x1": 66,
-    "y1": 246,
-    "x2": 561,
-    "y2": 273,
+    "x1": 11,
+    "y1": 304,
+    "x2": 600,
+    "y2": 331,
 }
 
 def get_coordinates_screen_XYZ() -> dict:
@@ -44,10 +43,10 @@ def get_coordinates_screen_XYZ_analysis_flag() -> bool:
     return coordinates_screen_XYZ_analysis_flag
 
 coordinates_screen_Facing = {
-    "x1": 3,
-    "y1": 327,
-    "x2": 775,
-    "y2": 354,
+    "x1": 11,
+    "y1": 385,
+    "x2": 800,
+    "y2": 412,
 }
 
 def get_coordinates_screen_Facing() -> dict:
@@ -84,8 +83,20 @@ farm_coordinate_range = [
 }
 ]
 
-def get_farm_coordinate_range() -> dict:
+def get_farm_coordinate_range() -> list:
     return farm_coordinate_range
+
+grinder_coordinate_range = {
+    'x1': 0,
+    'x2': 0,
+    'y1': 0,
+    'y2': 0,
+    'z1': 0,
+    'z2': 0,
+}
+
+def get_grinder_coordinate_range() -> dict:
+    return grinder_coordinate_range
 
 coordinates_problem_messages_list = [
     "aha?",
@@ -160,6 +171,7 @@ command_home_repair = '/home repair'
 command_home_mining = '/home mine'
 command_home_chest = '/home chest'
 command_home_farm = '/home farm'
+command_home_grinder = '/home mobgrinder'
 command_home_tmp = '/home tmp'
 command_sell_inventory = '/sellall inventory'
 
@@ -179,6 +191,9 @@ def get_command_home_chest() -> str:
 
 def get_command_home_farm() -> str:
     return command_home_farm
+
+def get_command_home_grinder() -> str:
+    return command_home_grinder
 
 def get_command_home_tmp() -> str:
     return command_home_tmp
@@ -229,6 +244,14 @@ axe_patterns_paths = {
     "enchanted-netherite": os.path.join(PATTERNS_DIR_PATH, f'axe_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_full_enchanted-netherite.png'),
 }
 axe_pattern_mask_path = os.path.join(PATTERNS_DIR_PATH, f'axe_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_full_mask.png')
+
+sword_patterns_paths = {
+    "diamond": os.path.join(PATTERNS_DIR_PATH, f'sword_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_full_diamond.png'),
+    "enchanted-diamond": os.path.join(PATTERNS_DIR_PATH, f'sword_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_full_enchanted-diamond.png'),
+    "netherite": os.path.join(PATTERNS_DIR_PATH, f'sword_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_full_netherite.png'),
+    "enchanted-netherite": os.path.join(PATTERNS_DIR_PATH, f'sword_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_full_enchanted-netherite.png'),
+}
+sword_pattern_mask_path = os.path.join(PATTERNS_DIR_PATH, f'sword_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_full_mask.png')
 
 repair_threshold = 2
 repair_mining_pickaxe_frequency = 15
@@ -315,10 +338,15 @@ def get_hotkey_moving_right() -> int:
 def get_hotkeys_slots() -> Dict[int, int]:
     return hotkeys_slots
 
+button_stop = 74
 button_autoclicker_lpm = 79
 button_autoclicker_ppm = 80
 button_mine_procedure = 78
 button_farm_procedure = 69
+button_mobgrinder_procedure = 55
+
+def get_button_stop() -> int:
+    return button_stop
 
 def get_button_autoclicker_lpm() -> int:
     return button_autoclicker_lpm
@@ -331,6 +359,9 @@ def get_button_mine_procedure() -> int:
 
 def get_button_farm_procedure() -> int:
     return button_farm_procedure
+
+def get_button_mobgrinder_procedure() -> int:
+    return button_mobgrinder_procedure
 
 protected_slots = set([7,8,9])
 
@@ -580,6 +611,7 @@ def get_config_dict():
         "mining": command_home_mining,
         "chest": command_home_chest,
         "farm": command_home_farm,
+        "mobgrinder": command_home_grinder,
         "tmp": command_home_tmp,
     }
     tmp_dict["sell_inventory_command"] = command_sell_inventory
@@ -599,10 +631,12 @@ def get_config_dict():
         "moving_right": hotkey_moving_right,
     }
     tmp_dict["app_buttons"] = {
+        "button_stop": button_stop,
         "autoclicker_lpm": button_autoclicker_lpm,
         "autoclicker_ppm": button_autoclicker_ppm,
         "mine": button_mine_procedure,
         "farm": button_farm_procedure,
+        "mobgrinder": button_mobgrinder_procedure,
     }
     tmp_dict["protected_slots"] = list(protected_slots)
     tmp_dict["items_stored_list"] = items_stored_list
@@ -626,10 +660,11 @@ def get_config_dict():
     tmp_dict["coordinates_screen_Facing"] = coordinates_screen_Facing
     tmp_dict["mine_coordinate_range"] = mine_coordinate_range
     tmp_dict["farm_coordinate_range"] = farm_coordinate_range
+    tmp_dict["grinder_coordinate_range"] = grinder_coordinate_range
     tmp_dict["coordinates_problem_messages_list"] = coordinates_problem_messages_list
     return tmp_dict
 
-def set_config_from_dict(config_dict):
+def set_config_from_dict(config_dict: dict) -> None:
     """
     Sets the global configuration based on the provided dictionary.
 
@@ -647,6 +682,7 @@ def set_config_from_dict(config_dict):
     global command_home_mining
     global command_home_chest
     global command_home_farm
+    global command_home_grinder
     global command_home_tmp
     global command_sell_inventory
     global autoclicker_delay_ms
@@ -662,10 +698,12 @@ def set_config_from_dict(config_dict):
     global hotkey_moving_down
     global hotkey_moving_left
     global hotkey_moving_right
+    global button_stop
     global button_autoclicker_lpm
     global button_autoclicker_ppm
     global button_mine_procedure
     global button_farm_procedure
+    global button_mobgrinder_procedure
     global protected_slots
     global items_stored_list
     global eq_limit_to_stored
@@ -689,6 +727,7 @@ def set_config_from_dict(config_dict):
     global coordinates_screen_Facing
     global mine_coordinate_range
     global farm_coordinate_range
+    global grinder_coordinate_range
     global coordinates_problem_messages_list
     if config_dict is not None:
         # if "pattern_settings" in config_dict:
@@ -698,6 +737,7 @@ def set_config_from_dict(config_dict):
             command_home_mining = config_dict["homes"]["mining"]
             command_home_chest = config_dict["homes"]["chest"]
             command_home_farm = config_dict["homes"]["farm"]
+            command_home_grinder = config_dict["homes"]["mobgrinder"]
             command_home_tmp = config_dict["homes"]["tmp"]
         if "sell_inventory_command" in config_dict:
             command_sell_inventory = config_dict["sell_inventory_command"]
@@ -721,10 +761,12 @@ def set_config_from_dict(config_dict):
             hotkey_moving_left = config_dict["game_hotkeys"]["moving_left"]
             hotkey_moving_right = config_dict["game_hotkeys"]["moving_right"]
         if "app_buttons" in config_dict:
+            button_stop = config_dict["app_buttons"]["button_stop"]
             button_autoclicker_lpm = config_dict["app_buttons"]["autoclicker_lpm"]
             button_autoclicker_ppm = config_dict["app_buttons"]["autoclicker_ppm"]
             button_mine_procedure = config_dict["app_buttons"]["mine"]
             button_farm_procedure = config_dict["app_buttons"]["farm"]
+            button_mobgrinder_procedure = config_dict["app_buttons"]["mobgrinder"]
         if "protected_slots" in config_dict:
             protected_slots = set(config_dict["protected_slots"])
         if "items_stored_list" in config_dict:
@@ -773,13 +815,15 @@ def set_config_from_dict(config_dict):
             farm_coordinate_range = config_dict["farm_coordinate_range"]
         if "coordinates_problem_messages_list" in config_dict:
             coordinates_problem_messages_list = config_dict["coordinates_problem_messages_list"]
+        if "grinder_coordinate_range" in config_dict:
+            grinder_coordinate_range = config_dict["grinder_coordinate_range"]
         app_logger.info(f"The configuration was loaded: {config_dict}")
     else:
         app_logger.info(f"Taked config dict is None")
 
 comments = {
     # 'pattern_settings': f"# pattern_settings - Settings for the patterns used by the application. \n# Note: patterns must be in the 'patterns' directory \n#     'width': - determines the width of the game window for which the used patterns were prepared, default value '{pattern_settings['width']}'. \n#     'height' - determines the height of the game window for which the used patterns were prepared, default value '{pattern_settings['height']}'. \n#     'texture_pack' - determines the game texturepack used in patterns, default value '{pattern_settings['texture_pack']}' \n#     'eq_size' - determines the game settings which represent the used patterning (game: options -> Video Settings -> GUI Scale), default value '{pattern_settings['eq_size']}'. \n",
-    'homes': f"# homes - Teleport command settings to key locations used in the scrip. \n#      'repair' - location used for repairing tools, default value '{command_home_repair}'. \n#      'mining' - location of mining, default value '{command_home_mining}' \n#      'chest' - location of the chest for depositing items, default value '{command_home_chest}'. \n#      'farm' - farm location prefix, default value '{command_home_farm}' \n#      'tmp' - tmp location prefix, default value '{command_home_farm}' \n",
+    'homes': f"# homes - Teleport command settings to key locations used in the scrip. \n#      'repair' - location used for repairing tools, default value '{command_home_repair}'. \n#      'mining' - location of mining, default value '{command_home_mining}' \n#      'chest' - location of the chest for depositing items, default value '{command_home_chest}' \n#      'farm' - farm location prefix, default value '{command_home_farm}' \n#      'mobgrinder' - mobgrinder location prefix, default value '{command_home_grinder}' \n#      'tmp' - tmp location prefix, default value '{command_home_farm}' \n",
     'sell_inventory_command': f"# sell_inventory_command - Command to sell items, default value '{command_sell_inventory}' \n",
     'autoclicker_delay_ms': f"# autoclicker_delay_ms - Frequency used in autoclicker, default value '{autoclicker_delay_ms}' \n",
     'afk_breaks': f"# afk_breaks - True or False flag specifying whether random interrupts are to be used, default value '{afk_breaks_flag}' \n",
@@ -787,7 +831,7 @@ comments = {
     'farm_floors_number': f"# farm_floors_number - Number of floors handled by the farm bot, default value '{farm_floors_number}' \n",
     'farm_floor_time_moving': f"# farm_floor_time_moving - Time for the farm bot to move in a certain direction, default value '{farm_floor_time_moving}' \n",
     'game_hotkeys': f"# game_hotkeys - Setting ID hotkeys game settings \n#     'esc' - hotkey to close the window default value '{hotkey_esc}' \n#     'enter' - hotkey to send a message default value '{hotkey_enter}' \n#     'chat' - hotkey to open chat default value '{hotkey_chat}' \n#     'inventory' - hotkey to open and close the inventory default value '{hotkey_inventory}' \n#     'moving_up' - hotkey of moving forward default value '{hotkey_moving_up}' \n#     'moving_down' - hotkey moving backwards default value '{hotkey_moving_down}' \n#     'moving_left' - hotkey moving left default value '{hotkey_moving_left}' \n#     'moving_right' - hotkey moving to the right default value '{hotkey_moving_right}' \n",
-    'app_buttons': f"# app_buttons - Application management button settings \n#     'autoclicker_lpm' - setting the ID of the button that turns the left mouse button autoclicker on and off, default value '{button_autoclicker_lpm}' \n#     'autoclicker_ppm' - setting the ID of the right mouse button autoclicker on and off button, default value '{button_autoclicker_ppm} \n#     'mine' - setting the ID of the button to enable and disable the autoclicker procedure, default value '{button_mine_procedure} \n#     'farm' - setting the ID of the button that turns the autofarm procedure on and off, default value '{button_farm_procedure} \n",
+    'app_buttons': f"# app_buttons - Application management button settings \n#     'button_stop' - setting a button ID that completely disables the application, default value '{button_stop}' \n#     'autoclicker_lpm' - setting the ID of the button that turns the left mouse button autoclicker on and off, default value '{button_autoclicker_lpm}' \n#     'autoclicker_ppm' - setting the ID of the right mouse button autoclicker on and off button, default value '{button_autoclicker_ppm} \n#     'mine' - setting the ID of the button to enable and disable the autoclicker procedure, default value '{button_mine_procedure} \n#     'farm' - setting the ID of the button that turns the autofarm procedure on and off, default value '{button_farm_procedure} \n#     'mobgrinder' - setting the ID of the button that turns the mobgrinder procedure on and off, default value '{button_mobgrinder_procedure} \n",
     'protected_slots': f"# protected_slots - A collection of slots protected from being put away in a box, default value '{protected_slots}' \n",
     'items_stored_list': f"# items_stored_list - list of items stored in the chest before sale, default value '{items_stored_list}' \n",
     'eq_limit_to_stored': f"# eq_limit_to_stored - Determines the number of slots that start the procedure of putting items in the chest, default value '{eq_limit_to_stored}' \n",
@@ -811,6 +855,7 @@ comments = {
     'coordinates_screen_Facing': f"# coordinates_screen_Facing - Coordinates on the screen of the Facing field displayed on the screen after pressing 'F3' (Note - the size of this field changes depending on the content) (USE show_config_coordinates.bat to show this coordinates), default value '{coordinates_screen_Facing}\n",
     'mine_coordinate_range': f"# mine_coordinate_range - Dict of the range of acceptable fla automine coordinates (for example, from x1=100 to x2=120). When any of the coordinates extracted from the analysis (coordinates_screen_XYZ) is out of range then the program aborts.\n",
     'farm_coordinate_range': f"# farm_coordinate_range - List containing dictionaries of the range of acceptable autofarm coordinates (for example, from y=-40 to y2=-20). When any of the coordinates extracted from the analysis (coordinates_screen_XYZ) is out of range then the program aborts.\n",
+    'grinder_coordinate_range': f"# grinder_coordinate_range - Dict of the range of acceptable fla autogrinder coordinates (for example, from x1=-10 to x2=-12). When any of the coordinates extracted from the analysis (coordinates_screen_XYZ) is out of range then the program aborts.\n",
     'coordinates_problem_messages_list': f"# coordinates_problem_messages_list - List of messages that will be sent to the public chat in case of a problem with coordinates - an empty list will not send any message, default value '{coordinates_problem_messages_list}\n",
 }
 
@@ -853,6 +898,7 @@ def save_config_dict(config_dict: Dict[str, any]) -> None:
         config_dict (dict): The configuration dictionary to save.
     """
     try:
+        app_logger.debug(f"config_dict to save: {config_dict}")
         for key in ['chat_messages', 'sell_inventory_command']:
             if key in config_dict:
                 value = config_dict[key]

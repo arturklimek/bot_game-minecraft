@@ -1,13 +1,11 @@
 import datetime
 import threading
 from typing import Optional, Tuple
-
 import activities.eq_bar
 import copy
 import time
 import keyboard
 import pyautogui
-
 from activities.afk import afk_break, get_afk_counter, draw_risk_afk_time, afk_on_spawn
 from activities.chat import tp_to_farm_home, sellall_inventory, tp_to_spawn, set_tmp_home, tp_to_tmp_home, send_on_chat, \
     send_random_message_coordinates_problem
@@ -280,6 +278,16 @@ def make_farm(farm_number) -> bool:
         app_logger.error(ex)
 
 def go_lobby_exit_farm() -> None:
+    """
+    Executes the command to go to the game lobby and stops the farm procedure.
+
+    This function sends a command to the game chat to move the player to the lobby. It waits for a short period
+    after sending the command to ensure it is executed properly. After this, it sets the flag to stop the farm
+    procedure.
+
+    Note:
+        This function is typically used to safely exit the farming process and return the player to the lobby.
+    """
     lobby_command = "/lobby 1"
     time.sleep(1)
     app_logger.info(f"Go to Lobby - execute command: {lobby_command}")
@@ -288,12 +296,30 @@ def go_lobby_exit_farm() -> None:
     set_is_running_farm_procedure(False)
 
 def release_farm_buttons() -> None:
+    """
+    Releases the mouse and keyboard buttons used in the farming process.
+
+    This function performs the action of releasing the left mouse button and the keyboard button assigned to
+    the current moving direction. It logs each action for debugging purposes.
+
+    Note:
+        It's essential to ensure all buttons are released to avoid unintended continuous actions in the game.
+    """
     app_logger.debug(f"Release mouse left")
     pyautogui.mouseUp(button='left')
     app_logger.debug(f"Release {current_moving_direction}")
     keyboard.release(current_moving_direction)
 
 def press_farm_buttons() -> None:
+    """
+    Presses the mouse and keyboard buttons required for the farming process.
+
+    This function performs the action of pressing down the left mouse button and the keyboard button assigned to
+    the current moving direction. It logs each action for tracking and debugging purposes.
+
+    Note:
+        This function is typically used to initiate or continue the automated farming actions in the game.
+    """
     app_logger.debug(f"Press mouse left")
     pyautogui.mouseDown(button='left')
     app_logger.debug(f"Press {current_moving_direction}")
@@ -395,7 +421,8 @@ def toggle_farm_procedure() -> None:
     global is_running_farm_procedure
     global farm_procedure_thread
     from activities.mine import is_running_mine_procedure
-    if is_running_mine_procedure:
+    from activities.mob_grinder import is_running_grind_procedure
+    if is_running_mine_procedure or is_running_grind_procedure:
         app_logger.info(f"Can not start farm procedure - other procedure is running")
     else:
         is_running_farm_procedure = not is_running_farm_procedure

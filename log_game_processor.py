@@ -315,7 +315,6 @@ def extract_nick_from_player_chat_message(log_line: str) -> str:
             app_logger.error(f"Error extracting player name: {ex}")
     return ""
 
-
 def extract_nick_from_player_private_message(log_line: str) -> str:
     """
     Extracts the sender's nickname from a private chat message.

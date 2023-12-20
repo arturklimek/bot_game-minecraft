@@ -9,27 +9,20 @@ import mouse
 import pyautogui
 import activities.eq_bar
 from activities.afk import afk_break, draw_risk_afk_time, afk_on_spawn
-from activities.chat import tp_to_mining_home, send_on_chat, sellall_inventory, tp_to_chest_home, tp_to_spawn, \
+from activities.chat import tp_to_mining_home, send_on_chat, tp_to_spawn, \
     send_chat_notification, send_random_message_coordinates_problem
-from activities.chest import check_and_get_chest_image, get_slots_chest_coordinates, get_chest_slots_images, \
-    eq_slots_amount, eq_inventory_amount, find_item_pattern_in_item_image, calc_and_get_screenshoot_sloot_coordinates, \
-    shift_click_at_coordinates_in_game_window, chest_inventory_elements
+from activities.chest import items_stored_procedure
 from activities.eq_bar import check_pickaxe_damage_to_repair, get_pickaxe_image, \
     get_item_slot_number, check_and_update_eq_coordinates
-from activities.equipment import check_inventory_full, check_slot_free
+from activities.equipment import check_inventory_full
 from activities.repair import repair_item
-from app_config import items_quantity_pattern, get_repair_mining_pickaxe_frequency, get_hotkey_inventory, \
-    get_hotkey_moving_up, get_hotkey_moving_left, get_hotkey_moving_right, get_hotkeys_slots, get_protected_slots, \
-    set_protected_slots, get_moving_time, get_moving_hold_shift, get_items_stored_list, \
-    get_coordinates_screen_XYZ_analysis_flag, get_mine_coordinate_range
-from clicker import click_right_mouse_button
+from app_config import get_repair_mining_pickaxe_frequency, get_hotkey_moving_up, get_hotkey_moving_left, get_hotkey_moving_right, get_hotkeys_slots, get_protected_slots, \
+    set_protected_slots, get_moving_time, get_moving_hold_shift, get_coordinates_screen_XYZ_analysis_flag, get_mine_coordinate_range
 from coordinate_analyzer import check_coordinates_compatibility_XYZ, get_coordinates_XYZ
 from delay import return_random_wait_interval_time
-from image_operations import convert_cv_image_to_gray, load_cv_image
 from log_game_processor import get_reply_data, check_risk_exit, check_risk_afk, make_reply, make_risk_afk, \
     make_risk_exit
 from logger import app_logger
-from patterns import items_patterns
 from screenshooter import get_last_screenshot
 
 mine_procedure_thread = None
@@ -57,115 +50,6 @@ def get_is_running_mine_procedure() -> bool:
 def set_is_running_mine_procedure(state: bool = False) -> None:
     global is_running_mine_procedure
     is_running_mine_procedure = state
-
-def items_stored_procedure() -> None:
-    """
-    Handles the procedure for storing items in the chest and selling them.
-
-    This function automates the process of teleporting to the chest home, interacting with the chest, identifying items to store, and performing actions like storing and selling items. It utilizes image recognition to find specific items in the inventory and interact with them accordingly.
-
-    Note:
-        The function is designed to work within a specific game environment, and its effectiveness is dependent on the accuracy of image pattern recognition.
-    """
-    try:
-        tp_to_chest_home()
-        app_logger.debug("items_stored_procedure use tp_to_chest_home()")
-        time.sleep(return_random_wait_interval_time(0.4, 1))
-        click_right_mouse_button()
-        time.sleep(0.3)
-        x = -(int(chest_inventory_elements["chest-big"]["width"] / 2))
-        y = -(int(chest_inventory_elements["chest-big"]["height"] / 2))
-        pyautogui.move(x, y)
-        app_logger.debug(f"items_stored_procedure moved mouse to x: {x} y: {y}")
-        time.sleep(1)
-        chest = check_and_get_chest_image()
-        if chest is not None:
-            cropped_chest_image, chest_top_left, chest_bottom_right, chest_size = chest
-            app_logger.debug(
-                f"chest - chest_top_left: {chest_top_left} chest_bottom_right: {chest_bottom_right} chest_size: {chest_size}")
-            slots_coordinates = get_slots_chest_coordinates(cropped_chest_image, chest_size)
-            app_logger.debug(f"geted slots_coordinates: {slots_coordinates}")
-            slots_images = get_chest_slots_images(cropped_chest_image, slots_coordinates)
-            app_logger.debug(f"geted {len(slots_images)} slot images")
-            item_quantity_mask = convert_cv_image_to_gray(load_cv_image(items_quantity_pattern))
-            slots_coordinates_to_stored = []
-            slots_amount = eq_slots_amount + eq_inventory_amount
-            slots_images_to_analize = slots_images[0:slots_amount]
-            app_logger.debug(f"slots_images_to_analize have {len(slots_images_to_analize)} elements.")
-            slots_coordinates_to_analize = slots_coordinates[0:slots_amount]
-            app_logger.debug(f"slots_coordinates_to_analize have {len(slots_coordinates_to_analize)} elements: {slots_coordinates_to_analize}")
-            for i, slot in enumerate(slots_images_to_analize):
-                if i >= slots_amount:
-                    app_logger.debug(f"i: {i} is greater than or equal to eq_slots_amount + eq_inventory_amount: {slots_amount} - break")
-                    break
-                if i + 1 in get_protected_slots():
-                    app_logger.debug(f"i: {i} +1 is in protected_slots - continue")
-                    continue
-                selected_item = find_item_pattern_in_item_image(slot, item_quantity_mask, items_patterns)
-                app_logger.debug(f"selected_item: {selected_item}")
-                app_logger.debug(f"get_items_stored_list(): {get_items_stored_list()}")
-                if selected_item is not None:
-                    if selected_item in get_items_stored_list():
-                        slots_coordinates_to_stored.insert(i, slots_coordinates_to_analize[i])
-            app_logger.debug(f"slots_coordinates_to_stored have {len(slots_coordinates_to_stored)} elements")
-            screen_coordinates_to_click = []
-            for slot_coordinates in slots_coordinates_to_stored:
-                screen_coordinates_to_click.append(
-                    calc_and_get_screenshoot_sloot_coordinates(slot_coordinates, chest_top_left, chest_bottom_right))
-            for slot_to_click in screen_coordinates_to_click:
-                shift_click_at_coordinates_in_game_window(slot_to_click)
-            app_logger.debug(f"screen_coordinates_to_click have {len(screen_coordinates_to_click)} elements")
-            time.sleep(return_random_wait_interval_time(0.1, 0.5))
-            keyboard.press_and_release(get_hotkey_inventory())
-            app_logger.debug(f"items_stored_procedure press and release: {get_hotkey_inventory()}")
-            time.sleep(return_random_wait_interval_time(0.1, 0.5))
-            sellall_inventory()
-            time.sleep(return_random_wait_interval_time(0.1, 0.5))
-            click_right_mouse_button()
-            time.sleep(0.3)
-            x = -(int(chest_inventory_elements["chest-big"]["width"] / 2))
-            y = -(int(chest_inventory_elements["chest-big"]["height"] / 2))
-            pyautogui.move(x, y)
-            app_logger.debug(f"items_stored_procedure moved mouse to x: {x} y: {y}")
-            time.sleep(1)
-            chest = check_and_get_chest_image()
-            if chest is not None:
-                cropped_chest_image, chest_top_left, chest_bottom_right, chest_size = chest
-                app_logger.debug(
-                    f"chest - chest_top_left: {chest_top_left} chest_bottom_right: {chest_bottom_right} chest_size: {chest_size}")
-                slots_coordinates = get_slots_chest_coordinates(cropped_chest_image, chest_size)
-                app_logger.debug(f"slots_coordinates have {len(slots_coordinates)} elements: {slots_coordinates}")
-                slots_images = get_chest_slots_images(cropped_chest_image, slots_coordinates)
-                app_logger.debug(f"slots_images have {len(slots_images)} elements")
-                slots_images_to_analize = slots_images[0:slots_amount]
-                app_logger.debug(f"slots_images_to_analize have {len(slots_images_to_analize)} elements")
-                slots_coordinates_to_analize = slots_coordinates[0:slots_amount]
-                app_logger.debug(
-                    f"slots_coordinates_to_analize have {len(slots_coordinates_to_analize)} elements: {slots_coordinates_to_analize}")
-                screen_coordinates_to_click.clear()
-                app_logger.debug(f"screen_coordinates_to_click was clear")
-                for i, slot_image in enumerate(slots_images_to_analize):
-                    if i >= slots_amount:
-                        break
-                    if i + 1 in get_protected_slots():
-                        continue
-                    if not check_slot_free(slot_image):
-                        screen_coordinates_to_click.append(
-                            calc_and_get_screenshoot_sloot_coordinates(slots_coordinates_to_analize[i], chest_top_left,
-                                                                       chest_bottom_right))
-                app_logger.debug(
-                    f"screen_coordinates_to_click was upadted, now have {len(screen_coordinates_to_click)} elements: {screen_coordinates_to_click}")
-                for slot_to_click in screen_coordinates_to_click:
-                    shift_click_at_coordinates_in_game_window(slot_to_click)
-            else:
-                app_logger.debug(f"chest is None")
-            time.sleep(0.3)
-            keyboard.press_and_release(get_hotkey_inventory())
-            app_logger.debug(f"items_stored_procedure press and release: {get_hotkey_inventory()}")
-        else:
-            app_logger.debug(f"chest taked from check_and_get_chest_image() is None")
-    except Exception as ex:
-        app_logger.error(ex)
 
 def change_pickaxe_slot_number(pickaxe_top_left: Optional[tuple] = None, pickaxe_bottom_right: Optional[tuple] = None) -> None:
     """
@@ -202,7 +86,7 @@ def change_pickaxe_slot_number(pickaxe_top_left: Optional[tuple] = None, pickaxe
                 app_logger.debug(f"protected_slots: {protected_slots}")
                 set_protected_slots(protected_slots)
             if new_pickaxe_slot not in protected_slots:
-                app_logger.debug(f"new_pickaxe_slot: {pickaxe_slot} is not in protected_slots - adding")
+                app_logger.debug(f"new_pickaxe_slot: {new_pickaxe_slot} is not in protected_slots - adding")
                 app_logger.debug(f"protected_slots: {protected_slots}")
                 protected_slots.add(new_pickaxe_slot)
                 set_protected_slots(protected_slots)
@@ -584,7 +468,8 @@ def toggle_mine_procedure() -> None:
     global mine_procedure_thread
     global pickaxe_damage_checker_thread
     from activities.farm import is_running_farm_procedure
-    if is_running_farm_procedure:
+    from activities.mob_grinder import is_running_grind_procedure
+    if is_running_farm_procedure or is_running_grind_procedure:
         app_logger.info(f"Can not start mining procedure - other procedure is running")
     else:
         is_running_mine_procedure = not is_running_mine_procedure

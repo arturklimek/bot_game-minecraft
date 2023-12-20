@@ -2,17 +2,23 @@
 # afk_breaks - True or False flag specifying whether random interrupts are to be used, default value 'False' 
 afk_breaks: false
 # app_buttons - Application management button settings 
+#     'button_stop' - setting a button ID that completely disables the application, default value '74' 
 #     'autoclicker_lpm' - setting the ID of the button that turns the left mouse button autoclicker on and off, default value '79' 
 #     'autoclicker_ppm' - setting the ID of the right mouse button autoclicker on and off button, default value '80 
 #     'mine' - setting the ID of the button to enable and disable the autoclicker procedure, default value '78 
 #     'farm' - setting the ID of the button that turns the autofarm procedure on and off, default value '69 
+#     'mobgrinder' - setting the ID of the button that turns the mobgrinder procedure on and off, default value '55 
 app_buttons:
   autoclicker_lpm: 79
   autoclicker_ppm: 80
+  button_stop: 74
   farm: 69
   mine: 78
+  mobgrinder: 55
 # autoclicker_delay_ms - Frequency used in autoclicker, default value '10' 
 autoclicker_delay_ms: 10
+# chat_message_answer_flag - Flag on whether the program should respond to messages appearing in the public chat directed to the set nickname., default value 'False' 
+chat_message_answer_flag: false
 # chat_messages_flag - True or False flag to specify sending messages to the chat, default value 'True 
 chat_messages_flag: true
 # chat_messages_frequency_min - Frequency of sending chat messages, default value '15' 
@@ -22,14 +28,51 @@ chat_messages_list:
 - '&6&lUWAGA! &f&lKupię &9&lMroczna Materia &7- &e&l2000&6&l$ &f&lza sztukę! &7- &b&l/msg
   MineArturVIP &7- &f&lNie ma mnie? Nie odpisuję? Napisz na DSC: &b&lMineArturVIP#6699
   &f&llub do innego członka &7[&b&lS&f&lB&7&l-&f&lM&b&laf&9&lia&7]'
+# coordinates_problem_messages_list - List of messages that will be sent to the public chat in case of a problem with coordinates - an empty list will not send any message, default value '['aha?', '?', 'xd', 'xd?']
+coordinates_problem_messages_list:
+- '?'
+# coordinates_screen_Facing - Coordinates on the screen of the Facing field displayed on the screen after pressing 'F3' (Note - the size of this field changes depending on the content) (USE show_config_coordinates.bat to show this coordinates), default value '{'x1': 11, 'y1': 385, 'x2': 800, 'y2': 412}
+coordinates_screen_Facing:
+  x1: 11
+  x2: 800
+  y1: 385
+  y2: 412
+# coordinates_screen_XYZ - Coordinates on the screen of the XYZ field displayed on the screen after pressing 'F3' (USE show_config_coordinates.bat to show this coordinates), default value '{'x1': 11, 'y1': 304, 'x2': 600, 'y2': 331}
+coordinates_screen_XYZ:
+  x1: 11
+  x2: 600
+  y1: 304
+  y2: 331
+# counter_risk_messages_to_afk - Number of messages from risk nicks (from the risk_nicks_list) after which the program goes afk on the spawn, value 0 - no afk, default value '0
+counter_risk_messages_to_afk: 0
+# counter_risk_messages_to_lobby - The number of messages from risk nicks (from the risk_nicks_list) after which the program exits to the lobby and completely stops the action, value 0 - no action execution, default value '0
+counter_risk_messages_to_lobby: 0
 # eq_limit_to_stored - Determines the number of slots that start the procedure of putting items in the chest, default value '33' 
 eq_limit_to_stored: 33
+# farm_coordinate_range - List containing dictionaries of the range of acceptable autofarm coordinates (for example, from y=-40 to y2=-20). When any of the coordinates extracted from the analysis (coordinates_screen_XYZ) is out of range then the program aborts.
+farm_coordinate_range:
+- x1: 0
+  x2: 0
+  y1: 0
+  y2: 0
+  z1: 0
+  z2: 0
+- x1: 0
+  x2: 0
+  y1: 0
+  y2: 0
+  z1: 0
+  z2: 0
 # farm_floor_time_moving - Time for the farm bot to move in a certain direction, default value '34' 
 farm_floor_time_moving: 34
 # farm_floors_number - Number of floors handled by the farm bot, default value '15' 
 farm_floors_number: 15
 # farm_number - Number of farms used by the farm bot, default value '2' 
 farm_number: 2
+# farm_sell_frequency - Determines the number of floors of the farm between sales (value <=0 will sell items on each floor), default value '0
+farm_sell_frequency: 0
+# farm_store_items - A value of true or false declaring whether items are to be deposited into chests during autofarm (requires tmp and chest homes), default value 'False
+farm_store_items: false
 # game_hotkeys - Setting ID hotkeys game settings 
 #     'esc' - hotkey to close the window default value '1' 
 #     'enter' - hotkey to send a message default value '28' 
@@ -50,34 +93,78 @@ game_hotkeys:
   moving_up: 17
 # game_latest_log_path - Path of the last log file that is changed by the game in real time (required to analyze chat text messages), default value 'C:\Users\Artur\AppData\Roaming\.minecraft\logs\latest.log' 
 game_latest_log_path: C:\Users\Artur\AppData\Roaming\.minecraft\logs\latest.log
+# grinder_coordinate_range - Dict of the range of acceptable fla autogrinder coordinates (for example, from x1=-10 to x2=-12). When any of the coordinates extracted from the analysis (coordinates_screen_XYZ) is out of range then the program aborts.
+grinder_coordinate_range:
+  x1: 0
+  x2: 0
+  y1: 0
+  y2: 0
+  z1: 0
+  z2: 0
 # homes - Teleport command settings to key locations used in the scrip. 
 #      'repair' - location used for repairing tools, default value '/home repair'. 
 #      'mining' - location of mining, default value '/home mine' 
-#      'chest' - location of the chest for depositing items, default value '/home chest'. 
+#      'chest' - location of the chest for depositing items, default value '/home chest' 
 #      'farm' - farm location prefix, default value '/home farm' 
+#      'mobgrinder' - mobgrinder location prefix, default value '/home mobgrinder' 
 #      'tmp' - tmp location prefix, default value '/home farm' 
 homes:
   chest: /home chest
   farm: /home farm
   mining: /home mine
+  mobgrinder: /home mobgrinder
   repair: /home repair
   tmp: /home tmp
-# items_stored_list - list of items stored in the chest before sale, default value '['diamond', 'emerald', 'gold-ore', 'iron-ingot', 'iron-ore']' 
+# items_stored_list - list of items stored in the chest before sale, default value '['diamond', 'emerald', 'gold-ore', 'iron-ingot', 'iron-ore', 'diamond-block']' 
 items_stored_list:
 - diamond
 - emerald
 - gold-ore
 - iron-ingot
 - iron-ore
+- diamond-block
+# messages_respond_dict - Response dictionary used to reply to messages of people on the list of endangered nicknames: The first value is the content of the message received from the sender, the second value is the content of the reply. The default value for content from outside the dictionary is: '?', default value '{'.': '?', '?': '?', 'halo': 'Co tam?', 'zyjesz': '?', 'Artur': '?'}' 
+messages_respond_dict:
+  .: '?'
+  '?': '?'
+# mine_coordinate_range - Dict of the range of acceptable fla automine coordinates (for example, from x1=100 to x2=120). When any of the coordinates extracted from the analysis (coordinates_screen_XYZ) is out of range then the program aborts.
+mine_coordinate_range:
+  x1: 0
+  x2: 0
+  y1: 0
+  y2: 0
+  z1: 0
+  z2: 0
 # mine_moving_hold_shift - True or False flag specifying pressing the 'shift' button during the digging procedure, default value 'False' 
 mine_moving_hold_shift: false
 # mine_moving_time - Time for the mine bot to move in a certain direction, default value '10' 
 mine_moving_time: 10
+# private_message_answer_flag - A flag regarding whether the program should respond to private messages that appear in the chat, default value 'True' 
+private_message_answer_flag: true
 # protected_slots - A collection of slots protected from being put away in a box, default value '{8, 9, 7}' 
 protected_slots:
 - 8
 - 9
+- 1
 - 7
+# reply_all_nicks_flag - True or False flag indicating whether the program should respond to messages from nicks outside the list (risk_nicks_list), default value 'False
+reply_all_nicks_flag: false
+# risk_nicks_list - List of nicks that are a threat (usually a list of administration) from which messages are analyzed and appropriate actions are performed according to the configuration., default value '['Artur']' 
+risk_nicks_list:
+- Artur
+- varten
+- Laniaa
+- slime123
+- Xiozeer
+- mastermixpl
+- Kageroumaru0
+- Piter26
+- X_MrJohn_X
+- Rexks
+- TBone151219
+- ilUnicornli
+- EsqL
+- Morkazoid
 # sell_inventory_command - Command to sell items, default value '/sellall inventory' 
 sell_inventory_command: /sellall inventory
 # tmp_home_flag - A value of True or False, determines whether the program should use set and go home temporary, default value 'True' 

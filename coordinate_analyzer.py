@@ -7,7 +7,7 @@ import easyocr as easyocr
 import numpy as np
 import torch
 from app_config import get_coordinates_screen_XYZ_analysis_flag, get_coordinates_screen_XYZ
-from image_operations import convert_cv_image_to_gray, load_cv_image, save_image_for_function
+from image_operations import convert_cv_image_to_gray, save_image_for_function
 from logger import app_logger
 from screenshooter import get_last_screenshot
 

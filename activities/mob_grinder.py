@@ -73,6 +73,15 @@ coordinates_without_data = 0
 coordinates_out_of_range = 0
 
 def grind_procedure() -> bool:
+    """
+    Executes the grinding procedure for a specific in-game activity.
+
+    This function automates a series of actions like pressing hotkeys, changing equipment, and attacking,
+    in a loop until certain conditions are met (e.g., inventory is full or sword needs repair).
+
+    Returns:
+        bool: True if the procedure completes without interruption, False otherwise.
+    """
     app_logger.debug("Start grind_procedure")
     keyboard.press_and_release(get_hotkeys_slots()[9])
     app_logger.debug(f"Press and release {get_hotkeys_slots()[9]}")
@@ -112,6 +121,15 @@ def grind_procedure() -> bool:
     return True
 
 def repair_sword() -> bool:
+    """
+    Checks and performs the repair of the sword if necessary.
+
+    This function takes a screenshot of the equipment slots, identifies the sword, checks its damage level,
+    and performs a repair action if the damage exceeds a certain threshold.
+
+    Returns:
+        bool: True if the sword was repaired, False otherwise.
+    """
     app_logger.debug("Start repair_sword")
     app_logger.info(datetime.datetime.now())
     time.sleep(return_random_wait_interval_time(0.1, 0.5))
@@ -143,6 +161,15 @@ def repair_sword() -> bool:
     return False
 
 def change_sword_slot_number(sword_top_left: Optional[Tuple[int, int]] = None, sword_bottom_right: Optional[Tuple[int, int]] = None) -> None:
+    """
+    Updates the slot number of the sword based on its position in the equipment slots.
+
+    Args:
+        sword_top_left (Optional[Tuple[int, int]]): The top-left coordinate of the sword.
+        sword_bottom_right (Optional[Tuple[int, int]]): The bottom-right coordinate of the sword.
+
+    If the coordinates are not provided, the function attempts to find the sword in the slots and update its slot number.
+    """
     app_logger.debug("Start change_sword_slot_number")
     if sword_top_left is None or sword_bottom_right is None:
         app_logger.debug(f"sword_top_left: {sword_top_left} OR sword_bottom_right: {sword_bottom_right} is None - try get_sword_image()")
@@ -162,6 +189,15 @@ def change_sword_slot_number(sword_top_left: Optional[Tuple[int, int]] = None, s
         app_logger.debug("sword_slot and new_sword_slot are that same")
 
 def check_coordinates() -> bool:
+    """
+    Verifies if the current in-game coordinates match the expected range.
+
+    The function checks the player's current coordinates against a predefined range and performs
+    actions based on whether the coordinates are within the range, such as sending messages or moving the player.
+
+    Returns:
+        bool: True if coordinates are within the expected range, False if actions need to be taken due to deviation.
+    """
     app_logger.debug("Start check_coordinates")
     global coordinates_without_moving
     global coordinates_without_data
@@ -219,6 +255,11 @@ def check_coordinates() -> bool:
     return True
 
 def go_lobby_exit_mobgrinder() -> None:
+    """
+    Exits the mob grinder and returns to the main lobby.
+
+    This function sends a command to return to the game lobby and updates the state of the grinding procedure.
+    """
     lobby_command = "/lobby 1"
     time.sleep(1)
     app_logger.info(f"Go to Lobby - execute command: {lobby_command}")
@@ -227,6 +268,15 @@ def go_lobby_exit_mobgrinder() -> None:
     set_is_running_grind_procedure(False)
 
 def check_and_reply_messages() -> bool:
+    """
+    Checks for pending messages and replies if necessary.
+
+    This function handles any pending communication or actions that need to be taken based on game messages,
+    such as replying, checking for risks, and adjusting the procedure accordingly.
+
+    Returns:
+        bool: True if normal operation can continue, False if the procedure needs to be halted.
+    """
     app_logger.debug("Start check_and_reply_messages")
     if get_reply_data():
         time.sleep(1)
@@ -249,13 +299,23 @@ def check_and_reply_messages() -> bool:
     return True
 
 def store_items_procedure():
+    """
+    Executes the procedure for storing items in the game.
+
+    This function automates the in-game actions required to store collected items properly.
+    """
     app_logger.info("Start stored items procedure")
     time.sleep(0.8)
     items_stored_procedure()
     time.sleep(0.8)
 
 def grinder_procedure_loop() -> None: #TODO: Wsadzić te funkcje w TRY !!!!!!!
-    #TODO: Docstringi
+    """
+    Main loop for the grinder procedure.
+
+    This function orchestrates the entire grinder procedure including teleporting, grinding, storing items,
+    and sending notifications, in a loop as long as the procedure is active.
+    """
     app_logger.debug("Starting grinder_procedure_loop")
     while get_is_running_grind_procedure():
         time.sleep(1)
@@ -271,6 +331,12 @@ def grinder_procedure_loop() -> None: #TODO: Wsadzić te funkcje w TRY !!!!!!!
     app_logger.debug("grinder_procedure_loop() end while loop - not get_is_running_grind_procedure()")
 
 def toggle_grinder_procedure() -> None:
+    """
+    Toggles the state of the grinder procedure.
+
+    This function switches the grinder procedure on or off and manages the corresponding threading.
+    It ensures that no other procedures like farming or mining are running concurrently.
+    """
     global is_running_grind_procedure
     global grinder_procedure_thread
     from activities.farm import is_running_farm_procedure

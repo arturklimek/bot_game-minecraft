@@ -6,7 +6,8 @@ from typing import Optional, Tuple
 import keyboard
 import pyautogui
 from activities.afk import afk_break, afk_on_spawn, draw_risk_afk_time
-from activities.chat import tp_to_spawn, tp_to_mobgrinder_home, send_on_chat, send_random_message_coordinates_problem
+from activities.chat import tp_to_spawn, tp_to_mobgrinder_home, send_on_chat, send_random_message_coordinates_problem, \
+    send_chat_notification
 from activities.chest import items_stored_procedure
 from activities.eq_bar import get_eq_slot_top_left, get_eq_slot_bottom_right, get_item_slot_number, \
     check_and_update_eq_coordinates, get_sword_image, check_sword_damage_to_repair
@@ -254,6 +255,7 @@ def grinder_procedure_loop() -> None: #TODO: Wsadzić te funkcje w TRY !!!!!!!
         if not grind_procedure():
             break
         store_items_procedure()
+        send_chat_notification()
 
 def toggle_grinder_procedure() -> None:
     global is_running_grind_procedure

@@ -8,7 +8,7 @@ import keyboard
 import pyautogui
 from activities.afk import afk_break, get_afk_counter, draw_risk_afk_time, afk_on_spawn
 from activities.chat import tp_to_farm_home, sellall_inventory, tp_to_spawn, set_tmp_home, tp_to_tmp_home, send_on_chat, \
-    send_random_message_coordinates_problem
+    send_random_message_coordinates_problem, send_chat_notification
 from activities.eq_bar import get_item_slot_number, get_axe_image, check_axe_damage_to_repair, check_and_update_eq_coordinates
 from activities.mine import random_double_move_mouse
 from activities.repair import repair_item
@@ -343,6 +343,7 @@ def farm_procedure() -> None:
         if is_running_farm_procedure:
             app_logger.debug(f"farm_number is {get_farm_number()}")
             for farm in range(int(get_farm_number())):
+                send_chat_notification()
                 if make_farm(farm) is False:
                     is_running_farm_procedure= False
                     return

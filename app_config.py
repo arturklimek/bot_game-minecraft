@@ -268,6 +268,7 @@ farm_number = 2
 farm_floors_number = 15
 farm_floor_time_moving = 34
 farm_sell_frequency = 0
+farm_store_items = False
 
 tmp_home_flag = True
 
@@ -282,6 +283,9 @@ def get_farm_floor_time_moving() -> int:
 
 def get_farm_sell_frequency() -> int:
     return farm_sell_frequency
+
+def get_farm_store_items() -> int:
+    return farm_store_items
 
 def get_tmp_home_flag() -> bool:
     return tmp_home_flag
@@ -655,6 +659,7 @@ def get_config_dict():
     tmp_dict["counter_risk_messages_to_afk"] = counter_risk_messages_to_afk
     tmp_dict["counter_risk_messages_to_lobby"] = counter_risk_messages_to_lobby
     tmp_dict["farm_sell_frequency"] = farm_sell_frequency
+    tmp_dict["farm_store_items"] = farm_store_items
     tmp_dict["reply_all_nicks_flag"] = reply_all_nicks_flag
     tmp_dict["coordinates_screen_XYZ"] = coordinates_screen_XYZ
     tmp_dict["coordinates_screen_Facing"] = coordinates_screen_Facing
@@ -722,6 +727,7 @@ def set_config_from_dict(config_dict: dict) -> None:
     global counter_risk_messages_to_afk
     global counter_risk_messages_to_lobby
     global farm_sell_frequency
+    global farm_store_items
     global reply_all_nicks_flag
     global coordinates_screen_XYZ
     global coordinates_screen_Facing
@@ -803,6 +809,8 @@ def set_config_from_dict(config_dict: dict) -> None:
             counter_risk_messages_to_lobby = config_dict["counter_risk_messages_to_lobby"]
         if "farm_sell_frequency" in config_dict:
             farm_sell_frequency = config_dict["farm_sell_frequency"]
+        if "farm_store_items" in config_dict:
+            farm_store_items = config_dict["farm_store_items"]
         if "reply_all_nicks_flag" in config_dict:
             reply_all_nicks_flag = config_dict["reply_all_nicks_flag"]
         if "coordinates_screen_XYZ" in config_dict:
@@ -850,6 +858,7 @@ comments = {
     'counter_risk_messages_to_afk': f"# counter_risk_messages_to_afk - Number of messages from risk nicks (from the risk_nicks_list) after which the program goes afk on the spawn, value 0 - no afk, default value '{counter_risk_messages_to_afk}\n",
     'counter_risk_messages_to_lobby': f"# counter_risk_messages_to_lobby - The number of messages from risk nicks (from the risk_nicks_list) after which the program exits to the lobby and completely stops the action, value 0 - no action execution, default value '{counter_risk_messages_to_lobby}\n",
     'farm_sell_frequency': f"# farm_sell_frequency - Determines the number of floors of the farm between sales (value <=0 will sell items on each floor), default value '{farm_sell_frequency}\n",
+    'farm_store_items': f"# farm_store_items - A value of true or false declaring whether items are to be deposited into chests during autofarm (requires tmp and chest homes), default value '{farm_store_items}\n",
     'reply_all_nicks_flag': f"# reply_all_nicks_flag - True or False flag indicating whether the program should respond to messages from nicks outside the list (risk_nicks_list), default value '{reply_all_nicks_flag}\n",
     'coordinates_screen_XYZ': f"# coordinates_screen_XYZ - Coordinates on the screen of the XYZ field displayed on the screen after pressing 'F3' (USE show_config_coordinates.bat to show this coordinates), default value '{coordinates_screen_XYZ}\n",
     'coordinates_screen_Facing': f"# coordinates_screen_Facing - Coordinates on the screen of the Facing field displayed on the screen after pressing 'F3' (Note - the size of this field changes depending on the content) (USE show_config_coordinates.bat to show this coordinates), default value '{coordinates_screen_Facing}\n",

@@ -5,7 +5,7 @@ import keyboard
 from app_config import get_command_sethome, get_command_home_tmp, get_command_spawn, \
     get_command_home_repair, get_command_home_mining, get_command_home_chest, get_command_home_farm, \
     get_command_sell_inventory, get_hotkey_enter, get_hotkey_chat, get_chat_messages_flag, \
-    get_chat_messages_frequency_min, get_chat_messages, get_coordinates_problem_messages_list
+    get_chat_messages_frequency_min, get_chat_messages, get_coordinates_problem_messages_list, get_command_home_grinder
 from delay import return_random_wait_interval_time
 from logger import app_logger
 
@@ -121,6 +121,14 @@ def tp_to_farm_home(index: int) -> None:
     time.sleep(return_random_wait_interval_time())
     send_on_chat(f"{get_command_home_farm()}{index}")
 
+def tp_to_mobgrinder_home() -> None:
+    """
+    This function sends a teleport command to the game chat to move the player to the 'mobgrinder' home.
+    """
+    app_logger.debug("tp_to_mobgrinder_home was used")
+    time.sleep(return_random_wait_interval_time())
+    send_on_chat(get_command_home_grinder())
+
 def tp_to_tmp_home() -> None:
     """
     Teleports the player to a temporary home location in the game.
@@ -160,7 +168,6 @@ def sellall_inventory() -> None:
     app_logger.debug("sellall_inventory was used")
     time.sleep(return_random_wait_interval_time())
     send_on_chat(get_command_sell_inventory())
-
 
 def send_random_message_coordinates_problem() -> None:
     """

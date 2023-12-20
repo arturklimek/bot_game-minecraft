@@ -4,7 +4,6 @@ from image_operations import convert_cv_image_to_gray
 from logger import app_logger
 from patterns import item_destruction_patterns
 
-
 def analyze_damage_level(item_image: np.ndarray) -> int:
     """
     Analyzes the damage level of a tool or item based on its image.
@@ -35,4 +34,3 @@ def analyze_damage_level(item_image: np.ndarray) -> int:
     best_match_score = scores[best_match_index]
     app_logger.debug(f"best_match_index: {best_match_index} best_match_score: {best_match_score}")
     return best_match_index
-

@@ -9,12 +9,14 @@ import pyautogui
 from activities.afk import afk_break, get_afk_counter, draw_risk_afk_time, afk_on_spawn
 from activities.chat import tp_to_farm_home, sellall_inventory, tp_to_spawn, set_tmp_home, tp_to_tmp_home, send_on_chat, \
     send_random_message_coordinates_problem, send_chat_notification
+from activities.chest import items_stored_procedure
 from activities.eq_bar import get_item_slot_number, get_axe_image, check_axe_damage_to_repair, check_and_update_eq_coordinates
+from activities.equipment import check_inventory_full
 from activities.mine import random_double_move_mouse
 from activities.repair import repair_item
 from app_config import get_farm_number, get_farm_floors_number, get_farm_floor_time_moving, \
     get_tmp_home_flag, get_hotkey_moving_left, get_hotkey_moving_right, get_hotkeys_slots, get_farm_sell_frequency, \
-    get_coordinates_screen_XYZ_analysis_flag, get_farm_coordinate_range
+    get_coordinates_screen_XYZ_analysis_flag, get_farm_coordinate_range, get_farm_store_items
 from coordinate_analyzer import get_coordinates_XYZ, check_coordinates_compatibility_XYZ
 from delay import return_random_wait_interval_time
 from log_game_processor import get_reply_data, make_reply, check_risk_exit, make_risk_exit, check_risk_afk, \
@@ -207,11 +209,23 @@ def make_farm(farm_number) -> bool:
                     current_moving_direction = get_hotkey_moving_right()
                 app_logger.debug(f"current_moving_direction was set to: {current_moving_direction}")
                 time.sleep(return_random_wait_interval_time(0.1, 0.5))
-                if sell_counter <= get_farm_sell_frequency():
-                    sellall_inventory()
-                    sell_counter = 0
+                if get_farm_store_items() and get_tmp_home_flag():
+                    inventory_status = check_inventory_full()
+                    if inventory_status:
+                        set_tmp_home()
+                        time.sleep(return_random_wait_interval_time(0.2, 0.5))
+                        app_logger.info("Start stored items procedure")
+                        time.sleep(0.8)
+                        items_stored_procedure()
+                        time.sleep(0.8)
+                        tp_to_tmp_home()
+                        time.sleep(return_random_wait_interval_time(0.5, 1))
                 else:
-                    sell_counter = sell_counter + 1
+                    if sell_counter <= get_farm_sell_frequency():
+                        sellall_inventory()
+                        sell_counter = 0
+                    else:
+                        sell_counter = sell_counter + 1
                 time.sleep(return_random_wait_interval_time(0.1, 0.5))
                 keyboard.press_and_release(get_hotkeys_slots()[9])
                 app_logger.debug(f"Press and release {get_hotkeys_slots()[9]}")

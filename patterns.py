@@ -1,7 +1,8 @@
 import array
 from app_config import item_destruction_patterns_paths, slots_pattern_path, slots_pattern_mask_path, \
     pickaxe_patterns_paths, pickaxe_pattern_mask_path, eq_inventory_patterns_paths, chest_inventory_patterns_paths, \
-    items_quantity_pattern, axe_patterns_paths, axe_pattern_mask_path, items_patterns_paths
+    items_quantity_pattern, axe_patterns_paths, axe_pattern_mask_path, items_patterns_paths, sword_pattern_mask_path, \
+    sword_patterns_paths
 from image_operations import convert_cv_image_to_gray, load_cv_image
 from logger import app_logger
 from typing import Dict, Any
@@ -10,6 +11,7 @@ item_destruction_patterns: Dict[str, Dict[str, Any]] = {}
 slots_patterns: Dict[str, Any] = {}
 pickaxe_patterns: Dict[str, Any] = {}
 axe_patterns: Dict[str, Any] = {}
+sword_patterns: Dict[str, Any] = {}
 eq_inventory_patterns: Dict[str, Any] = {}
 chest_inventory_patterns: Dict[str, Any] = {}
 items_patterns: Dict[str, Dict[str, Any]] = {}
@@ -29,45 +31,30 @@ def load_slots_patterns() -> None:
     except Exception as ex:
         app_logger.error(ex)
 
-def load_pickaxe_patterns() -> None:
+def load_item_patterns(patterns_dict: dict, patterns_paths: dict, mask_path: str, item_name: str) -> None:
     """
-    Loads and stores pickaxe patterns and their masks for the application.
+    Loads and stores item patterns and their masks for the application.
 
-    Converts and stores the pickaxe pattern and its mask from the predefined path.
+    Args:
+        patterns_dict (dict): The global dictionary where patterns are to be stored.
+        patterns_paths (dict): The dictionary of paths to the item patterns.
+        mask_path (str): The path to the mask of the item patterns.
+        item_name (str): The name of the item for logging purposes.
+
+    This function handles the loading of item patterns and masks.
     """
-    global pickaxe_patterns
     try:
-        for key, path in pickaxe_patterns_paths.items():
-            pickaxe_pattern = convert_cv_image_to_gray(load_cv_image(path))
-            pickaxe_patterns[key] = pickaxe_pattern
-            if pickaxe_pattern is None:
-                app_logger.warning(f"Not loaded axe pattern for key: {key}")
-        pickaxe_pattern_mask = convert_cv_image_to_gray(load_cv_image(pickaxe_pattern_mask_path))
-        pickaxe_patterns["mask"] = pickaxe_pattern_mask
-        if pickaxe_pattern_mask is None:
-            app_logger.warning("Not loaded pickaxe_pattern_mask")
-        app_logger.info("pickaxe_patterns was loaded")
-    except Exception as ex:
-        app_logger.error(ex)
-
-def load_axe_patterns() -> None:
-    """
-    Loads and stores axe patterns and their masks for the application.
-
-    Similar to `load_pickaxe_patterns`, it handles the loading of axe patterns and masks.
-    """
-    global axe_patterns
-    try:
-        for key, path in axe_patterns_paths.items():
-            axe_pattern = convert_cv_image_to_gray(load_cv_image(path))
-            axe_patterns[key] = axe_pattern
-            if axe_pattern is None:
-                app_logger.warning(f"Not loaded axe pattern for key: {key}")
-        axe_pattern_mask = convert_cv_image_to_gray(load_cv_image(axe_pattern_mask_path))
-        axe_patterns["mask"] = axe_pattern_mask
-        if axe_pattern_mask is None:
-            app_logger.warning("Not loaded axe_pattern_mask")
-        app_logger.info("axe_patterns was loaded")
+        for key, path in patterns_paths.items():
+            item_pattern = load_cv_image(path)
+            patterns_dict[key] = item_pattern
+            if item_pattern is None:
+                app_logger.warning(f"Not loaded {item_name} pattern for key: {key}")
+        # item_pattern_mask = convert_cv_image_to_gray(load_cv_image(mask_path))
+        item_pattern_mask = load_cv_image(mask_path)
+        patterns_dict["mask"] = item_pattern_mask
+        if item_pattern_mask is None:
+            app_logger.warning(f"Not loaded {item_name}_pattern_mask")
+        app_logger.info(f"{item_name}_patterns was loaded")
     except Exception as ex:
         app_logger.error(ex)
 
@@ -153,10 +140,14 @@ def load_patterns_all() -> None:
 
     Calls individual functions to load different sets of patterns like item destruction, slots, pickaxe, axe, equipment inventory, chest inventory, and item patterns.
     """
+    global pickaxe_patterns
+    global axe_patterns
+    global sword_patterns
     load_item_destruction_patterns()
     load_slots_patterns()
-    load_pickaxe_patterns()
-    load_axe_patterns()
+    load_item_patterns(pickaxe_patterns, pickaxe_patterns_paths, pickaxe_pattern_mask_path, "pickaxe")
+    load_item_patterns(axe_patterns, axe_patterns_paths, axe_pattern_mask_path, "axe")
+    load_item_patterns(sword_patterns, sword_patterns_paths, sword_pattern_mask_path, "sword")
     load_eq_inventory_patterns()
     load_chest_inventory_patterns()
     load_items_patterns()

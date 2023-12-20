@@ -73,6 +73,7 @@ coordinates_without_data = 0
 coordinates_out_of_range = 0
 
 def grind_procedure() -> bool:
+    app_logger.debug("Start grind_procedure")
     keyboard.press_and_release(get_hotkeys_slots()[9])
     app_logger.debug(f"Press and release {get_hotkeys_slots()[9]}")
     time.sleep(return_random_wait_interval_time(0.5, 1))
@@ -95,8 +96,10 @@ def grind_procedure() -> bool:
         for iteration in range(attacks_number_in_iteration):
             pyautogui.click(button='left')
             if not check_and_reply_messages():
+                app_logger.debug("not check_and_reply_messages() - return False")
                 return False
             if not check_coordinates():
+                app_logger.debug("not check_coordinates() - return False")
                 return False
             time.sleep(random.uniform(min_atack_interval, max_atack_interval))
         inventory_status = check_inventory_full()
@@ -109,10 +112,11 @@ def grind_procedure() -> bool:
     return True
 
 def repair_sword() -> bool:
+    app_logger.debug("Start repair_sword")
     app_logger.info(datetime.datetime.now())
     time.sleep(return_random_wait_interval_time(0.1, 0.5))
-    keyboard.press_and_release(get_hotkeys_slots()[9])
     app_logger.debug(f"Press and release {get_hotkeys_slots()[9]}")
+    keyboard.press_and_release(get_hotkeys_slots()[9])
     time.sleep(return_random_wait_interval_time(0.5, 1))
     last_image = copy.copy(get_last_screenshot())
     check_and_update_eq_coordinates()
@@ -139,6 +143,7 @@ def repair_sword() -> bool:
     return False
 
 def change_sword_slot_number(sword_top_left: Optional[Tuple[int, int]] = None, sword_bottom_right: Optional[Tuple[int, int]] = None) -> None:
+    app_logger.debug("Start change_sword_slot_number")
     if sword_top_left is None or sword_bottom_right is None:
         app_logger.debug(f"sword_top_left: {sword_top_left} OR sword_bottom_right: {sword_bottom_right} is None - try get_sword_image()")
         axe = get_sword_image()
@@ -157,10 +162,12 @@ def change_sword_slot_number(sword_top_left: Optional[Tuple[int, int]] = None, s
         app_logger.debug("sword_slot and new_sword_slot are that same")
 
 def check_coordinates() -> bool:
+    app_logger.debug("Start check_coordinates")
     global coordinates_without_moving
     global coordinates_without_data
     global coordinates_out_of_range
     if get_coordinates_screen_XYZ_analysis_flag():
+        app_logger.debug("get_coordinates_screen_XYZ_analysis_flag() is True")
         current_time = datetime.datetime.now()
         time_difference = current_time - get_last_iteration_time()
         if time_difference.total_seconds() < 1:
@@ -208,6 +215,7 @@ def check_coordinates() -> bool:
                 return False
             set_last_coordinates(current_coordinates)
             set_last_iteration_time(current_time)
+    app_logger.debug("check_coordinates - return True")
     return True
 
 def go_lobby_exit_mobgrinder() -> None:
@@ -219,6 +227,7 @@ def go_lobby_exit_mobgrinder() -> None:
     set_is_running_grind_procedure(False)
 
 def check_and_reply_messages() -> bool:
+    app_logger.debug("Start check_and_reply_messages")
     if get_reply_data():
         time.sleep(1)
         make_reply()
@@ -228,12 +237,15 @@ def check_and_reply_messages() -> bool:
             make_risk_exit()
             time.sleep(1)
             set_is_running_grind_procedure(False)
+            app_logger.debug("check_and_reply_messages() return False - grinder procedure need be stop")
             return False
         if check_risk_afk():
             time.sleep(1)
             make_risk_afk()
             time.sleep(1)
+            app_logger.debug("check_risk_afk() return False - grinder procedure need be stop")
             return False
+    app_logger.debug("check_and_reply_messages - return True")
     return True
 
 def store_items_procedure():
@@ -256,6 +268,7 @@ def grinder_procedure_loop() -> None: #TODO: Wsadzić te funkcje w TRY !!!!!!!
             break
         store_items_procedure()
         send_chat_notification()
+    app_logger.debug("grinder_procedure_loop() end while loop - not get_is_running_grind_procedure()")
 
 def toggle_grinder_procedure() -> None:
     global is_running_grind_procedure

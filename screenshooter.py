@@ -6,9 +6,14 @@ import pygetwindow
 from app_config import get_game_window_name, get_screenshots_frequency
 from image_operations import convert_screenshot_for_opencv
 from logger import app_logger
-from typing import Optional, Union
+from typing import Optional
 
-last_screenshot: Optional[np.ndarray] = None
+last_screenshoot: Optional[np.ndarray] = None #TODO: change variables and functions from screenshot to screenshoot
+
+def set_last_screenshoot(new_last_screensh0ot: Optional[np.ndarray] = None) -> None:
+    global last_screenshoot
+    if new_last_screensh0ot is not None:
+        last_screenshoot = new_last_screensh0ot
 
 def get_last_screenshot() -> Optional[np.ndarray]:
     """
@@ -51,13 +56,12 @@ def screenshot_loop() -> None:
 
     This function runs in an infinite loop, capturing screenshots and updating the global 'last_screenshot' variable.
     """
-    global last_screenshoot
     time.sleep(1)
     while True:
         try:
             screenshot = get_screenshot(get_game_window_name())
             if screenshot is not None:
-                last_screenshoot = screenshot
+                set_last_screenshoot(screenshot)
             else:
                 app_logger.debug(f"No screenshot taken for window '{get_game_window_name()}'")
             time.sleep(get_screenshots_frequency())

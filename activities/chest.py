@@ -2,11 +2,17 @@ import copy
 import time
 from typing import Optional, Tuple, List
 import cv2
+import keyboard
 import numpy as np
 import pyautogui
 import pygetwindow
-from app_config import get_game_window_name
-from image_operations import convert_cv_image_to_gray
+from activities.chat import tp_to_chest_home, sellall_inventory
+from activities.equipment import check_slot_free
+from app_config import get_game_window_name, items_quantity_pattern, get_protected_slots, \
+    get_items_stored_list, get_hotkey_inventory
+from clicker import click_right_mouse_button
+from delay import return_random_wait_interval_time
+from image_operations import convert_cv_image_to_gray, save_image_for_function, load_cv_image
 from logger import app_logger
 from patterns import chest_inventory_patterns, items_patterns
 from screenshooter import get_last_screenshot
@@ -62,6 +68,7 @@ def find_chest_big_pattern(image: np.ndarray, threshold: float = 0.75) -> Option
     app_logger.debug("find_chest_big_pattern was used")
     app_logger.debug(f"threshold: {threshold}")
     try:
+        save_image_for_function("find_chest_big_pattern", "image", image)
         image_gray = convert_cv_image_to_gray(copy.copy(image))
         result = cv2.matchTemplate(image_gray, chest_inventory_patterns["chest-big"], cv2.TM_CCOEFF_NORMED, mask=chest_inventory_patterns["chest-big_mask"])
         _, max_val, _, max_loc = cv2.minMaxLoc(result)
@@ -94,12 +101,14 @@ def get_chest_big_image(image_screenshoot: Optional[np.ndarray] = None) -> Optio
     else:
         image = copy.copy(image_screenshoot)
     try:
+        save_image_for_function("get_chest_big_image", "image_screenshoot", image_screenshoot)
         chest_pattern = find_chest_big_pattern(image)
         if chest_pattern:
             chest_top_left, chest_bottom_right = chest_pattern
             chest_x1, chest_y1 = chest_top_left
             chest_x2, chest_y2 = chest_bottom_right
             cropped_chest_image = image[chest_y1:chest_y2, chest_x1:chest_x2]
+            save_image_for_function("get_chest_big_image", "cropped_chest_image", cropped_chest_image)
             app_logger.debug(f"chest_top_left: {chest_top_left} chest_bottom_right: {chest_bottom_right}")
             return cropped_chest_image, chest_top_left, chest_bottom_right
         else:
@@ -124,6 +133,7 @@ def find_chest_small_pattern(image: np.ndarray, threshold: float = 0.75) -> Opti
     app_logger.debug("find_chest_small_pattern was used")
     app_logger.debug(f"threshold: {threshold}")
     try:
+        save_image_for_function("find_chest_small_pattern", "image", image)
         image_gray = convert_cv_image_to_gray(copy.copy(image))
         result = cv2.matchTemplate(image_gray, chest_inventory_patterns["chest-small"], cv2.TM_CCOEFF_NORMED, mask=chest_inventory_patterns["chest-small_mask"])
         _, max_val, _, max_loc = cv2.minMaxLoc(result)
@@ -156,6 +166,7 @@ def get_chest_small_image(image_screenshoot: Optional[np.ndarray] = None) -> Opt
     else:
         image = copy.copy(image_screenshoot)
     try:
+        save_image_for_function("get_chest_small_image", "image_screenshoot", image_screenshoot)
         chest_pattern = find_chest_small_pattern(image)
         if chest_pattern:
             chest_top_left, chest_bottom_right = chest_pattern
@@ -188,6 +199,7 @@ def check_and_get_chest_image(image_screenshoot: Optional[np.ndarray] = None) ->
     else:
         image = copy.copy(image_screenshoot)
     try:
+        save_image_for_function("check_and_get_chest_image", "image", image)
         chest_pattern = find_chest_big_pattern(image)
         chest_size = chest_big_inventory_amount
         if not chest_pattern:
@@ -198,6 +210,7 @@ def check_and_get_chest_image(image_screenshoot: Optional[np.ndarray] = None) ->
             chest_x1, chest_y1 = chest_top_left
             chest_x2, chest_y2 = chest_bottom_right
             cropped_chest_image = image[chest_y1:chest_y2, chest_x1:chest_x2]
+            save_image_for_function("check_and_get_chest_image", "cropped_chest_image", cropped_chest_image)
             app_logger.debug(f"chest_top_left: {chest_top_left} chest_bottom_right: {chest_bottom_right} chest_size: {chest_size}")
             return cropped_chest_image, chest_top_left, chest_bottom_right, chest_size
         app_logger.debug("chest_pattern is None")
@@ -224,6 +237,7 @@ def get_slots_chest_coordinates(chest_image: Optional[np.ndarray] = None, chest_
             chest_image, chest_top_left, chest_bottom_right, chest_size = check_and_get_chest_image()
         else:
             chest_image = copy.copy(chest_image)
+        save_image_for_function("get_slots_chest_coordinates", "chest_image", chest_image)
         chest_width, chest_height = chest_image.shape[1], chest_image.shape[0]
         slots_coordinates = []
         start_slot_x1 = chest_inventory_elements["left-frame"]["width"]
@@ -283,6 +297,7 @@ def get_chest_slots_images(chest_image: Optional[np.ndarray] = None, slots_coord
             chest_image, chest_top_left, chest_bottom_right, chest_size = check_and_get_chest_image()
         else:
             chest_image = copy.copy(chest_image)
+        save_image_for_function("get_chest_slots_images", "chest_image", chest_image)
         if slots_coordinates is None:
             app_logger.debug("slots_coordinates is None")
             chest_width, chest_height = chest_image.shape[1], chest_image.shape[0]
@@ -304,7 +319,7 @@ def get_chest_slots_images(chest_image: Optional[np.ndarray] = None, slots_coord
         app_logger.error(ex)
         return None
 
-def find_item_pattern_in_item_image(item_image: np.ndarray, items_quantity_mask: np.ndarray, patterns: dict = items_patterns, threshold_pixels: float = 0.95, threshold_pattern: float = 0.26) -> Optional[str]:
+def find_item_pattern_in_item_image(item_image: np.ndarray, items_quantity_mask: np.ndarray, patterns: dict = items_patterns, threshold_pixels: float = 0.95, threshold_pattern: float = 0.23) -> Optional[str]:
     """
     Identifies an item pattern within an item image.
 
@@ -322,6 +337,7 @@ def find_item_pattern_in_item_image(item_image: np.ndarray, items_quantity_mask:
         app_logger.debug("find_item_pattern_in_item_image was used")
         app_logger.debug(f"threshold_pixels: {threshold_pixels}")
         app_logger.debug(f"threshold_pattern: {threshold_pattern}")
+        save_image_for_function("find_item_pattern_in_item_image", "item_image", item_image)
         quantity_mask_inverted = cv2.bitwise_not(items_quantity_mask)
         best_match = (None, 0)
         for key, pattern_info in patterns.items():
@@ -381,6 +397,7 @@ def shift_click_at_coordinates_in_game_window(slots_coordinates: Tuple[Tuple[int
     app_logger.debug(f"Taked slots_coordinates: {slots_coordinates}")
     window_coordinates = get_game_window_coordinates(get_game_window_name())
     if window_coordinates is None:
+        app_logger.debug(f"window_coordinates is: {window_coordinates}")
         return
     window_x, window_y = window_coordinates
     slot_top_left, slot_bottom_right = slots_coordinates
@@ -443,6 +460,111 @@ def calc_and_get_screenshoot_sloot_coordinates(slot_coordinates: Tuple[Tuple[int
     app_logger.debug(f"new_slot_coordinates: {new_slot_coordinates}")
     return new_slot_coordinates
 
+def items_stored_procedure() -> None:
+    """
+    Handles the procedure for storing items in the chest and selling them.
 
+    This function automates the process of teleporting to the chest home, interacting with the chest, identifying items to store, and performing actions like storing and selling items. It utilizes image recognition to find specific items in the inventory and interact with them accordingly.
 
-
+    Note:
+        The function is designed to work within a specific game environment, and its effectiveness is dependent on the accuracy of image pattern recognition.
+    """
+    try:
+        tp_to_chest_home()
+        app_logger.debug("items_stored_procedure use tp_to_chest_home()")
+        time.sleep(return_random_wait_interval_time(0.4, 1))
+        click_right_mouse_button()
+        time.sleep(0.3)
+        x = -(int(chest_inventory_elements["chest-big"]["width"] / 2))
+        y = -(int(chest_inventory_elements["chest-big"]["height"] / 2))
+        pyautogui.move(x, y)
+        app_logger.debug(f"items_stored_procedure moved mouse to x: {x} y: {y}")
+        time.sleep(1)
+        chest = check_and_get_chest_image()
+        if chest is not None:
+            cropped_chest_image, chest_top_left, chest_bottom_right, chest_size = chest
+            app_logger.debug(
+                f"chest - chest_top_left: {chest_top_left} chest_bottom_right: {chest_bottom_right} chest_size: {chest_size}")
+            slots_coordinates = get_slots_chest_coordinates(cropped_chest_image, chest_size)
+            app_logger.debug(f"geted slots_coordinates: {slots_coordinates}")
+            slots_images = get_chest_slots_images(cropped_chest_image, slots_coordinates)
+            app_logger.debug(f"geted {len(slots_images)} slot images")
+            item_quantity_mask = convert_cv_image_to_gray(load_cv_image(items_quantity_pattern))
+            slots_coordinates_to_stored = []
+            slots_amount = eq_slots_amount + eq_inventory_amount
+            slots_images_to_analize = slots_images[0:slots_amount]
+            app_logger.debug(f"slots_images_to_analize have {len(slots_images_to_analize)} elements.")
+            slots_coordinates_to_analize = slots_coordinates[0:slots_amount]
+            app_logger.debug(f"slots_coordinates_to_analize have {len(slots_coordinates_to_analize)} elements: {slots_coordinates_to_analize}")
+            for i, slot in enumerate(slots_images_to_analize):
+                if i >= slots_amount:
+                    app_logger.debug(f"i: {i} is greater than or equal to eq_slots_amount + eq_inventory_amount: {slots_amount} - break")
+                    break
+                if i + 1 in get_protected_slots():
+                    app_logger.debug(f"i: {i} +1 is in protected_slots - continue")
+                    continue
+                selected_item = find_item_pattern_in_item_image(slot, item_quantity_mask, items_patterns)
+                app_logger.debug(f"selected_item: {selected_item}")
+                app_logger.debug(f"get_items_stored_list(): {get_items_stored_list()}")
+                if selected_item is not None:
+                    if selected_item in get_items_stored_list():
+                        slots_coordinates_to_stored.insert(i, slots_coordinates_to_analize[i])
+            app_logger.debug(f"slots_coordinates_to_stored have {len(slots_coordinates_to_stored)} elements")
+            screen_coordinates_to_click = []
+            for slot_coordinates in slots_coordinates_to_stored:
+                screen_coordinates_to_click.append(
+                    calc_and_get_screenshoot_sloot_coordinates(slot_coordinates, chest_top_left, chest_bottom_right))
+            for slot_to_click in screen_coordinates_to_click:
+                shift_click_at_coordinates_in_game_window(slot_to_click)
+            app_logger.debug(f"screen_coordinates_to_click have {len(screen_coordinates_to_click)} elements")
+            time.sleep(return_random_wait_interval_time(0.1, 0.5))
+            keyboard.press_and_release(get_hotkey_inventory())
+            app_logger.debug(f"items_stored_procedure press and release: {get_hotkey_inventory()}")
+            time.sleep(return_random_wait_interval_time(0.1, 0.5))
+            sellall_inventory()
+            time.sleep(return_random_wait_interval_time(0.1, 0.5))
+            click_right_mouse_button()
+            time.sleep(0.3)
+            x = -(int(chest_inventory_elements["chest-big"]["width"] / 2))
+            y = -(int(chest_inventory_elements["chest-big"]["height"] / 2))
+            pyautogui.move(x, y)
+            app_logger.debug(f"items_stored_procedure moved mouse to x: {x} y: {y}")
+            time.sleep(1)
+            chest = check_and_get_chest_image()
+            if chest is not None:
+                cropped_chest_image, chest_top_left, chest_bottom_right, chest_size = chest
+                app_logger.debug(
+                    f"chest - chest_top_left: {chest_top_left} chest_bottom_right: {chest_bottom_right} chest_size: {chest_size}")
+                slots_coordinates = get_slots_chest_coordinates(cropped_chest_image, chest_size)
+                app_logger.debug(f"slots_coordinates have {len(slots_coordinates)} elements: {slots_coordinates}")
+                slots_images = get_chest_slots_images(cropped_chest_image, slots_coordinates)
+                app_logger.debug(f"slots_images have {len(slots_images)} elements")
+                slots_images_to_analize = slots_images[0:slots_amount]
+                app_logger.debug(f"slots_images_to_analize have {len(slots_images_to_analize)} elements")
+                slots_coordinates_to_analize = slots_coordinates[0:slots_amount]
+                app_logger.debug(
+                    f"slots_coordinates_to_analize have {len(slots_coordinates_to_analize)} elements: {slots_coordinates_to_analize}")
+                screen_coordinates_to_click.clear()
+                app_logger.debug(f"screen_coordinates_to_click was clear")
+                for i, slot_image in enumerate(slots_images_to_analize):
+                    if i >= slots_amount:
+                        break
+                    if i + 1 in get_protected_slots():
+                        continue
+                    if not check_slot_free(slot_image):
+                        screen_coordinates_to_click.append(
+                            calc_and_get_screenshoot_sloot_coordinates(slots_coordinates_to_analize[i], chest_top_left,
+                                                                       chest_bottom_right))
+                app_logger.debug(
+                    f"screen_coordinates_to_click was upadted, now have {len(screen_coordinates_to_click)} elements: {screen_coordinates_to_click}")
+                for slot_to_click in screen_coordinates_to_click:
+                    shift_click_at_coordinates_in_game_window(slot_to_click)
+            else:
+                app_logger.debug(f"chest is None")
+            time.sleep(0.3)
+            keyboard.press_and_release(get_hotkey_inventory())
+            app_logger.debug(f"items_stored_procedure press and release: {get_hotkey_inventory()}")
+        else:
+            app_logger.debug(f"chest taked from check_and_get_chest_image() is None")
+    except Exception as ex:
+        app_logger.error(ex)

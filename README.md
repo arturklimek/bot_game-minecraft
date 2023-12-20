@@ -18,6 +18,8 @@ The bot operates by teleporting between farms using /home and then moving altern
 The movement time in a given direction is specified in the configuration; the farm's design causes the character to fall to a lower floor at the end, and the bot begins work on the new floor in the opposite direction.
 At the end of each floor, the bot takes a screenshot and then, by analyzing the image, checks the position of the inventory in the game area, automatically determines and changes the tool slot, and analyzes tool wear, proceeding to the repair procedure if necessary.
 WARNING: The number of supported farms requires an appropriate number of set /home farmX where X is the farm number starting from 1 - therefore it is recommended to expand the farm and work the bot down floors, not in width.
+<br> _For one farm, it requires a minimum setting of /home farmX where X is the farm number starting from 1 (more farms require more homes) and /home repair (recommended use also /home tmp)_
+
 
 ### AutoMine:
 The bot operates in a loop, teleports to the appropriate /home, and performs the digging procedure according to the configuration.
@@ -25,7 +27,7 @@ Every 3 moves, the bot opens the inventory and analyzes its occupancy.
 When the inventory is full, it proceeds to the procedure of depositing items according to the configuration into the chest and selling the rest, then ensuring that all unnecessary elements have disappeared from its inventory.
 If the above procedure is carried out successfully, the bot returns to mining.
 The bot has a module for detecting and automatically selecting tools and analyzing their wear along with the repair procedure.
-
+<br>Requires a minimum of /home stone /home repair and /home chest
 
 __Notes__:
 

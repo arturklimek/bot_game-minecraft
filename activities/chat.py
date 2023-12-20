@@ -1,10 +1,11 @@
+import random
 import time
 from datetime import datetime, timedelta
 import keyboard
 from app_config import get_command_sethome, get_command_home_tmp, get_command_spawn, \
     get_command_home_repair, get_command_home_mining, get_command_home_chest, get_command_home_farm, \
     get_command_sell_inventory, get_hotkey_enter, get_hotkey_chat, get_chat_messages_flag, \
-    get_chat_messages_frequency_min
+    get_chat_messages_frequency_min, get_chat_messages, get_coordinates_problem_messages_list, get_command_home_grinder
 from delay import return_random_wait_interval_time
 from logger import app_logger
 
@@ -22,12 +23,12 @@ def send_chat_notification() -> None:
     app_logger.debug("send_chat_notification was used")
     try:
         current_time = datetime.now()
-        chat_messages_len = len(get_chat_messages_frequency_min()())
+        chat_messages_len = len(get_chat_messages())
         if get_chat_messages_flag() and current_time - last_message_time >= timedelta(minutes=get_chat_messages_frequency_min()) and chat_messages_len > 0:
             time.sleep(return_random_wait_interval_time(0.25, 1))
-            send_on_chat(get_chat_messages_flag()[chat_message_id])
+            send_on_chat(get_chat_messages()[chat_message_id])
             chat_message_id = chat_message_id + 1
-            if chat_messages_len <= chat_message_id:
+            if chat_message_id >= chat_messages_len:
                 chat_message_id = 0
             time.sleep(return_random_wait_interval_time(0.25, 1))
             last_message_time = current_time
@@ -35,7 +36,6 @@ def send_chat_notification() -> None:
             app_logger.debug(f"The conditions were not met chat_messages_flag: {get_chat_messages_flag()} chat_messages_len {chat_messages_len} last_message_time: {last_message_time}")
     except Exception as ex:
         app_logger.error(ex)
-
 
 def send_on_chat(text: str) -> None:
     """
@@ -59,6 +59,24 @@ def send_on_chat(text: str) -> None:
     time.sleep(return_random_wait_interval_time(0.75,1.5))
     keyboard.press_and_release(get_hotkey_enter())
     app_logger.debug(f"Press and release {get_hotkey_enter()}")
+
+def send_chat_message_to_player(nickname: str = "", reply_text: str = "") -> None:
+    message_text = ""
+    if nickname:
+        message_text = nickname + " "
+        app_logger.debug("nickname is empty")
+    if reply_text:
+        message_text = message_text + reply_text
+        send_on_chat(message_text)
+    else:
+        app_logger.debug("can not send player chat message - reply_text is empty")
+
+def send_private_message_to_player(nickname: str = "", reply_text: str = "") -> None:
+    if nickname and reply_text:
+        message_text = f"/msg {nickname} {reply_text}"
+        send_on_chat(message_text)
+    else:
+        app_logger.debug("can not send player private message - reply_text or reply_text is empty")
 
 def tp_to_repair_home() -> None:
     """
@@ -103,6 +121,14 @@ def tp_to_farm_home(index: int) -> None:
     time.sleep(return_random_wait_interval_time())
     send_on_chat(f"{get_command_home_farm()}{index}")
 
+def tp_to_mobgrinder_home() -> None:
+    """
+    This function sends a teleport command to the game chat to move the player to the 'mobgrinder' home.
+    """
+    app_logger.debug("tp_to_mobgrinder_home was used")
+    time.sleep(return_random_wait_interval_time())
+    send_on_chat(get_command_home_grinder())
+
 def tp_to_tmp_home() -> None:
     """
     Teleports the player to a temporary home location in the game.
@@ -142,3 +168,15 @@ def sellall_inventory() -> None:
     app_logger.debug("sellall_inventory was used")
     time.sleep(return_random_wait_interval_time())
     send_on_chat(get_command_sell_inventory())
+
+def send_random_message_coordinates_problem() -> None:
+    """
+    Sends a random chat message from a predefined list when a coordinate problem is detected.
+
+    This function selects a random message from a list of predefined messages regarding coordinate problems
+    and sends it to the game chat.
+    """
+    if len(get_coordinates_problem_messages_list()) > 0:
+        tmp_message = random.choice(get_coordinates_problem_messages_list())
+        if tmp_message:
+            send_on_chat(tmp_message)

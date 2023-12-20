@@ -1,13 +1,13 @@
 import copy
 import time
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Callable
 import cv2
 import keyboard
 import numpy as np
 from activities.item import analyze_damage_level
 from app_config import get_repair_threshold, get_hotkeys_slots
 from delay import return_random_wait_interval_time
-from patterns import slots_patterns, pickaxe_patterns, axe_patterns
+from patterns import slots_patterns, pickaxe_patterns, axe_patterns, sword_patterns
 from image_operations import convert_cv_image_to_gray
 from logger import app_logger
 from screenshooter import get_last_screenshot, get_screenshot
@@ -15,36 +15,11 @@ from screenshooter import get_last_screenshot, get_screenshot
 eq_slot_top_left = None
 eq_slot_bottom_right = None
 
-def find_pickaxe_pattern(image: np.ndarray, threshold: float = 0.935) -> Optional[Tuple[Tuple[int, int], Tuple[int, int]]]: #TODO: przenieść część wspólną do jednej osobnej funkcji razem z find_eq_slots_pattern
-    """
-    Finds the pickaxe pattern in a given image using template matching.
+def get_eq_slot_top_left():
+    return eq_slot_top_left
 
-    Args:
-        image: The image to search for the pickaxe pattern.
-        threshold: The threshold value for template matching, default is 0.935.
-
-    Returns:
-        A tuple containing the top-left and bottom-right coordinates of the found pickaxe pattern, or None if not found.
-    """
-    app_logger.debug("find_pickaxe_pattern was used")
-    app_logger.debug(f"used threshold: {threshold}")
-    try:
-        image_gray = convert_cv_image_to_gray(image)
-        result = cv2.matchTemplate(image_gray, pickaxe_patterns["pickaxe_pattern"], cv2.TM_CCORR_NORMED, mask=pickaxe_patterns["pickaxe_pattern_mask"])
-        _, max_val, _, max_loc = cv2.minMaxLoc(result)
-        app_logger.debug(f"pickaxe max_val: {max_val} max_loc: {max_loc}")
-        if max_val > threshold:
-            top_left = max_loc
-            w, h = pickaxe_patterns["pickaxe_pattern"].shape[1], pickaxe_patterns["pickaxe_pattern"].shape[0]
-            bottom_right = (top_left[0] + w, top_left[1] + h)
-            app_logger.debug(f'pickaxe was found in - top_left: {top_left} bottom_right: {bottom_right}')
-            return top_left, bottom_right
-        else:
-            app_logger.info('pickaxe pattern was not found.')
-            return None
-    except Exception as ex:
-        app_logger.error(ex)
-
+def get_eq_slot_bottom_right():
+    return eq_slot_bottom_right
 
 def find_eq_slots_pattern(image: np.ndarray, threshold: float = 0.9) -> Optional[Tuple[Tuple[int, int], Tuple[int, int]]]: # requires a slot set to 9
     """
@@ -106,6 +81,27 @@ def get_slots_image(image_screenshoot: Optional[np.ndarray] = None) -> Optional[
         app_logger.error(ex)
         return None
 
+def check_and_update_eq_coordinates() -> None:
+    """
+    Checks and updates the global coordinates of the equipment slots.
+
+    This function captures a new screenshot, finds the equipment slots pattern, and updates the global coordinates.
+    """
+    app_logger.debug("check_and_update_eq_coordinates was used")
+    global eq_slot_top_left
+    global eq_slot_bottom_right
+    try:
+        time.sleep(return_random_wait_interval_time())
+        keyboard.press_and_release(get_hotkeys_slots()[9])
+        app_logger.debug(f"press and release: {get_hotkeys_slots()[9]}")
+        time.sleep(return_random_wait_interval_time(0.2,0.6))
+        new_screenshoot = get_screenshot()
+        image_slots, eq_slot_top_left, eq_slot_bottom_right = get_slots_image(new_screenshoot)
+        app_logger.debug(f"eq_slot_top_left was set to {eq_slot_top_left} eq_slot_bottom_right was set to {eq_slot_bottom_right}")
+        time.sleep(return_random_wait_interval_time())
+    except Exception as ex:
+        app_logger.warning(ex)
+
 def get_item_slot_number(item_top_left: Optional[Tuple[int, int]] = None, item_bottom_right: Optional[Tuple[int, int]] = None) -> Optional[int]:
     """
     Calculates the slot number of an item based on its position in the equipment inventory.
@@ -133,24 +129,28 @@ def get_item_slot_number(item_top_left: Optional[Tuple[int, int]] = None, item_b
             0]
         slot_size = int(slots_width / 9)
         app_logger.debug(f"slot_size: {slot_size}")
-        item_slot_number = round(item_x1 / slot_size + 1)
+        # item_slot_number = round(item_x1 / slot_size + 1)
+        item_slot_number = (item_x1 // slot_size) + 1
         app_logger.debug(f"item_slot_number: {item_slot_number}")
         return item_slot_number
     except Exception as ex:
         app_logger.error(ex)
         return None
 
-def get_pickaxe_image(image_slots: Optional[np.ndarray] = None) -> Optional[Tuple[np.ndarray, Tuple[int, int], Tuple[int, int]]]:  #TODO: przenieść część wspólną do jednej osobnej funkcji razem z get_axe_image
+def get_item_image(image_slots: Optional[np.ndarray], find_item_pattern: Callable) -> Optional[Tuple[np.ndarray, Tuple[int, int], Tuple[int, int]]]:
     """
-    Retrieves the image of the pickaxe from the equipment slots.
+    Retrieves the image of an item from the equipment slots.
 
     Args:
         image_slots: An optional image of the equipment slots.
+        find_item_pattern: Function to find the specific item pattern in the image.
 
     Returns:
-        A tuple containing the cropped pickaxe image, top-left, and bottom-right coordinates of the pickaxe, or None if not found.
+        A tuple containing the cropped item image, top-left, and bottom-right coordinates of the item, or None if not found.
     """
-    app_logger.debug("get_pickaxe_image was used")
+    global eq_slot_top_left
+    global eq_slot_bottom_right
+    app_logger.debug("get_item_image was used")
     if image_slots is None:
         app_logger.debug("image_slots is None - try get_slots_image(get_last_screenshot())")
         image_slots, eq_slot_top_left, eq_slot_bottom_right = get_slots_image(get_last_screenshot())
@@ -158,20 +158,55 @@ def get_pickaxe_image(image_slots: Optional[np.ndarray] = None) -> Optional[Tupl
     else:
         image = copy.copy(image_slots)
     try:
-        cropped_pickaxe_image = None
-        pickaxe = find_pickaxe_pattern(image)
-        if pickaxe is not None:
-            pickaxe_top_left, pickaxe_bottom_right = pickaxe
-            if pickaxe_top_left and pickaxe_bottom_right:
-                pickaxe_x1, pickaxe_y1 = pickaxe_top_left
-                pickaxe_x2, pickaxe_y2 = pickaxe_bottom_right
-                cropped_pickaxe_image = image[pickaxe_y1:pickaxe_y2, pickaxe_x1:pickaxe_x2]
-            return cropped_pickaxe_image, pickaxe_top_left, pickaxe_bottom_right
+        item = find_item_pattern(image)
+        if item is not None:
+            item_top_left, item_bottom_right = item
+            if item_top_left and item_bottom_right:
+                item_x1, item_y1 = item_top_left
+                item_x2, item_y2 = item_bottom_right
+                cropped_item_image = image[item_y1:item_y2, item_x1:item_x2]
+                return cropped_item_image, item_top_left, item_bottom_right
         else:
-            app_logger.debug("pickaxe is None")
+            app_logger.debug("Item is None")
     except Exception as ex:
         app_logger.error(ex)
         return None
+
+def get_pickaxe_image(image_slots: Optional[np.ndarray] = None) -> Optional[Tuple[np.ndarray, Tuple[int, int], Tuple[int, int]]]:
+    return get_item_image(image_slots, find_pickaxe_pattern)
+
+def get_axe_image(image_slots: Optional[np.ndarray] = None) -> Optional[Tuple[np.ndarray, Tuple[int, int], Tuple[int, int]]]:
+    return get_item_image(image_slots, find_axe_pattern)
+
+def get_sword_image(image_slots: Optional[np.ndarray] = None) -> Optional[Tuple[np.ndarray, Tuple[int, int], Tuple[int, int]]]:
+    return get_item_image(image_slots, find_sword_pattern)
+
+def check_item_damage_to_repair(item_image: Optional[np.ndarray], get_item_image_function) -> Optional[bool]:
+    """
+    Checks if an item needs repair based on its damage level.
+
+    Args:
+        item_image: An optional image of the item.
+        get_item_image_function: A function to get the item's image if not provided.
+
+    Returns:
+        True if the item needs repair, False otherwise, or None if an error occurs.
+    """
+    app_logger.debug("check_item_damage_to_repair was used")
+    if item_image is None:
+        app_logger.debug("item_image is None - try get_item_image()")
+        item_image, item_top_left, item_bottom_right = copy.copy(get_item_image_function())
+        if not item_image:
+            app_logger.debug("Taken item_image is None - return")
+            return None
+    item_damage_id = analyze_damage_level(item_image)
+    app_logger.info(f"check_item_damage_to_repair - item_damage_id: {item_damage_id}")
+    if item_damage_id <= get_repair_threshold():
+        app_logger.info(f"check_item_damage_to_repair: True")
+        return True
+    else:
+        app_logger.info(f"check_item_damage_to_repair: False")
+        return False
 
 def check_pickaxe_damage_to_repair(image_pickaxe: Optional[np.ndarray] = None) -> Optional[bool]:
     """
@@ -183,84 +218,7 @@ def check_pickaxe_damage_to_repair(image_pickaxe: Optional[np.ndarray] = None) -
     Returns:
         True if the pickaxe needs repair, False otherwise, or None if an error occurs.
     """
-    app_logger.debug("check_pickaxe_damage_to_repair was used")
-    if image_pickaxe is None:
-        app_logger.debug("image_pickaxe is None - try get_pickaxe_image()")
-        image_pickaxe, pickaxe_top_left, pickaxe_bottom_right = copy.copy(get_pickaxe_image())
-        if not image_pickaxe:
-            app_logger.debug("Taked image_pickaxe again is None - return")
-            return None
-    item_damage_id = analyze_damage_level(image_pickaxe)
-    app_logger.info(f"check_pickaxe_damage_to_repair - item_damage_id: {item_damage_id}")
-    if item_damage_id <= get_repair_threshold():
-        app_logger.info(f"check_pickaxe_damage_to_repair: True")
-        return True
-    else:
-        app_logger.info(f"check_pickaxe_damage_to_repair: False")
-        return False
-
-def find_axe_pattern(image: np.ndarray, threshold: float = 0.95) -> Optional[Tuple[Tuple[int, int], Tuple[int, int]]]:
-    """
-    Finds the axe pattern in a given image using template matching.
-
-    Args:
-        image: The image to search for the axe pattern.
-        threshold: The threshold value for template matching, default is 0.95.
-
-    Returns:
-        A tuple containing the top-left and bottom-right coordinates of the found axe pattern, or None if not found.
-    """
-    app_logger.debug("find_axe_pattern was used")
-    app_logger.debug(f"used threshold: {threshold}")
-    try:
-        image_gray = convert_cv_image_to_gray(image)
-        result = cv2.matchTemplate(image_gray, axe_patterns["axe_pattern"], cv2.TM_CCORR_NORMED, mask=axe_patterns["axe_pattern_mask"])
-        _, max_val, _, max_loc = cv2.minMaxLoc(result)
-        app_logger.debug(f"axe max_val: {max_val} max_loc:{max_loc}")
-        if max_val > threshold:
-            top_left = max_loc
-            w, h = axe_patterns["axe_pattern"].shape[1], axe_patterns["axe_pattern"].shape[0]
-            bottom_right = (top_left[0] + w, top_left[1] + h)
-            app_logger.debug(f'axe was found in - top_left: {top_left} bottom_right: {bottom_right}')
-            return top_left, bottom_right
-        else:
-            app_logger.info('axe pattern was not found.')
-            return None
-    except Exception as ex:
-        app_logger.error(ex)
-
-def get_axe_image(image_slots: Optional[np.ndarray] = None) -> Optional[Tuple[np.ndarray, Tuple[int, int], Tuple[int, int]]]:
-    """
-    Retrieves the image of the axe from the equipment slots.
-
-    Args:
-        image_slots: An optional image of the equipment slots.
-
-    Returns:
-        A tuple containing the cropped axe image, top-left, and bottom-right coordinates of the axe, or None if not found.
-    """
-    app_logger.debug("get_axe_image was used")
-    if image_slots is None:
-        app_logger.debug("image_slots is None - try get_slots_image(get_last_screenshot())")
-        image_slots, eq_slot_top_left, eq_slot_bottom_right = get_slots_image(get_last_screenshot())
-        image = copy.copy(image_slots)
-    else:
-        image = copy.copy(image_slots)
-    try:
-        cropped_axe_image = None
-        axe = find_axe_pattern(image)
-        if axe is not None:
-            axe_top_left, axe_bottom_right = axe
-            if axe_top_left and axe_bottom_right:
-                axe_x1, axe_y1 = axe_top_left
-                axe_x2, axe_y2 = axe_bottom_right
-                cropped_axe_image = image[axe_y1:axe_y2, axe_x1:axe_x2]
-            return cropped_axe_image, axe_top_left, axe_bottom_right
-        else:
-            app_logger.debug("axe is None")
-    except Exception as ex:
-        app_logger.error(ex)
-        return None
+    return check_item_damage_to_repair(image_pickaxe, get_pickaxe_image)
 
 def check_axe_damage_to_repair(image_axe: Optional[np.ndarray] = None) -> Optional[bool]:
     """
@@ -272,38 +230,63 @@ def check_axe_damage_to_repair(image_axe: Optional[np.ndarray] = None) -> Option
     Returns:
         True if the axe needs repair, False otherwise, or None if an error occurs.
     """
-    app_logger.debug("check_axe_damage_to_repair was used")
-    if image_axe is None:
-        app_logger.debug("image_axe is None - try get_axe_image()")
-        image_axe, axe_top_left, axe_bottom_right = copy.copy(get_axe_image())
-        if not image_axe:
-            return None
-    item_damage_id = analyze_damage_level(image_axe)
-    app_logger.debug(f"check_axe_damage_to_repair - item_damage_id: {item_damage_id}")
-    if item_damage_id <= get_repair_threshold():
-        app_logger.info(f"check_axe_damage_to_repair: True")
-        return True
-    else:
-        app_logger.info(f"check_axe_damage_to_repair: False")
-        return False
+    return check_item_damage_to_repair(image_axe, get_axe_image)
 
-def check_and_update_eq_coordinates() -> None:
+def check_sword_damage_to_repair(image_sword: Optional[np.ndarray] = None) -> Optional[bool]:
     """
-    Checks and updates the global coordinates of the equipment slots.
+    Checks if the sword needs repair based on its damage level.
 
-    This function captures a new screenshot, finds the equipment slots pattern, and updates the global coordinates.
+    Args:
+        image_sword: An optional image of the sword.
+
+    Returns:
+        True if the sword needs repair, False otherwise, or None if an error occurs.
     """
-    app_logger.debug("check_and_update_eq_coordinates was used")
-    global eq_slot_top_left
-    global eq_slot_bottom_right
+    return check_item_damage_to_repair(image_sword, get_sword_image)
+
+def find_item_pattern(image: np.ndarray, item_patterns: dict, threshold: float, item_name: str) -> Optional[Tuple[Tuple[int, int], Tuple[int, int]]]:
+    """
+    Finds the best matching item pattern in a given image using template matching.
+
+    Args:
+        image (np.ndarray): The image to search for item patterns.
+        item_patterns (dict): The dictionary of item patterns.
+        threshold (float): The threshold value for template matching.
+        item_name (str): The name of the item for logging purposes.
+
+    Returns:
+        Optional[Tuple[Tuple[int, int], Tuple[int, int]]]: A tuple containing the top-left and bottom-right
+        coordinates of the best matching item pattern, or None if no pattern exceeds the threshold.
+    """
+    app_logger.debug(f"find_{item_name}_pattern was used")
+    app_logger.debug(f"used threshold: {threshold}")
     try:
-        time.sleep(return_random_wait_interval_time())
-        keyboard.press_and_release(get_hotkeys_slots()[9])
-        app_logger.debug(f"press and release: {get_hotkeys_slots()[9]}")
-        time.sleep(return_random_wait_interval_time(0.2,0.6))
-        new_screenshoot = get_screenshot()
-        image_slots, eq_slot_top_left, eq_slot_bottom_right = get_slots_image(new_screenshoot)
-        app_logger.debug(f"eq_slot_top_left was set to {eq_slot_top_left} eq_slot_bottom_right was set to {eq_slot_bottom_right}")
-        time.sleep(return_random_wait_interval_time())
+        best_match = (None, 0, None)
+        for key, pattern in item_patterns.items():
+            if "mask" in key:
+                continue
+            result = cv2.matchTemplate(image, pattern, cv2.TM_CCORR_NORMED, mask=item_patterns["mask"])
+            _, max_val, _, max_loc = cv2.minMaxLoc(result)
+            app_logger.debug(f"{key} {item_name} max_val: {max_val} max_loc:{max_loc}")
+            if max_val > best_match[1] and max_val > threshold:
+                w, h = pattern.shape[1], pattern.shape[0]
+                best_match = (max_loc, max_val, (w, h))
+        if best_match[1] > threshold:
+            top_left = best_match[0]
+            w, h = best_match[2]
+            bottom_right = (top_left[0] + w, top_left[1] + h)
+            app_logger.debug(f'Best matching {item_name} found - top_left: {top_left} bottom_right: {bottom_right}')
+            return top_left, bottom_right
+        app_logger.info(f'No {item_name} pattern exceeded the threshold.')
+        return None
     except Exception as ex:
-        app_logger.warning(ex)
+        app_logger.error(ex)
+
+def find_pickaxe_pattern(image: np.ndarray, threshold: float = 0.92) -> Optional[Tuple[Tuple[int, int], Tuple[int, int]]]:
+    return find_item_pattern(image, pickaxe_patterns, threshold, "pickaxe")
+
+def find_axe_pattern(image: np.ndarray, threshold: float = 0.92) -> Optional[Tuple[Tuple[int, int], Tuple[int, int]]]:
+    return find_item_pattern(image, axe_patterns, threshold, "axe")
+
+def find_sword_pattern(image: np.ndarray, threshold: float = 0.92) -> Optional[Tuple[Tuple[int, int], Tuple[int, int]]]:
+    return find_item_pattern(image, sword_patterns, threshold, "sword")

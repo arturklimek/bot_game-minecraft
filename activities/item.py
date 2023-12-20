@@ -34,4 +34,3 @@ def analyze_damage_level(item_image: np.ndarray) -> int:
     best_match_score = scores[best_match_index]
     app_logger.debug(f"best_match_index: {best_match_index} best_match_score: {best_match_score}")
     return best_match_index
-

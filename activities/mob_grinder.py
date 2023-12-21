@@ -35,8 +35,8 @@ def set_is_running_grind_procedure(new_state: bool = False) -> None:
 
 attacks_number_in_iteration = 20
 
-min_atack_interval = 0.5
-max_atack_interval = 3
+min_atack_interval = 0.4
+max_atack_interval = 1.5
 
 sword_slot = 1
 

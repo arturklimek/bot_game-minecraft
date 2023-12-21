@@ -506,6 +506,12 @@ items_patterns_paths = {
         "pattern": os.path.join(PATTERNS_DIR_PATH, f'item_diamond-block_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}.png'),
         "mask": os.path.join(PATTERNS_DIR_PATH, f'item_diamond-block_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_mask.png')
     },
+    "gunpowder": {
+        "pattern": os.path.join(PATTERNS_DIR_PATH,
+                                f'item_gunpowder_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}.png'),
+        "mask": os.path.join(PATTERNS_DIR_PATH,
+                             f'item_gunpowder_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_mask.png')
+    },
 }
 
 item_destruction_patterns_paths = {

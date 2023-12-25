@@ -265,7 +265,9 @@ sword_patterns_paths = {
 }
 sword_pattern_mask_path = os.path.join(PATTERNS_DIR_PATH, f'sword_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_full_mask.png')
 
-obscure_matter_pattern_path = os.path.join(PATTERNS_DIR_PATH, f'obscure-matter_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_full_mask.png')
+obscure_matter_patterns_paths = {
+    "obscure-matter": os.path.join(PATTERNS_DIR_PATH, f'obscure-matter_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_full_diamond.png'),
+}
 obscure_matter_pattern_mask_path = os.path.join(PATTERNS_DIR_PATH, f'obscure-matter_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_full_mask.png')
 
 repair_threshold = 2

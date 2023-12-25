@@ -14,7 +14,8 @@ from activities.eq_bar import get_eq_slot_top_left, get_eq_slot_bottom_right, ge
 from activities.equipment import check_inventory_full
 from activities.mine import random_double_move_mouse
 from activities.repair import repair_item
-from app_config import get_coordinates_screen_XYZ_analysis_flag, get_grinder_coordinate_range, get_hotkeys_slots
+from app_config import get_coordinates_screen_XYZ_analysis_flag, get_grinder_coordinate_range, get_hotkeys_slots, \
+    get_hotkey_moving_up
 from coordinate_analyzer import get_coordinates_XYZ, check_coordinates_compatibility_XYZ
 from delay import return_random_wait_interval_time
 from log_game_processor import get_reply_data, make_reply, check_risk_exit, make_risk_exit, check_risk_afk, \
@@ -89,7 +90,9 @@ def grind_procedure() -> bool:
         time.sleep(return_random_wait_interval_time(0.5, 1))
         app_logger.debug(f"Pressing 'shift'")
         keyboard.press("shift")
-        time.sleep(0.5)
+        keyboard.press(get_hotkey_moving_up())
+        time.sleep(0.8)
+        keyboard.release(get_hotkey_moving_up())
         app_logger.debug(f"Release 'shift'")
         keyboard.release("shift")
         repeat_grind = True

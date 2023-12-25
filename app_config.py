@@ -265,6 +265,9 @@ sword_patterns_paths = {
 }
 sword_pattern_mask_path = os.path.join(PATTERNS_DIR_PATH, f'sword_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_full_mask.png')
 
+obscure_matter_pattern_path = os.path.join(PATTERNS_DIR_PATH, f'obscure-matter_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_full_mask.png')
+obscure_matter_pattern_mask_path = os.path.join(PATTERNS_DIR_PATH, f'obscure-matter_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_full_mask.png')
+
 repair_threshold = 2
 repair_mining_pickaxe_frequency = 15
 
@@ -523,12 +526,6 @@ items_patterns_paths = {
                                 f'item_gunpowder_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}.png'),
         "mask": os.path.join(PATTERNS_DIR_PATH,
                              f'item_gunpowder_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_mask.png')
-    },
-    "obscure-matter": {
-        "pattern": os.path.join(PATTERNS_DIR_PATH,
-                                f'item_obscure-matter_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}.png'),
-        "mask": os.path.join(PATTERNS_DIR_PATH,
-                             f'item_obscure-matter_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_mask.png')
     },
 }
 

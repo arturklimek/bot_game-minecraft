@@ -2,7 +2,7 @@ import array
 from app_config import item_destruction_patterns_paths, slots_pattern_path, slots_pattern_mask_path, \
     pickaxe_patterns_paths, pickaxe_pattern_mask_path, eq_inventory_patterns_paths, chest_inventory_patterns_paths, \
     items_quantity_pattern, axe_patterns_paths, axe_pattern_mask_path, items_patterns_paths, sword_pattern_mask_path, \
-    sword_patterns_paths
+    sword_patterns_paths, obscure_matter_patterns_paths, obscure_matter_pattern_mask_path
 from image_operations import convert_cv_image_to_gray, load_cv_image
 from logger import app_logger
 from typing import Dict, Any
@@ -12,6 +12,7 @@ slots_patterns: Dict[str, Any] = {}
 pickaxe_patterns: Dict[str, Any] = {}
 axe_patterns: Dict[str, Any] = {}
 sword_patterns: Dict[str, Any] = {}
+obscure_matter_patterns: Dict[str, Any] = {}
 eq_inventory_patterns: Dict[str, Any] = {}
 chest_inventory_patterns: Dict[str, Any] = {}
 items_patterns: Dict[str, Dict[str, Any]] = {}
@@ -148,6 +149,7 @@ def load_patterns_all() -> None:
     load_item_patterns(pickaxe_patterns, pickaxe_patterns_paths, pickaxe_pattern_mask_path, "pickaxe")
     load_item_patterns(axe_patterns, axe_patterns_paths, axe_pattern_mask_path, "axe")
     load_item_patterns(sword_patterns, sword_patterns_paths, sword_pattern_mask_path, "sword")
+    load_item_patterns(obscure_matter_patterns, obscure_matter_patterns_paths, obscure_matter_pattern_mask_path, "obscure-matter")
     load_eq_inventory_patterns()
     load_chest_inventory_patterns()
     load_items_patterns()

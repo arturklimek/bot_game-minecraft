@@ -7,8 +7,9 @@ import numpy as np
 from activities.item import analyze_damage_level
 from app_config import get_repair_threshold, get_hotkeys_slots
 from delay import return_random_wait_interval_time
-from patterns import slots_patterns, pickaxe_patterns, axe_patterns, sword_patterns
-from image_operations import convert_cv_image_to_gray
+from patterns import slots_patterns, pickaxe_patterns, axe_patterns, sword_patterns, obscure_matter_patterns, \
+    obscure_matters_patterns
+from image_operations import convert_cv_image_to_gray, save_image_for_function
 from logger import app_logger
 from screenshooter import get_last_screenshot, get_screenshot
 
@@ -38,7 +39,7 @@ def find_eq_slots_pattern(image: np.ndarray, threshold: float = 0.9) -> Optional
         image_gray = convert_cv_image_to_gray(image)
         result = cv2.matchTemplate(image_gray, slots_patterns["slots_pattern"], cv2.TM_CCORR_NORMED, mask=slots_patterns["slots_pattern_mask"])
         _, max_val, _, max_loc = cv2.minMaxLoc(result)
-        app_logger.debug(f"pickaxe max_val: {max_val} max_loc: {max_loc}")
+        app_logger.debug(f"eq_slots max_val: {max_val} max_loc: {max_loc}")
         if max_val > threshold:
             top_left = max_loc
             w, h = slots_patterns["slots_pattern"].shape[1], slots_patterns["slots_pattern"].shape[0]
@@ -165,6 +166,7 @@ def get_item_image(image_slots: Optional[np.ndarray], find_item_pattern: Callabl
                 item_x1, item_y1 = item_top_left
                 item_x2, item_y2 = item_bottom_right
                 cropped_item_image = image[item_y1:item_y2, item_x1:item_x2]
+                save_image_for_function("get_item_image", "cropped_item_image", cropped_item_image)
                 return cropped_item_image, item_top_left, item_bottom_right
         else:
             app_logger.debug("Item is None")
@@ -180,6 +182,9 @@ def get_axe_image(image_slots: Optional[np.ndarray] = None) -> Optional[Tuple[np
 
 def get_sword_image(image_slots: Optional[np.ndarray] = None) -> Optional[Tuple[np.ndarray, Tuple[int, int], Tuple[int, int]]]:
     return get_item_image(image_slots, find_sword_pattern)
+
+def get_obscure_matter_image(image_slots: Optional[np.ndarray] = None) -> Optional[Tuple[np.ndarray, Tuple[int, int], Tuple[int, int]]]:
+    return get_item_image(image_slots, find_obscure_matter_pattern)
 
 def check_item_damage_to_repair(item_image: Optional[np.ndarray], get_item_image_function) -> Optional[bool]:
     """
@@ -290,3 +295,9 @@ def find_axe_pattern(image: np.ndarray, threshold: float = 0.92) -> Optional[Tup
 
 def find_sword_pattern(image: np.ndarray, threshold: float = 0.92) -> Optional[Tuple[Tuple[int, int], Tuple[int, int]]]:
     return find_item_pattern(image, sword_patterns, threshold, "sword")
+
+def find_obscure_matter_pattern(image: np.ndarray, threshold: float = 0.95) -> Optional[Tuple[Tuple[int, int], Tuple[int, int]]]:
+    result = find_item_pattern(image, obscure_matter_patterns, threshold, "obscure-matter")
+    if result is None:
+        result = find_item_pattern(image, obscure_matters_patterns, threshold, "obscure-matters")
+    return result

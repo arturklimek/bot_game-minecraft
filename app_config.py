@@ -11,21 +11,35 @@ PATTERNS_DIR_PATH = os.path.join(APP_PATH, 'patterns')
 game_window_name = 'Minecraft'
 
 save_images_flags = {
-    "find_chest_big_pattern": False,
-    "get_chest_big_image": False,
-    "find_chest_small_pattern": False,
-    "get_chest_small_image": False,
-    "check_and_get_chest_image": False,
+    "find_chest_big_pattern": True,
+    "get_chest_big_image": True,
+    "find_chest_small_pattern": True,
+    "get_chest_small_image": True,
+    "check_and_get_chest_image": True,
     "get_slots_chest_coordinates": False,
     "get_chest_slots_images": False,
     "find_item_pattern_in_item_image": False,
     "extract_text_from_image": False,
+    "get_item_image": True,
+    "incubators_activation": True,
 }
 
 game_latest_log_path = os.path.join('C:', os.sep, 'Users', 'Artur', 'AppData', 'Roaming', '.minecraft', 'logs', 'latest.log')
 
 def get_game_latest_log_path() -> str:
     return game_latest_log_path
+
+incubator_restore = 0
+
+def get_incubator_restore() -> int:
+    return incubator_restore
+
+incubator_list = [
+    "diamond-block"
+]
+
+def get_incubator_list() -> list:
+    return incubator_list
 
 coordinates_screen_XYZ = {
     "x1": 11,
@@ -174,6 +188,8 @@ command_home_farm = '/home farm'
 command_home_grinder = '/home mobgrinder'
 command_home_tmp = '/home tmp'
 command_sell_inventory = '/sellall inventory'
+command_incubator = '/inkubator'
+command_incubator_reset = f'{command_incubator} odnow'
 
 command_sethome = "/sethome"
 
@@ -200,6 +216,12 @@ def get_command_home_tmp() -> str:
 
 def get_command_sell_inventory() -> str:
     return command_sell_inventory
+
+def get_command_incubator() -> str:
+    return command_incubator
+
+def get_command_incubator_reset() -> str:
+    return command_incubator_reset
 
 def get_command_sethome() -> str:
     return command_sethome
@@ -252,6 +274,12 @@ sword_patterns_paths = {
     "enchanted-netherite": os.path.join(PATTERNS_DIR_PATH, f'sword_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_full_enchanted-netherite.png'),
 }
 sword_pattern_mask_path = os.path.join(PATTERNS_DIR_PATH, f'sword_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_full_mask.png')
+
+obscure_matter_patterns_paths = {
+    "obscure-matter": os.path.join(PATTERNS_DIR_PATH, f'item_obscure-matter_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}.png'),
+}
+obscure_matter_pattern_mask_path = os.path.join(PATTERNS_DIR_PATH, f'item_obscure-matter_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_mask.png')
+obscure_matters_pattern_mask_path = os.path.join(PATTERNS_DIR_PATH, f'item_obscure-matters_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_mask.png')
 
 repair_threshold = 2
 repair_mining_pickaxe_frequency = 15
@@ -512,6 +540,18 @@ items_patterns_paths = {
         "mask": os.path.join(PATTERNS_DIR_PATH,
                              f'item_gunpowder_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_mask.png')
     },
+    "oak-log": {
+        "pattern": os.path.join(PATTERNS_DIR_PATH,
+                                f'item_oak-log_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}.png'),
+        "mask": os.path.join(PATTERNS_DIR_PATH,
+                             f'item_oak-log_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_mask.png')
+    },
+    "sand": {
+        "pattern": os.path.join(PATTERNS_DIR_PATH,
+                                f'item_sand_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}.png'),
+        "mask": os.path.join(PATTERNS_DIR_PATH,
+                             f'item_sand_{pattern_settings["texture_pack"]}_EQ{pattern_settings["eq_size"]}_{pattern_settings["width"]}x{pattern_settings["height"]}_mask.png')
+    },
 }
 
 item_destruction_patterns_paths = {
@@ -673,6 +713,8 @@ def get_config_dict():
     tmp_dict["farm_coordinate_range"] = farm_coordinate_range
     tmp_dict["grinder_coordinate_range"] = grinder_coordinate_range
     tmp_dict["coordinates_problem_messages_list"] = coordinates_problem_messages_list
+    tmp_dict["incubator_restore"] = incubator_restore
+    tmp_dict["incubator_list"] = incubator_list
     return tmp_dict
 
 def set_config_from_dict(config_dict: dict) -> None:
@@ -741,6 +783,8 @@ def set_config_from_dict(config_dict: dict) -> None:
     global farm_coordinate_range
     global grinder_coordinate_range
     global coordinates_problem_messages_list
+    global incubator_restore
+    global incubator_list
     if config_dict is not None:
         # if "pattern_settings" in config_dict:
         #     pattern_settings = config_dict["pattern_settings"]
@@ -831,6 +875,10 @@ def set_config_from_dict(config_dict: dict) -> None:
             coordinates_problem_messages_list = config_dict["coordinates_problem_messages_list"]
         if "grinder_coordinate_range" in config_dict:
             grinder_coordinate_range = config_dict["grinder_coordinate_range"]
+        if "incubator_restore" in config_dict:
+            incubator_restore = config_dict["incubator_restore"]
+        if "incubator_list" in config_dict:
+            incubator_list = config_dict["incubator_list"]
         app_logger.info(f"The configuration was loaded: {config_dict}")
     else:
         app_logger.info(f"Taked config dict is None")
@@ -872,6 +920,8 @@ comments = {
     'farm_coordinate_range': f"# farm_coordinate_range - List containing dictionaries of the range of acceptable autofarm coordinates (for example, from y=-40 to y2=-20). When any of the coordinates extracted from the analysis (coordinates_screen_XYZ) is out of range then the program aborts.\n",
     'grinder_coordinate_range': f"# grinder_coordinate_range - Dict of the range of acceptable fla autogrinder coordinates (for example, from x1=-10 to x2=-12). When any of the coordinates extracted from the analysis (coordinates_screen_XYZ) is out of range then the program aborts.\n",
     'coordinates_problem_messages_list': f"# coordinates_problem_messages_list - List of messages that will be sent to the public chat in case of a problem with coordinates - an empty list will not send any message, default value '{coordinates_problem_messages_list}\n",
+    'incubator_restore': f"# incubator_restore - Determines every how many minutes the system will renew the incubator during operation (value <=0 means no incubator reset), default value '{incubator_restore}\n",
+    'incubator_list': f"# incubator_list - List of incubators (object appearance) that will be pressed, default value '{incubator_list}\n",
 }
 
 def encode_special_characters(string: str) -> str:

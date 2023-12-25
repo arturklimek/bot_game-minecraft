@@ -29,10 +29,29 @@ chest_inventory_elements = {
     "separation-frame_2": {},
 }
 
+def get_chest_inventory_elements() -> dict:
+    return chest_inventory_elements
+
+def set_chest_inventory_elements(new_chest_inventory_elements: dict):
+    global chest_inventory_elements
+    chest_inventory_elements = new_chest_inventory_elements
+
 eq_slots_amount = 9
 eq_inventory_amount = 27
 chest_big_inventory_amount = 54
 chest_small_inventory_amount = 27
+
+def get_eq_slots_amount() -> int:
+    return eq_slots_amount
+
+def get_eq_inventory_amount() -> int:
+    return eq_inventory_amount
+
+def get_chest_big_inventory_amount() -> int:
+    return chest_big_inventory_amount
+
+def get_chest_small_inventory_amount() -> int:
+    return chest_small_inventory_amount
 
 def set_dimensions(element: dict, pattern: np.ndarray) -> None:
     """

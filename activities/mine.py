@@ -15,6 +15,7 @@ from activities.chest import items_stored_procedure
 from activities.eq_bar import check_pickaxe_damage_to_repair, get_pickaxe_image, \
     get_item_slot_number, check_and_update_eq_coordinates
 from activities.equipment import check_inventory_full
+from activities.incubator import restoring_incubator_procedure
 from activities.repair import repair_item
 from app_config import get_repair_mining_pickaxe_frequency, get_hotkey_moving_up, get_hotkey_moving_left, get_hotkey_moving_right, get_hotkeys_slots, get_protected_slots, \
     set_protected_slots, get_moving_time, get_moving_hold_shift, get_coordinates_screen_XYZ_analysis_flag, get_mine_coordinate_range
@@ -453,6 +454,7 @@ def mine_procedure() -> None:
                 app_logger.debug(f"current_moving_direction was set to: {current_moving_direction}")
                 tp_to_mining_home()
                 time.sleep(1)
+            restoring_incubator_procedure()
         time.sleep(return_random_wait_interval_time())
 
 def toggle_mine_procedure() -> None:

@@ -12,6 +12,7 @@ from activities.chat import tp_to_farm_home, sellall_inventory, tp_to_spawn, set
 from activities.chest import items_stored_procedure
 from activities.eq_bar import get_item_slot_number, get_axe_image, check_axe_damage_to_repair, check_and_update_eq_coordinates
 from activities.equipment import check_inventory_full
+from activities.incubator import restoring_incubator_procedure
 from activities.mine import random_double_move_mouse
 from activities.repair import repair_item
 from app_config import get_farm_number, get_farm_floors_number, get_farm_floor_time_moving, \
@@ -361,6 +362,7 @@ def farm_procedure() -> None:
                 if make_farm(farm) is False:
                     is_running_farm_procedure= False
                     return
+                restoring_incubator_procedure()
     except Exception as ex:
         app_logger.error(ex)
 

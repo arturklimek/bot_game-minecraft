@@ -5,7 +5,8 @@ import keyboard
 from app_config import get_command_sethome, get_command_home_tmp, get_command_spawn, \
     get_command_home_repair, get_command_home_mining, get_command_home_chest, get_command_home_farm, \
     get_command_sell_inventory, get_hotkey_enter, get_hotkey_chat, get_chat_messages_flag, \
-    get_chat_messages_frequency_min, get_chat_messages, get_coordinates_problem_messages_list, get_command_home_grinder
+    get_chat_messages_frequency_min, get_chat_messages, get_coordinates_problem_messages_list, get_command_home_grinder, \
+    get_command_incubator_reset, get_command_incubator
 from delay import return_random_wait_interval_time
 from logger import app_logger
 
@@ -180,3 +181,23 @@ def send_random_message_coordinates_problem() -> None:
         tmp_message = random.choice(get_coordinates_problem_messages_list())
         if tmp_message:
             send_on_chat(tmp_message)
+
+def send_incubator_command() -> None:
+    """
+    Executes the command to open incubators menu.
+
+    This function sends a command to the game chat to open incubators menu.
+    """
+    app_logger.debug("send_incubator_command was used")
+    time.sleep(return_random_wait_interval_time())
+    send_on_chat(get_command_incubator())
+
+def send_incubator_reset_command() -> None:
+    """
+    Executes the command to incubators reset.
+
+    This function sends a command to the game chat to reset all incubators (need to have obscure matter in hand).
+    """
+    app_logger.debug("send_incubator_reset_command was used")
+    time.sleep(return_random_wait_interval_time())
+    send_on_chat(get_command_incubator_reset())

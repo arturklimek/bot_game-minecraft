@@ -27,6 +27,18 @@ game_latest_log_path = os.path.join('C:', os.sep, 'Users', 'Artur', 'AppData', '
 def get_game_latest_log_path() -> str:
     return game_latest_log_path
 
+incubator_restore_flag = 0
+
+def get_incubator_restore_flag() -> int:
+    return incubator_restore_flag
+
+incubator_list = [
+    "diamind-block"
+]
+
+def get_incubator_list() -> list:
+    return incubator_list
+
 coordinates_screen_XYZ = {
     "x1": 11,
     "y1": 304,
@@ -679,6 +691,8 @@ def get_config_dict():
     tmp_dict["farm_coordinate_range"] = farm_coordinate_range
     tmp_dict["grinder_coordinate_range"] = grinder_coordinate_range
     tmp_dict["coordinates_problem_messages_list"] = coordinates_problem_messages_list
+    tmp_dict["incubator_restore_flag"] = incubator_restore_flag
+    tmp_dict["incubator_list"] = incubator_list
     return tmp_dict
 
 def set_config_from_dict(config_dict: dict) -> None:
@@ -747,6 +761,8 @@ def set_config_from_dict(config_dict: dict) -> None:
     global farm_coordinate_range
     global grinder_coordinate_range
     global coordinates_problem_messages_list
+    global incubator_restore_flag
+    global incubator_list
     if config_dict is not None:
         # if "pattern_settings" in config_dict:
         #     pattern_settings = config_dict["pattern_settings"]
@@ -837,6 +853,10 @@ def set_config_from_dict(config_dict: dict) -> None:
             coordinates_problem_messages_list = config_dict["coordinates_problem_messages_list"]
         if "grinder_coordinate_range" in config_dict:
             grinder_coordinate_range = config_dict["grinder_coordinate_range"]
+        if "incubator_restore_flag" in config_dict:
+            incubator_restore_flag = config_dict["incubator_restore_flag"]
+        if "incubator_list" in config_dict:
+            incubator_list = config_dict["incubator_list"]
         app_logger.info(f"The configuration was loaded: {config_dict}")
     else:
         app_logger.info(f"Taked config dict is None")
@@ -878,6 +898,8 @@ comments = {
     'farm_coordinate_range': f"# farm_coordinate_range - List containing dictionaries of the range of acceptable autofarm coordinates (for example, from y=-40 to y2=-20). When any of the coordinates extracted from the analysis (coordinates_screen_XYZ) is out of range then the program aborts.\n",
     'grinder_coordinate_range': f"# grinder_coordinate_range - Dict of the range of acceptable fla autogrinder coordinates (for example, from x1=-10 to x2=-12). When any of the coordinates extracted from the analysis (coordinates_screen_XYZ) is out of range then the program aborts.\n",
     'coordinates_problem_messages_list': f"# coordinates_problem_messages_list - List of messages that will be sent to the public chat in case of a problem with coordinates - an empty list will not send any message, default value '{coordinates_problem_messages_list}\n",
+    'incubator_restore_flag': f"# incubator_restore_flag - Determines every how many minutes the system will renew the incubator during operation (value <=0 means no incubator reset), default value '{incubator_restore_flag}\n",
+    'incubator_list': f"# incubator_list - List of incubators (object appearance) that will be pressed, default value '{incubator_list}\n",
 }
 
 def encode_special_characters(string: str) -> str:

@@ -11,17 +11,17 @@ PATTERNS_DIR_PATH = os.path.join(APP_PATH, 'patterns')
 game_window_name = 'Minecraft'
 
 save_images_flags = {
-    "find_chest_big_pattern": True,
-    "get_chest_big_image": True,
-    "find_chest_small_pattern": True,
-    "get_chest_small_image": True,
-    "check_and_get_chest_image": True,
+    "find_chest_big_pattern": False,
+    "get_chest_big_image": False,
+    "find_chest_small_pattern": False,
+    "get_chest_small_image": False,
+    "check_and_get_chest_image": False,
     "get_slots_chest_coordinates": False,
     "get_chest_slots_images": False,
     "find_item_pattern_in_item_image": False,
     "extract_text_from_image": False,
-    "get_item_image": True,
-    "incubators_activation": True,
+    "get_item_image": False,
+    "incubators_activation": False,
 }
 
 game_latest_log_path = os.path.join('C:', os.sep, 'Users', 'Artur', 'AppData', 'Roaming', '.minecraft', 'logs', 'latest.log')

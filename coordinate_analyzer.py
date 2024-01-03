@@ -81,7 +81,8 @@ def extract_text_from_image(image: Optional[np.ndarray] = None, coordinates: dic
                          decoder = 'beamsearch',
                          contrast_ths=contrast_ths,
                          adjust_contrast=adjust_contrast,
-                         add_margin=add_margin)
+                         add_margin=add_margin,
+                         allowlist ='0123456789.XYZxyz:-~')
         extracted_text = ''
         for text in results:
             extracted_text = extracted_text + " " + text

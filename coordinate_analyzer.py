@@ -120,6 +120,8 @@ def coordinates_analyzer_loop_XYZ() -> None:
             app_logger.debug(f"After replace '~' to '-' in output_str: {output_str}")
             output_str = output_str.replace('/', ' ')
             app_logger.debug(f"After replace '/', ' ' in output_str: {output_str}")
+            output_str = output_str.replace(':', ' ')
+            app_logger.debug(f"After replace ':', ' ' in output_str: {output_str}")
             output_str = re.sub("\s\s+", " ", output_str)
             output_list = [item for item in output_str.split(" ") if item]
             app_logger.debug(f"output_list: {output_list}")

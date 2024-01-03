@@ -92,7 +92,7 @@ def grind_procedure() -> bool:
         app_logger.debug(f"Pressing 'shift'")
         keyboard.press("shift")
         keyboard.press(get_hotkey_moving_up())
-        time.sleep(0.8)
+        time.sleep(1)
         keyboard.release(get_hotkey_moving_up())
         app_logger.debug(f"Release 'shift'")
         keyboard.release("shift")
@@ -109,6 +109,9 @@ def grind_procedure() -> bool:
             keyboard.press_and_release(get_hotkeys_slots()[get_sword_slot()])
             for iteration in range(attacks_number_in_iteration):
                 pyautogui.click(button='left')
+                if not get_is_running_grind_procedure():
+                    app_logger.debug("is not is_running_grind_procedure - return False")
+                    return False
                 if not check_and_reply_messages():
                     app_logger.debug("not check_and_reply_messages() - return False")
                     return False

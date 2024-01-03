@@ -35,6 +35,7 @@ def convert_to_float(string_value: str) -> float:
     Returns:
         float: The converted float value if the conversion is successful, or None if an error occurs.
     """
+    app_logger.debug(f"convert_to_float string_value: {string_value}")
     try:
         return float(string_value)
     except ValueError:
@@ -56,9 +57,9 @@ def extract_text_from_image(image: Optional[np.ndarray] = None, coordinates: dic
     app_logger.debug(f"print(torch.__version__): {torch.__version__}")
 
     reader = easyocr.Reader(['en'])
-    contrast_ths = 0.5
-    adjust_contrast = 1.5
-    add_margin = 0.05
+    contrast_ths = 0.6
+    adjust_contrast = 1.75
+    add_margin = 0.1
     try:
         if image is None:
             app_logger.warning("Taked image is None - exit the function")
@@ -113,8 +114,11 @@ def coordinates_analyzer_loop_XYZ() -> None:
         if image is not None:
             app_logger.debug(f"Used coordinates: {coordinates}")
             output_str = extract_text_from_image(image, coordinates)
-            output_str.replace('~', '-')
-            output_str.replace('/', ' ')
+            app_logger.debug(f"output_str: {output_str}")
+            output_str = output_str.replace('~', '-')
+            app_logger.debug(f"After replace '~' to '-' in output_str: {output_str}")
+            output_str = output_str.replace('/', ' ')
+            app_logger.debug(f"After replace '/', ' ' in output_str: {output_str}")
             output_str = re.sub("\s\s+", " ", output_str)
             output_list = [item for item in output_str.split(" ") if item]
             app_logger.debug(f"output_list: {output_list}")

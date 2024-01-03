@@ -57,7 +57,7 @@ def extract_text_from_image(image: Optional[np.ndarray] = None, coordinates: dic
     app_logger.debug(f"print(torch.__version__): {torch.__version__}")
 
     reader = easyocr.Reader(['en'])
-    contrast_ths = 0.6
+    contrast_ths = 0.625
     adjust_contrast = 1.75
     add_margin = 0.1
     try:
